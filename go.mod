@@ -4,7 +4,7 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/air-gases/cacheman v0.5.0
 	github.com/air-gases/defibrillator v0.10.0
-	github.com/air-gases/limiter v0.10.0 // indirect
+	github.com/air-gases/limiter v0.10.0
 	github.com/air-gases/logger v0.10.0
 	github.com/air-gases/redirector v0.10.0
 	github.com/aofei/air v0.10.0

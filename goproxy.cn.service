@@ -1,0 +1,15 @@
+[Unit]
+Description=A trusted Go module proxy located in China.
+After=network.target
+
+[Service]
+WorkingDirectory=/usr/local/lib/goproxy.cn
+ExecStart=/usr/local/bin/goproxy.cn --config=/usr/local/etc/goproxy.cn-config.toml
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=goproxy.cn
+KillSignal=SIGINT
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
