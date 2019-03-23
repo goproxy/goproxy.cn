@@ -2,6 +2,15 @@
 
 A trusted Go module proxy located in China.
 
+This project has fully implemented the Go's
+[module proxy protocol](https://golang.org/cmd/go/#hdr-Module_proxy_protocol).
+And it's a non-profit project that will (when it is fully tested) run on China's
+well-trusted cloud service provider [Qiniu Cloud](https://www.qiniu.com). The
+goal of this project is to provide a free, trusted, always on, and CDNed Go
+module proxy for Gophers in China and around the world.
+
+Happy coding, Gophers! ;-)
+
 ## Usage
 
 ### macOS or Linux
