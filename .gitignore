@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# Vim
+*.swo
+*.swp
+
+# Bin
+goproxy.cn
