@@ -1,0 +1,22 @@
+# Air
+[air]
+app_name = "goproxy-china"
+debug_mode = true
+address = "localhost:8080"
+minifier_enabled = true
+gzip_enabled = true
+coffer_enabled = true
+i18n_enabled = true
+
+# Zerolog
+[zerolog]
+logger_level = "debug"
+
+# Goproxy
+[goproxy]
+go_bin_name = "go"
+max_local_cache_bytes = 8589934592 # 8 GB
+qiniu_access_key = "<QINIU_ACCESS_KEY>"
+qiniu_secret_key = "<QINIU_secret_KEY>"
+qiniu_storage_bucket = "<QINIU_STORAGE_BUCKET>"
+qiniu_storage_bucket_access_endpoint = "<QINIU_STORAGE_BUCKET_ACCESS_ENDPOINT>"
