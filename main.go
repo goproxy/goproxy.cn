@@ -58,11 +58,16 @@ func errorHandler(err error, req *air.Request, res *air.Response) {
 		return
 	}
 
+	m := ""
 	if !req.Air.DebugMode && res.Status == http.StatusInternalServerError {
-		res.WriteString(http.StatusText(res.Status))
+		m = http.StatusText(res.Status)
 	} else {
-		res.WriteString(err.Error())
+		m = err.Error()
 	}
+
+	res.WriteJSON(map[string]interface{}{
+		"Error": m,
+	})
 }
 
 // errorLogWriter is an error log writer.
