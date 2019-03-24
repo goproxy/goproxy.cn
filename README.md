@@ -34,7 +34,7 @@ done.
 Open your PowerShell and execute
 
 ```poweshell
-> $env:GOPROXY = "https://goproxy.cn" # Temporary
+C:\> $env:GOPROXY = "https://goproxy.cn" # Temporary
 ```
 
 or

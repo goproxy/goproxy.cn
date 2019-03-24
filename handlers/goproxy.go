@@ -145,12 +145,13 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 	}
 
 	var (
+		escapedModulePath = filenameParts[0]
 		modulePathBuilder strings.Builder
 		bang              bool
 	)
 
-	modulePathBuilder.Grow(len(filenameParts[0]))
-	for _, b := range filenameParts[0] {
+	modulePathBuilder.Grow(len(escapedModulePath))
+	for _, b := range escapedModulePath {
 		if b == '!' {
 			bang = true
 			continue
@@ -208,7 +209,9 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 			return err
 		}
 
-		infoFilename := path.Join(modulePath, "@v", path.Base(mdr.Info))
+		director := path.Join(escapedModulePath, "@v")
+
+		infoFilename := path.Join(director, path.Base(mdr.Info))
 		infoFileInfo, err := qiniuStorageBucketManager.Stat(
 			cfg.Goproxy.QiniuStorageBucket,
 			infoFilename,
@@ -225,7 +228,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 			return err
 		}
 
-		modFilename := path.Join(modulePath, "@v", path.Base(mdr.GoMod))
+		modFilename := path.Join(director, path.Base(mdr.GoMod))
 		modFileInfo, err := qiniuStorageBucketManager.Stat(
 			cfg.Goproxy.QiniuStorageBucket,
 			modFilename,
@@ -242,7 +245,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 			return err
 		}
 
-		zipFilename := path.Join(modulePath, "@v", path.Base(mdr.Zip))
+		zipFilename := path.Join(director, path.Base(mdr.Zip))
 		zipFileInfo, err := qiniuStorageBucketManager.Stat(
 			cfg.Goproxy.QiniuStorageBucket,
 			zipFilename,
@@ -306,8 +309,14 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 		base64.StdEncoding.EncodeToString(eTag),
 	))
 
-	filePutTime := storage.ParsePutTime(fileInfo.PutTime)
-	res.Header.Set("Last-Modified", filePutTime.Format(http.TimeFormat))
+	res.Header.Set(
+		"Last-Modified",
+		storage.ParsePutTime(fileInfo.PutTime).Format(http.TimeFormat),
+	)
+
+	if path.Base(filename) == path.Base(req.Path) {
+		res.Header.Set("Cache-Control", "max-age=31536000")
+	}
 
 	_, err = io.Copy(res.Body, fileRes.Body)
 
