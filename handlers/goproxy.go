@@ -254,7 +254,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 			if err := uploadFile(
 				zipFilename,
 				mdr.Zip,
-				"application/zip; charset=utf-8",
+				"application/zip",
 			); err != nil {
 				return err
 			}
