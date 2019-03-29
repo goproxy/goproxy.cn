@@ -138,20 +138,14 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 	localCacheWaitGroup.Add(1)
 	defer localCacheWaitGroup.Done()
 
-	filename := req.Param("*").Value().String()
-	filenameParts := strings.Split(filename, "/@")
-	if len(filenameParts) != 2 {
-		return a.NotFoundHandler(req, res)
-	}
-
 	var (
-		escapedModulePath = filenameParts[0]
-		modulePathBuilder strings.Builder
-		bang              bool
+		encodedFilename = req.Param("*").Value().String()
+		filenameBuilder strings.Builder
+		bang            bool
 	)
 
-	modulePathBuilder.Grow(len(escapedModulePath))
-	for _, r := range escapedModulePath {
+	filenameBuilder.Grow(len(encodedFilename))
+	for _, r := range encodedFilename {
 		if r >= 'A' && r <= 'Z' {
 			return a.NotFoundHandler(req, res)
 		}
@@ -166,14 +160,20 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 			if r >= 'a' && r <= 'z' {
 				r -= 'a' - 'A' // To upper
 			} else {
-				modulePathBuilder.WriteByte('!')
+				filenameBuilder.WriteByte('!')
 			}
 		}
 
-		modulePathBuilder.WriteRune(r)
+		filenameBuilder.WriteRune(r)
 	}
 
-	modulePath := modulePathBuilder.String()
+	filename := filenameBuilder.String()
+	filenameParts := strings.Split(filename, "/@")
+	if len(filenameParts) != 2 {
+		return a.NotFoundHandler(req, res)
+	}
+
+	modulePath := filenameParts[0]
 
 	switch filenameParts[1] {
 	case "v/list", "latest":
@@ -213,7 +213,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 			return err
 		}
 
-		director := path.Join(escapedModulePath, "@v")
+		director := path.Join(modulePath, "@v")
 
 		infoFilename := path.Join(director, path.Base(mdr.Info))
 		infoFileInfo, err := qiniuStorageBucketManager.Stat(
