@@ -151,22 +151,26 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 	)
 
 	modulePathBuilder.Grow(len(escapedModulePath))
-	for _, b := range escapedModulePath {
-		if b == '!' {
+	for _, r := range escapedModulePath {
+		if r >= 'A' && r <= 'Z' {
+			return a.NotFoundHandler(req, res)
+		}
+
+		if r == '!' {
 			bang = true
 			continue
 		}
 
 		if bang {
 			bang = false
-			if b >= 'a' && b <= 'z' {
-				b -= ' ' // To upper
+			if r >= 'a' && r <= 'z' {
+				r -= 'a' - 'A' // To upper
 			} else {
 				modulePathBuilder.WriteByte('!')
 			}
 		}
 
-		modulePathBuilder.WriteRune(b)
+		modulePathBuilder.WriteRune(r)
 	}
 
 	modulePath := modulePathBuilder.String()
