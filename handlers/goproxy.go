@@ -216,77 +216,48 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 		director := path.Join(modulePath, "@v")
 
 		infoFilename := path.Join(director, path.Base(mdr.Info))
-		infoFileInfo, err := qiniuStorageBucketManager.Stat(
-			cfg.Goproxy.QiniuStorageBucket,
+		if err := uploadFile(
 			infoFilename,
-		)
-		if isFileNotExist(err) {
-			if err := uploadFile(
-				infoFilename,
-				mdr.Info,
-				"application/json; charset=utf-8",
-			); err != nil {
-				return err
-			}
-		} else if err != nil {
+			mdr.Info,
+			"application/json; charset=utf-8",
+		); err != nil {
 			return err
 		}
 
 		modFilename := path.Join(director, path.Base(mdr.GoMod))
-		modFileInfo, err := qiniuStorageBucketManager.Stat(
-			cfg.Goproxy.QiniuStorageBucket,
+		if err := uploadFile(
 			modFilename,
-		)
-		if isFileNotExist(err) {
-			if err := uploadFile(
-				modFilename,
-				mdr.GoMod,
-				"text/plain; charset=utf-8",
-			); err != nil {
-				return err
-			}
-		} else if err != nil {
+			mdr.GoMod,
+			"text/plain; charset=utf-8",
+		); err != nil {
 			return err
 		}
 
 		zipFilename := path.Join(director, path.Base(mdr.Zip))
-		zipFileInfo, err := qiniuStorageBucketManager.Stat(
-			cfg.Goproxy.QiniuStorageBucket,
+		if err := uploadFile(
 			zipFilename,
-		)
-		if isFileNotExist(err) {
-			if err := uploadFile(
-				zipFilename,
-				mdr.Zip,
-				"application/zip",
-			); err != nil {
-				return err
-			}
-		} else if err != nil {
+			mdr.Zip,
+			"application/zip",
+		); err != nil {
 			return err
 		}
 
 		switch filenameExt {
 		case path.Ext(mdr.Info):
 			filename = infoFilename
-			fileInfo = infoFileInfo
 		case path.Ext(mdr.GoMod):
 			filename = modFilename
-			fileInfo = modFileInfo
 		case path.Ext(mdr.Zip):
 			filename = zipFilename
-			fileInfo = zipFileInfo
 		default:
 			return a.NotFoundHandler(req, res)
 		}
 
-		if fileInfo.Hash == "" {
-			if fileInfo, err = qiniuStorageBucketManager.Stat(
-				cfg.Goproxy.QiniuStorageBucket,
-				filename,
-			); err != nil {
-				return err
-			}
+		if fileInfo, err = qiniuStorageBucketManager.Stat(
+			cfg.Goproxy.QiniuStorageBucket,
+			filename,
+		); err != nil {
+			return err
 		}
 	} else if err != nil {
 		return err
