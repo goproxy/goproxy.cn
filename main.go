@@ -48,7 +48,10 @@ func main() {
 	}()
 
 	<-shutdownChan
-	ctx, _ := context.WithTimeout(context.Background(), time.Minute)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+
 	a.Shutdown(ctx)
 }
 
