@@ -21,8 +21,8 @@ import (
 
 	"github.com/air-gases/cacheman"
 	"github.com/aofei/air"
-	"github.com/aofei/goproxy.cn/cfg"
 	"github.com/cespare/xxhash/v2"
+	"github.com/goproxy/goproxy.cn/cfg"
 	"github.com/qiniu/api.v7/auth/qbox"
 	"github.com/qiniu/api.v7/storage"
 	"github.com/rs/zerolog/log"

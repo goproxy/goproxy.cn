@@ -55,13 +55,13 @@ done.
 ## Community
 
 If you want to discuss this project, or ask questions about it, simply post
-questions or ideas [here](https://github.com/aofei/goproxy.cn/issues).
+questions or ideas [here](https://github.com/goproxy/goproxy.cn/issues).
 
 ## Contributing
 
 If you want to help build this project, simply follow
-[this](https://github.com/aofei/goproxy.cn/wiki/Contributing) to send pull
-requests [here](https://github.com/aofei/goproxy.cn/pulls).
+[this](https://github.com/goproxy/goproxy.cn/wiki/Contributing) to send pull
+requests [here](https://github.com/goproxy/goproxy.cn/pulls).
 
 ## License
 

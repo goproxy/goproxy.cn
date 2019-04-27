@@ -1,4 +1,4 @@
-module github.com/aofei/goproxy.cn
+module github.com/goproxy/goproxy.cn
 
 require (
 	github.com/BurntSushi/toml v0.3.1
