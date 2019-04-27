@@ -18,7 +18,7 @@ Happy coding, Gophers! ;-)
 Open your terminal and execute
 
 ```bash
-$ export GOPROXY=https://goproxy.cn # Temporary
+$ export GOPROXY=https://goproxy.cn
 ```
 
 or
@@ -34,7 +34,7 @@ done.
 Open your PowerShell and execute
 
 ```poweshell
-C:\> $env:GOPROXY = "https://goproxy.cn" # Temporary
+C:\> $env:GOPROXY = "https://goproxy.cn"
 ```
 
 or
