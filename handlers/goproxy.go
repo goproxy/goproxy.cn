@@ -36,6 +36,15 @@ var (
 	qiniuStorageConfig        *storage.Config
 	qiniuStorageBucketManager *storage.BucketManager
 
+	invalidModOutputKeywords = []string{
+		"could not read Username",
+		"invalid",
+		"malformed",
+		"no matching",
+		"unknown",
+		"unrecognized",
+	}
+
 	errModuleNotFound = errors.New("module not found")
 )
 
@@ -321,14 +330,12 @@ func modList(modulePath string) (*modListResult, error) {
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 	if err := cmd.Run(); err != nil {
-		errMsg := fmt.Sprint(stdout.String(), stderr.String())
-		if strings.Contains(errMsg, "malformed module path") ||
-			strings.Contains(errMsg, "invalid version") ||
-			strings.Contains(errMsg, "unknown revision") {
+		output := fmt.Sprint(stdout.String(), stderr.String())
+		if invalidModOutput(output) {
 			return nil, errModuleNotFound
 		}
 
-		return nil, err
+		return nil, fmt.Errorf("modList: %v: %s", err, output)
 	}
 
 	mlr := &modListResult{}
@@ -361,14 +368,12 @@ func modDownload(modulePath, moduleVersion string) (*modDownloadResult, error) {
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 	if err := cmd.Run(); err != nil {
-		errMsg := fmt.Sprint(stdout.String(), stderr.String())
-		if strings.Contains(errMsg, "malformed module path") ||
-			strings.Contains(errMsg, "invalid version") ||
-			strings.Contains(errMsg, "unknown revision") {
+		output := fmt.Sprint(stdout.String(), stderr.String())
+		if invalidModOutput(output) {
 			return nil, errModuleNotFound
 		}
 
-		return nil, err
+		return nil, fmt.Errorf("modDownload: %v: %s", err, output)
 	}
 
 	mdr := &modDownloadResult{}
@@ -377,6 +382,17 @@ func modDownload(modulePath, moduleVersion string) (*modDownloadResult, error) {
 	}
 
 	return mdr, nil
+}
+
+// invalidModOutput reports whether the mo is a invalid mod output.
+func invalidModOutput(mo string) bool {
+	for _, k := range invalidModOutputKeywords {
+		if strings.Contains(mo, k) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // isFileNotExist reports whether the err indicates that some file does not
