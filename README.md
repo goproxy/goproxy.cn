@@ -11,6 +11,9 @@ module proxy for Gophers in China and around the world.
 
 Happy coding, Gophers! ;-)
 
+**Note that whether this project will be officially released depends on how Go
+team will solve the https://github.com/golang/go/issues/31755.**
+
 ## Usage
 
 ### macOS or Linux
