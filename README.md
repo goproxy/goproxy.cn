@@ -19,14 +19,13 @@ A: Due to the Chinese government's network supervision system, there are lot of
 modules in the Go ecosystem that Chinese Gophers cannot `go get`, such as the
 most famous `golang.org/x/...`. And the speed of getting modules from GitHub in
 the mainland of China is a bit slow. So I created this project to make Gophers
-in China better use Go modules. In fact, since the `goproxy.cn` has beend CDNed,
+in China better use Go modules. In fact, since the `goproxy.cn` will be CDNed,
 Gophers in other countries can also use it.
 
 **Q: Is this project legal in China?**
 
 A: The `goproxy.cn` will be a business-supported project rather than a personal
-project. This means that the `goproxy.cn` will be **fully legal** in China and
-we will try our best to spread it.
+project. This means that `goproxy.cn` will be **fully legal** in China.
 
 **Q: Why not use the `proxy.golang.org`?**
 
