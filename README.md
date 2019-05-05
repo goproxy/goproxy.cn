@@ -1,6 +1,6 @@
 # Goproxy China
 
-A trusted Go module proxy located in China.
+The most trusted Go module proxy in China.
 
 Goproxy China has fully implemented the Go's
 [module proxy protocol](https://golang.org/cmd/go/#hdr-Module_proxy_protocol).
@@ -20,17 +20,18 @@ modules in the Go ecosystem that Chinese Gophers cannot `go get`, such as the
 most famous `golang.org/x/...`. And the speed of getting modules from GitHub in
 the mainland of China is a bit slow. So we created Goproxy China to make Gophers
 in China better use Go modules. In fact, since the
-[https://goproxy.cn](https://goproxy.cn) will be CDNed, Gophers in other
-countries can also use it.
+[goproxy.cn](https://goproxy.cn) will be CDNed, Gophers in other countries can
+also use it.
 
 **Q: Is Goproxy China legal in China?**
 
 A: The Goproxy China will be a business-supported project rather than a personal
-project. This means that Goproxy China will be **fully legal** in China.
+project. This means that it will be **fully legal** in China.
 
-**Q: Why not use the `proxy.golang.org`?**
+**Q: Why not use the [proxy.golang.org](https://proxy.golang.org)?**
 
-A: The `proxy.golang.org` has been blocked in the mainland of China. So, no.
+A: The [proxy.golang.org](https://proxy.golang.org) has been blocked in the
+mainland of China. So, no.
 
 ## Usage
 
