@@ -186,7 +186,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 
 	switch filenameParts[1] {
 	case "v/list", "latest":
-		mlo, err := modList(modulePath)
+		mlo, err := modList(req.Context, modulePath)
 		if err != nil {
 			if err == errModuleNotFound {
 				return a.NotFoundHandler(req, res)
@@ -213,7 +213,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 		filenameExt := path.Ext(filenameBase)
 		moduleVersion := strings.TrimSuffix(filenameBase, filenameExt)
 
-		mdr, err := modDownload(modulePath, moduleVersion)
+		mdr, err := modDownload(req.Context, modulePath, moduleVersion)
 		if err != nil {
 			if err == errModuleNotFound {
 				return a.NotFoundHandler(req, res)
@@ -226,6 +226,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 
 		infoFilename := path.Join(director, path.Base(mdr.Info))
 		if err := uploadFile(
+			req.Context,
 			infoFilename,
 			mdr.Info,
 			"application/json; charset=utf-8",
@@ -235,6 +236,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 
 		modFilename := path.Join(director, path.Base(mdr.GoMod))
 		if err := uploadFile(
+			req.Context,
 			modFilename,
 			mdr.GoMod,
 			"text/plain; charset=utf-8",
@@ -244,6 +246,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 
 		zipFilename := path.Join(director, path.Base(mdr.Zip))
 		if err := uploadFile(
+			req.Context,
 			zipFilename,
 			mdr.Zip,
 			"application/zip",
@@ -272,12 +275,23 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 		return err
 	}
 
-	fileRes, err := http.Get(storage.MakePrivateURL(
-		qiniuMac,
-		cfg.Goproxy.QiniuStorageBucketAccessEndpoint,
-		filename,
-		time.Now().Add(time.Hour).Unix(),
-	))
+	fileReq, err := http.NewRequest(
+		http.MethodGet,
+		storage.MakePrivateURL(
+			qiniuMac,
+			cfg.Goproxy.QiniuStorageBucketAccessEndpoint,
+			filename,
+			time.Now().Add(time.Hour).Unix(),
+		),
+		nil,
+	)
+	if err != nil {
+		return err
+	}
+
+	fileReq = fileReq.WithContext(req.Context)
+
+	fileRes, err := http.DefaultClient.Do(fileReq)
 	if err != nil {
 		return err
 	}
@@ -316,8 +330,9 @@ type modListResult struct {
 }
 
 // modList executes `go list -json -m -versions modulePath@latest`.
-func modList(modulePath string) (*modListResult, error) {
-	cmd := exec.Command(
+func modList(ctx context.Context, modulePath string) (*modListResult, error) {
+	cmd := exec.CommandContext(
+		ctx,
 		cfg.Goproxy.GoBinName,
 		"list",
 		"-json",
@@ -355,8 +370,13 @@ type modDownloadResult struct {
 }
 
 // modDownload executes `go mod download -json modulePath@moduleVersion`.
-func modDownload(modulePath, moduleVersion string) (*modDownloadResult, error) {
-	cmd := exec.Command(
+func modDownload(
+	ctx context.Context,
+	modulePath string,
+	moduleVersion string,
+) (*modDownloadResult, error) {
+	cmd := exec.CommandContext(
+		ctx,
 		cfg.Goproxy.GoBinName,
 		"mod",
 		"download",
@@ -403,9 +423,14 @@ func isFileNotExist(err error) bool {
 
 // uploadFile uploads the localFilename as the contentType to the Qiniu storage
 // bucket. The filename is the new name in the Qiniu storage bucket.
-func uploadFile(filename, localFilename, contentType string) error {
+func uploadFile(
+	ctx context.Context,
+	filename string,
+	localFilename string,
+	contentType string,
+) error {
 	return storage.NewFormUploader(qiniuStorageConfig).PutFile(
-		context.Background(),
+		ctx,
 		nil,
 		(&storage.PutPolicy{
 			Scope: fmt.Sprintf(
