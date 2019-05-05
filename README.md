@@ -2,30 +2,31 @@
 
 A trusted Go module proxy located in China.
 
-This project has fully implemented the Go's
+Goproxy China has fully implemented the Go's
 [module proxy protocol](https://golang.org/cmd/go/#hdr-Module_proxy_protocol).
 And it's a non-profit project that will (when it is fully tested) run on China's
-well-trusted cloud service provider [Qiniu Cloud](https://www.qiniu.com). The
-goal of this project is to provide a free, trusted, always on, and CDNed Go
-module proxy for Gophers in China and around the world.
+well-trusted cloud service provider [Qiniu Cloud](https://www.qiniu.com). Our
+goal is to provide a free, trusted, always on, and CDNed Go module proxy for
+Gophers in China and the rest of the world.
 
 Happy coding, Gophers! ;-)
 
 ## FAQ
 
-**Q: Why create this project?**
+**Q: Why create Goproxy China?**
 
 A: Due to the Chinese government's network supervision system, there are lot of
 modules in the Go ecosystem that Chinese Gophers cannot `go get`, such as the
 most famous `golang.org/x/...`. And the speed of getting modules from GitHub in
-the mainland of China is a bit slow. So I created this project to make Gophers
-in China better use Go modules. In fact, since the `goproxy.cn` will be CDNed,
-Gophers in other countries can also use it.
+the mainland of China is a bit slow. So we created Goproxy China to make Gophers
+in China better use Go modules. In fact, since the
+[https://goproxy.cn](https://goproxy.cn) will be CDNed, Gophers in other
+countries can also use it.
 
-**Q: Is this project legal in China?**
+**Q: Is Goproxy China legal in China?**
 
-A: The `goproxy.cn` will be a business-supported project rather than a personal
-project. This means that `goproxy.cn` will be **fully legal** in China.
+A: The Goproxy China will be a business-supported project rather than a personal
+project. This means that Goproxy China will be **fully legal** in China.
 
 **Q: Why not use the `proxy.golang.org`?**
 
@@ -74,12 +75,12 @@ done.
 
 ## Community
 
-If you want to discuss this project, or ask questions about it, simply post
+If you want to discuss Goproxy China, or ask questions about it, simply post
 questions or ideas [here](https://github.com/goproxy/goproxy.cn/issues).
 
 ## Contributing
 
-If you want to help build this project, simply follow
+If you want to help build Goproxy China, simply follow
 [this](https://github.com/goproxy/goproxy.cn/wiki/Contributing) to send pull
 requests [here](https://github.com/goproxy/goproxy.cn/pulls).
 
