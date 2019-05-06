@@ -41,6 +41,7 @@ var (
 		"invalid",
 		"malformed",
 		"no matching",
+		"not found",
 		"unknown",
 		"unrecognized",
 	}
