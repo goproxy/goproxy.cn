@@ -37,7 +37,7 @@ var (
 	qiniuStorageBucketManager *storage.BucketManager
 
 	invalidModOutputKeywords = []string{
-		"could not read Username",
+		"could not read username",
 		"invalid",
 		"malformed",
 		"no matching",
@@ -407,6 +407,7 @@ func modDownload(
 
 // invalidModOutput reports whether the mo is a invalid mod output.
 func invalidModOutput(mo string) bool {
+	mo = strings.ToLower(mo)
 	for _, k := range invalidModOutputKeywords {
 		if strings.Contains(mo, k) {
 			return true
