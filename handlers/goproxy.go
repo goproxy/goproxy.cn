@@ -166,7 +166,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 
 	switch filenameParts[1] {
 	case "v/list", "latest":
-		mlo, err := modList(req.Context, modulePath)
+		mlr, err := modList(req.Context, modulePath)
 		if err != nil {
 			if err == errModuleNotFound {
 				return a.NotFoundHandler(req, res)
@@ -177,10 +177,10 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 
 		switch filenameParts[1] {
 		case "v/list":
-			return res.WriteString(strings.Join(mlo.Versions, "\n"))
+			return res.WriteString(strings.Join(mlr.Versions, "\n"))
 		case "latest":
-			mlo.Versions = nil // No need
-			return res.WriteJSON(mlo)
+			mlr.Versions = nil // No need
+			return res.WriteJSON(mlr)
 		}
 	}
 
@@ -410,13 +410,13 @@ func modDownload(
 		return nil, err
 	}
 
-	filePrefix := path.Join(
+	filenamePrefix := path.Join(
 		encodeModulePathOrVersion(modulePath),
 		"@v",
 		encodeModulePathOrVersion(moduleVersion),
 	)
 
-	infoFilename := fmt.Sprint(filePrefix, ".info")
+	infoFilename := fmt.Sprint(filenamePrefix, ".info")
 	if err := uploadFile(
 		ctx,
 		infoFilename,
@@ -426,7 +426,7 @@ func modDownload(
 		return nil, err
 	}
 
-	modFilename := fmt.Sprint(filePrefix, ".mod")
+	modFilename := fmt.Sprint(filenamePrefix, ".mod")
 	if err := uploadFile(
 		ctx,
 		modFilename,
@@ -436,7 +436,7 @@ func modDownload(
 		return nil, err
 	}
 
-	zipFilename := fmt.Sprint(filePrefix, ".zip")
+	zipFilename := fmt.Sprint(filenamePrefix, ".zip")
 	if err := uploadFile(
 		ctx,
 		zipFilename,
