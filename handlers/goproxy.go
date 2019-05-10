@@ -191,6 +191,11 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 	if isFileNotExist(err) {
 		filenameBase := path.Base(filenameParts[1])
 		filenameExt := path.Ext(filenameBase)
+		switch filenameExt {
+		case ".info", ".mod", ".zip":
+		default:
+			return a.NotFoundHandler(req, res)
+		}
 
 		encodedModuleVersion := strings.TrimSuffix(
 			filenameBase,
@@ -201,51 +206,13 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 			return a.NotFoundHandler(req, res)
 		}
 
-		mdr, err := modDownload(req.Context, modulePath, moduleVersion)
+		_, err := modDownload(req.Context, modulePath, moduleVersion)
 		if err != nil {
 			if err == errModuleNotFound {
 				return a.NotFoundHandler(req, res)
 			}
 
 			return err
-		}
-
-		directory := path.Join(encodedModulePath, "@v")
-
-		infoFilename := path.Join(directory, filepath.Base(mdr.Info))
-		if err := uploadFile(
-			req.Context,
-			infoFilename,
-			mdr.Info,
-			"application/json; charset=utf-8",
-		); err != nil {
-			return err
-		}
-
-		modFilename := path.Join(directory, filepath.Base(mdr.GoMod))
-		if err := uploadFile(
-			req.Context,
-			modFilename,
-			mdr.GoMod,
-			"text/plain; charset=utf-8",
-		); err != nil {
-			return err
-		}
-
-		zipFilename := path.Join(directory, filepath.Base(mdr.Zip))
-		if err := uploadFile(
-			req.Context,
-			zipFilename,
-			mdr.Zip,
-			"application/zip",
-		); err != nil {
-			return err
-		}
-
-		switch filenameExt {
-		case ".info", ".mod", ".zip":
-		default:
-			return a.NotFoundHandler(req, res)
 		}
 
 		if fileInfo, err = qiniuStorageBucketManager.Stat(
@@ -337,6 +304,22 @@ func decodeModulePathOrVersion(epov string) string {
 	return dpovb.String()
 }
 
+// encodeModulePathOrVersion encodes the dpov as the module path or version.
+func encodeModulePathOrVersion(dpov string) string {
+	epovb := strings.Builder{}
+	epovb.Grow(len(dpov))
+	for _, r := range dpov {
+		if r >= 'A' && r <= 'Z' {
+			epovb.WriteByte('!')
+			epovb.WriteRune(r + 'a' - 'A') // To lower
+		} else {
+			epovb.WriteRune(r)
+		}
+	}
+
+	return epovb.String()
+}
+
 // modListResult is the result of
 // `go list -json -m -versions <MODULE_PATH>@latest`.
 type modListResult struct {
@@ -424,6 +407,42 @@ func modDownload(
 
 	mdr := &modDownloadResult{}
 	if err := json.Unmarshal(stdout.Bytes(), mdr); err != nil {
+		return nil, err
+	}
+
+	filePrefix := path.Join(
+		encodeModulePathOrVersion(modulePath),
+		"@v",
+		encodeModulePathOrVersion(moduleVersion),
+	)
+
+	infoFilename := fmt.Sprint(filePrefix, ".info")
+	if err := uploadFile(
+		ctx,
+		infoFilename,
+		mdr.Info,
+		"application/json; charset=utf-8",
+	); err != nil {
+		return nil, err
+	}
+
+	modFilename := fmt.Sprint(filePrefix, ".mod")
+	if err := uploadFile(
+		ctx,
+		modFilename,
+		mdr.GoMod,
+		"text/plain; charset=utf-8",
+	); err != nil {
+		return nil, err
+	}
+
+	zipFilename := fmt.Sprint(filePrefix, ".zip")
+	if err := uploadFile(
+		ctx,
+		zipFilename,
+		mdr.Zip,
+		"application/zip",
+	); err != nil {
 		return nil, err
 	}
 
