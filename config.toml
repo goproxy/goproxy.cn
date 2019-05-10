@@ -15,6 +15,7 @@ logger_level = "debug"
 # Goproxy
 [goproxy]
 go_bin_name = "go"
+max_go_bin_workers = 8
 max_local_cache_bytes = 8589934592 # 8 GB
 qiniu_access_key = "<QINIU_ACCESS_KEY>"
 qiniu_secret_key = "<QINIU_SECRET_KEY>"

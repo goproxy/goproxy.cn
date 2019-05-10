@@ -29,6 +29,8 @@ import (
 )
 
 var (
+	goBinWorkerChan chan struct{}
+
 	localCacheMutex     sync.Mutex
 	localCacheWaitGroup sync.WaitGroup
 
@@ -93,6 +95,8 @@ func init() {
 			Str("app_name", a.AppName).
 			Msg("failed to set $GOPATH")
 	}
+
+	goBinWorkerChan = make(chan struct{}, cfg.Goproxy.MaxGoBinWorkers)
 
 	go func() {
 		for {
@@ -332,6 +336,11 @@ type modListResult struct {
 
 // modList executes `go list -json -m -versions modulePath@latest`.
 func modList(ctx context.Context, modulePath string) (*modListResult, error) {
+	goBinWorkerChan <- struct{}{}
+	defer func() {
+		<-goBinWorkerChan
+	}()
+
 	cmd := exec.CommandContext(
 		ctx,
 		cfg.Goproxy.GoBinName,
@@ -376,6 +385,11 @@ func modDownload(
 	modulePath string,
 	moduleVersion string,
 ) (*modDownloadResult, error) {
+	goBinWorkerChan <- struct{}{}
+	defer func() {
+		<-goBinWorkerChan
+	}()
+
 	cmd := exec.CommandContext(
 		ctx,
 		cfg.Goproxy.GoBinName,
