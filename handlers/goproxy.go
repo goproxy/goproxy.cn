@@ -212,7 +212,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 
 		directory := path.Join(encodedModulePath, "@v")
 
-		infoFilename := path.Join(directory, path.Base(mdr.Info))
+		infoFilename := path.Join(directory, filepath.Base(mdr.Info))
 		if err := uploadFile(
 			req.Context,
 			infoFilename,
@@ -222,7 +222,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 			return err
 		}
 
-		modFilename := path.Join(directory, path.Base(mdr.GoMod))
+		modFilename := path.Join(directory, filepath.Base(mdr.GoMod))
 		if err := uploadFile(
 			req.Context,
 			modFilename,
@@ -232,7 +232,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 			return err
 		}
 
-		zipFilename := path.Join(directory, path.Base(mdr.Zip))
+		zipFilename := path.Join(directory, filepath.Base(mdr.Zip))
 		if err := uploadFile(
 			req.Context,
 			zipFilename,
@@ -243,12 +243,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 		}
 
 		switch filenameExt {
-		case path.Ext(mdr.Info):
-			filename = infoFilename
-		case path.Ext(mdr.GoMod):
-			filename = modFilename
-		case path.Ext(mdr.Zip):
-			filename = zipFilename
+		case ".info", ".mod", ".zip":
 		default:
 			return a.NotFoundHandler(req, res)
 		}
