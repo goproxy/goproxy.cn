@@ -152,42 +152,17 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 	localCacheWaitGroup.Add(1)
 	defer localCacheWaitGroup.Done()
 
-	var (
-		encodedFilename = req.Param("*").Value().String()
-		filenameBuilder strings.Builder
-		bang            bool
-	)
-
-	filenameBuilder.Grow(len(encodedFilename))
-	for _, r := range encodedFilename {
-		if r >= 'A' && r <= 'Z' {
-			return a.NotFoundHandler(req, res)
-		}
-
-		if r == '!' {
-			bang = true
-			continue
-		}
-
-		if bang {
-			bang = false
-			if r >= 'a' && r <= 'z' {
-				r -= 'a' - 'A' // To upper
-			} else {
-				filenameBuilder.WriteByte('!')
-			}
-		}
-
-		filenameBuilder.WriteRune(r)
-	}
-
-	filename := filenameBuilder.String()
+	filename := req.Param("*").Value().String()
 	filenameParts := strings.Split(filename, "/@")
 	if len(filenameParts) != 2 {
 		return a.NotFoundHandler(req, res)
 	}
 
-	modulePath := filenameParts[0]
+	encodedModulePath := filenameParts[0]
+	modulePath := decodeModulePathOrVersion(encodedModulePath)
+	if modulePath == "" {
+		return a.NotFoundHandler(req, res)
+	}
 
 	switch filenameParts[1] {
 	case "v/list", "latest":
@@ -216,7 +191,15 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 	if isFileNotExist(err) {
 		filenameBase := path.Base(filenameParts[1])
 		filenameExt := path.Ext(filenameBase)
-		moduleVersion := strings.TrimSuffix(filenameBase, filenameExt)
+
+		encodedModuleVersion := strings.TrimSuffix(
+			filenameBase,
+			filenameExt,
+		)
+		moduleVersion := decodeModulePathOrVersion(encodedModuleVersion)
+		if moduleVersion == "" {
+			return a.NotFoundHandler(req, res)
+		}
 
 		mdr, err := modDownload(req.Context, modulePath, moduleVersion)
 		if err != nil {
@@ -227,9 +210,9 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 			return err
 		}
 
-		director := path.Join(modulePath, "@v")
+		directory := path.Join(encodedModulePath, "@v")
 
-		infoFilename := path.Join(director, path.Base(mdr.Info))
+		infoFilename := path.Join(directory, path.Base(mdr.Info))
 		if err := uploadFile(
 			req.Context,
 			infoFilename,
@@ -239,7 +222,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 			return err
 		}
 
-		modFilename := path.Join(director, path.Base(mdr.GoMod))
+		modFilename := path.Join(directory, path.Base(mdr.GoMod))
 		if err := uploadFile(
 			req.Context,
 			modFilename,
@@ -249,7 +232,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 			return err
 		}
 
-		zipFilename := path.Join(director, path.Base(mdr.Zip))
+		zipFilename := path.Join(directory, path.Base(mdr.Zip))
 		if err := uploadFile(
 			req.Context,
 			zipFilename,
@@ -324,6 +307,39 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 	_, err = io.Copy(res.Body, fileRes.Body)
 
 	return err
+}
+
+// decodeModulePathOrVersion decodes the epov as the module path or version.
+func decodeModulePathOrVersion(epov string) string {
+	var (
+		dpovb strings.Builder
+		bang  bool
+	)
+
+	dpovb.Grow(len(epov))
+	for _, r := range epov {
+		if r >= 'A' && r <= 'Z' {
+			return ""
+		}
+
+		if r == '!' {
+			bang = true
+			continue
+		}
+
+		if bang {
+			bang = false
+			if r >= 'a' && r <= 'z' {
+				r -= 'a' - 'A' // To upper
+			} else {
+				dpovb.WriteByte('!')
+			}
+		}
+
+		dpovb.WriteRune(r)
+	}
+
+	return dpovb.String()
 }
 
 // modListResult is the result of
