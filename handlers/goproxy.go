@@ -188,7 +188,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 		cfg.Goproxy.QiniuStorageBucket,
 		filename,
 	)
-	if isFileNotExist(err) {
+	if err != nil && err.Error() == "no such file or directory" {
 		filenameBase := path.Base(filenameParts[1])
 		filenameExt := path.Ext(filenameBase)
 		switch filenameExt {
@@ -459,12 +459,6 @@ func invalidModOutput(mo string) bool {
 	}
 
 	return false
-}
-
-// isFileNotExist reports whether the err indicates that some file does not
-// exist.
-func isFileNotExist(err error) bool {
-	return err != nil && err.Error() == "no such file or directory"
 }
 
 // uploadFile uploads the localFilename as the contentType to the Qiniu storage
