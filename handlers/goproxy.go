@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
@@ -16,7 +17,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/air-gases/cacheman"
@@ -30,23 +30,21 @@ import (
 )
 
 var (
-	goBinWorkerChan chan struct{}
-
-	localCacheMutex     sync.Mutex
-	localCacheWaitGroup sync.WaitGroup
+	goBinWorkerChan = make(chan struct{}, cfg.Goproxy.MaxGoBinWorkers)
+	goproxyRoot     = filepath.Join(os.TempDir(), "goproxy")
 
 	qiniuMac                  *qbox.Mac
 	qiniuStorageConfig        *storage.Config
 	qiniuStorageBucketManager *storage.BucketManager
 
-	invalidModOutputKeywords = []string{
-		"could not read username",
-		"invalid",
-		"malformed",
-		"no matching",
-		"not found",
-		"unknown",
-		"unrecognized",
+	invalidModOutputKeywords = [][]byte{
+		[]byte("could not read username"),
+		[]byte("invalid"),
+		[]byte("malformed"),
+		[]byte("no matching"),
+		[]byte("not found"),
+		[]byte("unknown"),
+		[]byte("unrecognized"),
 	}
 
 	errModuleNotFound = errors.New("module not found")
@@ -77,59 +75,27 @@ func init() {
 		qiniuStorageConfig,
 	)
 
-	goproxyRoot := filepath.Join(os.TempDir(), "goproxy")
+	if err := os.RemoveAll(goproxyRoot); err != nil && !os.IsNotExist(err) {
+		log.Fatal().Err(err).
+			Str("app_name", a.AppName).
+			Msg("failed to remove goproxy root")
+	}
 
-	if err := os.Setenv(
-		"GOCACHE",
-		filepath.Join(goproxyRoot, "gocache"),
+	if err := os.Mkdir(goproxyRoot, 0700); err != nil {
+		log.Fatal().Err(err).
+			Str("app_name", a.AppName).
+			Msg("failed to create goproxy root")
+	}
+
+	if err := ioutil.WriteFile(
+		filepath.Join(goproxyRoot, "go.mod"),
+		[]byte("module goproxy"),
+		0700,
 	); err != nil {
 		log.Fatal().Err(err).
 			Str("app_name", a.AppName).
-			Msg("failed to set $GOCACHE")
+			Msg("failed to create go.mod in goproxy root")
 	}
-
-	if err := os.Setenv(
-		"GOPATH",
-		filepath.Join(goproxyRoot, "gopath"),
-	); err != nil {
-		log.Fatal().Err(err).
-			Str("app_name", a.AppName).
-			Msg("failed to set $GOPATH")
-	}
-
-	goBinWorkerChan = make(chan struct{}, cfg.Goproxy.MaxGoBinWorkers)
-
-	go func() {
-		for {
-			startTime := time.Now()
-
-			var totalSize int64
-			filepath.Walk(goproxyRoot, func(
-				_ string,
-				fi os.FileInfo,
-				err error,
-			) error {
-				if fi != nil && !fi.IsDir() {
-					totalSize += fi.Size()
-				}
-
-				return err
-			})
-
-			if totalSize > int64(cfg.Goproxy.MaxLocalCacheBytes) {
-				localCacheMutex.Lock()
-
-				localCacheWaitGroup.Wait()
-				os.RemoveAll(goproxyRoot)
-
-				localCacheMutex.Unlock()
-			}
-
-			if d := time.Now().Sub(startTime); d < 10*time.Minute {
-				time.Sleep(10*time.Minute - d)
-			}
-		}
-	}()
 
 	a.BATCH(
 		[]string{http.MethodGet, http.MethodHead},
@@ -147,12 +113,6 @@ func init() {
 
 // goproxyHandler handles requests to perform a Go module proxy action.
 func goproxyHandler(req *air.Request, res *air.Response) error {
-	localCacheMutex.Lock()
-	localCacheMutex.Unlock()
-
-	localCacheWaitGroup.Add(1)
-	defer localCacheWaitGroup.Done()
-
 	filename := req.Param("*").Value().String()
 	filenameParts := strings.Split(filename, "/@")
 	if len(filenameParts) != 2 {
@@ -284,6 +244,12 @@ func modList(ctx context.Context, modulePath string) (*modListResult, error) {
 		<-goBinWorkerChan
 	}()
 
+	tempDir, err := ioutil.TempDir(goproxyRoot, "")
+	if err != nil {
+		return nil, err
+	}
+	defer os.RemoveAll(tempDir)
+
 	cmd := exec.CommandContext(
 		ctx,
 		cfg.Goproxy.GoBinName,
@@ -293,12 +259,19 @@ func modList(ctx context.Context, modulePath string) (*modListResult, error) {
 		"-versions",
 		modulePath+"@latest",
 	)
-	stdout := bytes.Buffer{}
-	stderr := bytes.Buffer{}
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		output := fmt.Sprint(stdout.String(), stderr.String())
+	cmd.Env = append(
+		os.Environ(),
+		fmt.Sprint("GOCACHE=", filepath.Join(tempDir, "gocache")),
+		fmt.Sprint("GOPATH=", filepath.Join(tempDir, "gopath")),
+	)
+	cmd.Dir = goproxyRoot
+	stdout, err := cmd.Output()
+	if err != nil {
+		output := stdout
+		if ee, ok := err.(*exec.ExitError); ok {
+			output = append(output, ee.Stderr...)
+		}
+
 		if invalidModOutput(output) {
 			return nil, errModuleNotFound
 		}
@@ -307,7 +280,7 @@ func modList(ctx context.Context, modulePath string) (*modListResult, error) {
 	}
 
 	mlr := &modListResult{}
-	if err := json.Unmarshal(stdout.Bytes(), mlr); err != nil {
+	if err := json.Unmarshal(stdout, mlr); err != nil {
 		return nil, err
 	}
 
@@ -333,6 +306,12 @@ func modDownload(
 		<-goBinWorkerChan
 	}()
 
+	tempDir, err := ioutil.TempDir("", "goproxy")
+	if err != nil {
+		return nil, err
+	}
+	defer os.RemoveAll(tempDir)
+
 	cmd := exec.CommandContext(
 		ctx,
 		cfg.Goproxy.GoBinName,
@@ -341,12 +320,19 @@ func modDownload(
 		"-json",
 		modulePath+"@"+moduleVersion,
 	)
-	stdout := bytes.Buffer{}
-	stderr := bytes.Buffer{}
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		output := fmt.Sprint(stdout.String(), stderr.String())
+	cmd.Env = append(
+		os.Environ(),
+		fmt.Sprint("GOCACHE=", filepath.Join(tempDir, "gocache")),
+		fmt.Sprint("GOPATH=", filepath.Join(tempDir, "gopath")),
+	)
+	cmd.Dir = goproxyRoot
+	stdout, err := cmd.Output()
+	if err != nil {
+		output := stdout
+		if ee, ok := err.(*exec.ExitError); ok {
+			output = append(output, ee.Stderr...)
+		}
+
 		if invalidModOutput(output) {
 			return nil, errModuleNotFound
 		}
@@ -355,7 +341,7 @@ func modDownload(
 	}
 
 	mdr := &modDownloadResult{}
-	if err := json.Unmarshal(stdout.Bytes(), mdr); err != nil {
+	if err := json.Unmarshal(stdout, mdr); err != nil {
 		return nil, err
 	}
 
@@ -409,10 +395,10 @@ func modDownload(
 }
 
 // invalidModOutput reports whether the mo is a invalid mod output.
-func invalidModOutput(mo string) bool {
-	mo = strings.ToLower(mo)
+func invalidModOutput(mo []byte) bool {
+	mo = bytes.ToLower(mo)
 	for _, k := range invalidModOutputKeywords {
-		if strings.Contains(mo, k) {
+		if bytes.Contains(mo, k) {
 			return true
 		}
 	}

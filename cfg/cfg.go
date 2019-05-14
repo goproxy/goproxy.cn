@@ -30,10 +30,6 @@ var (
 		// same time.
 		MaxGoBinWorkers int `mapstructure:"max_go_bin_workers"`
 
-		// MaxLocalCacheBytes is the maximum number of bytes of the
-		// local cache the Goproxy will use.
-		MaxLocalCacheBytes int `mapstructure:"max_local_cache_bytes"`
-
 		// QiniuAccessKey is the access key of the Qiniu of the Goproxy.
 		QiniuAccessKey string `mapstructure:"qiniu_access_key"`
 
