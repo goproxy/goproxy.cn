@@ -12,4 +12,5 @@ require (
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/qiniu/api.v7 v0.0.0-20190307065957-039fdba59f73
 	github.com/rs/zerolog v1.14.3
+	golang.org/x/mod v0.0.0-20190513183733-4bf6d317e70e
 )

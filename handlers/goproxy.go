@@ -26,6 +26,7 @@ import (
 	"github.com/qiniu/api.v7/auth/qbox"
 	"github.com/qiniu/api.v7/storage"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/mod/module"
 )
 
 var (
@@ -158,9 +159,8 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 		return a.NotFoundHandler(req, res)
 	}
 
-	encodedModulePath := filenameParts[0]
-	modulePath := decodeModulePathOrVersion(encodedModulePath)
-	if modulePath == "" {
+	modulePath, err := module.UnescapePath(filenameParts[0])
+	if err != nil {
 		return a.NotFoundHandler(req, res)
 	}
 
@@ -197,16 +197,14 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 			return a.NotFoundHandler(req, res)
 		}
 
-		encodedModuleVersion := strings.TrimSuffix(
-			filenameBase,
-			filenameExt,
+		moduleVersion, err := module.UnescapeVersion(
+			strings.TrimSuffix(filenameBase, filenameExt),
 		)
-		moduleVersion := decodeModulePathOrVersion(encodedModuleVersion)
-		if moduleVersion == "" {
+		if err != nil {
 			return a.NotFoundHandler(req, res)
 		}
 
-		_, err := modDownload(req.Context, modulePath, moduleVersion)
+		_, err = modDownload(req.Context, modulePath, moduleVersion)
 		if err != nil {
 			if err == errModuleNotFound {
 				return a.NotFoundHandler(req, res)
@@ -269,55 +267,6 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 	_, err = io.Copy(res.Body, fileRes.Body)
 
 	return err
-}
-
-// decodeModulePathOrVersion decodes the epov as the module path or version.
-func decodeModulePathOrVersion(epov string) string {
-	var (
-		dpovb strings.Builder
-		bang  bool
-	)
-
-	dpovb.Grow(len(epov))
-	for _, r := range epov {
-		if r >= 'A' && r <= 'Z' {
-			return ""
-		}
-
-		if r == '!' {
-			bang = true
-			continue
-		}
-
-		if bang {
-			bang = false
-			if r >= 'a' && r <= 'z' {
-				r -= 'a' - 'A' // To upper
-			} else {
-				dpovb.WriteByte('!')
-			}
-		}
-
-		dpovb.WriteRune(r)
-	}
-
-	return dpovb.String()
-}
-
-// encodeModulePathOrVersion encodes the dpov as the module path or version.
-func encodeModulePathOrVersion(dpov string) string {
-	epovb := strings.Builder{}
-	epovb.Grow(len(dpov))
-	for _, r := range dpov {
-		if r >= 'A' && r <= 'Z' {
-			epovb.WriteByte('!')
-			epovb.WriteRune(r + 'a' - 'A') // To lower
-		} else {
-			epovb.WriteRune(r)
-		}
-	}
-
-	return epovb.String()
 }
 
 // modListResult is the result of
@@ -410,10 +359,20 @@ func modDownload(
 		return nil, err
 	}
 
+	escapedModulePath, err := module.EscapePath(modulePath)
+	if err != nil {
+		return nil, err
+	}
+
+	escapedModuleVersion, err := module.EscapeVersion(moduleVersion)
+	if err != nil {
+		return nil, err
+	}
+
 	filenamePrefix := path.Join(
-		encodeModulePathOrVersion(modulePath),
+		escapedModulePath,
 		"@v",
-		encodeModulePathOrVersion(moduleVersion),
+		escapedModuleVersion,
 	)
 
 	infoFilename := fmt.Sprint(filenamePrefix, ".info")
