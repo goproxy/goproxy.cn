@@ -20,6 +20,22 @@ var (
 		LoggerLevel string `mapstructure:"logger_level"`
 	}
 
+	// Qiniu is the Qiniu configuration items.
+	Qiniu struct {
+		// AccessKey is the access key of the Qiniu.
+		AccessKey string `mapstructure:"access_key"`
+
+		// SecretKey is the secret key of the Qiniu.
+		SecretKey string `mapstructure:"secret_key"`
+
+		// StorageBucket is the storage bucket of the Qiniu.
+		StorageBucket string `mapstructure:"storage_bucket"`
+
+		// StorageBucketAccessEndpoint is the storage bucket access
+		// endpoint of the Qiniu.
+		StorageBucketAccessEndpoint string `mapstructure:"storage_bucket_access_endpoint"`
+	}
+
 	// Goproxy is the Goproxy configuration items.
 	Goproxy struct {
 		// GoBinName is the name of the Go binary of the Goproxy.
@@ -29,20 +45,6 @@ var (
 		// commands of the Goproxy that are allowed to execute at the
 		// same time.
 		MaxGoBinWorkers int `mapstructure:"max_go_bin_workers"`
-
-		// QiniuAccessKey is the access key of the Qiniu of the Goproxy.
-		QiniuAccessKey string `mapstructure:"qiniu_access_key"`
-
-		// QiniuSecretKey is the secret key of the Qiniu of the Goproxy.
-		QiniuSecretKey string `mapstructure:"qiniu_secret_key"`
-
-		// QiniuStorageBucket is the storage bucket of the Qiniu of the
-		// Goproxy.
-		QiniuStorageBucket string `mapstructure:"qiniu_storage_bucket"`
-
-		// QiniuStorageBucketAccessEndpoint is the storage bucket access
-		// endpoint of the Qiniu of the Goproxy.
-		QiniuStorageBucketAccessEndpoint string `mapstructure:"qiniu_storage_bucket_access_endpoint"`
 	}
 )
 

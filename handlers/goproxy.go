@@ -23,7 +23,6 @@ import (
 	"github.com/aofei/air"
 	"github.com/cespare/xxhash/v2"
 	"github.com/goproxy/goproxy.cn/cfg"
-	"github.com/qiniu/api.v7/auth/qbox"
 	"github.com/qiniu/api.v7/storage"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/mod/module"
@@ -31,10 +30,6 @@ import (
 
 var (
 	goBinWorkerChan = make(chan struct{}, cfg.Goproxy.MaxGoBinWorkers)
-
-	qiniuMac                  *qbox.Mac
-	qiniuStorageConfig        *storage.Config
-	qiniuStorageBucketManager *storage.BucketManager
 
 	invalidModOutputKeywords = [][]byte{
 		[]byte("could not read username"),
@@ -50,30 +45,6 @@ var (
 )
 
 func init() {
-	qiniuMac = qbox.NewMac(
-		cfg.Goproxy.QiniuAccessKey,
-		cfg.Goproxy.QiniuSecretKey,
-	)
-
-	qiniuStorageRegion, err := storage.GetRegion(
-		cfg.Goproxy.QiniuAccessKey,
-		cfg.Goproxy.QiniuStorageBucket,
-	)
-	if err != nil {
-		log.Fatal().Err(err).
-			Str("app_name", a.AppName).
-			Msg("failed to get qiniu storage region client")
-	}
-
-	qiniuStorageConfig = &storage.Config{
-		Region: qiniuStorageRegion,
-	}
-
-	qiniuStorageBucketManager = storage.NewBucketManager(
-		qiniuMac,
-		qiniuStorageConfig,
-	)
-
 	if err := os.Setenv("GO111MODULE", "on"); err != nil {
 		log.Fatal().Err(err).
 			Str("app_name", a.AppName).
@@ -140,7 +111,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 	}
 
 	fileInfo, err := qiniuStorageBucketManager.Stat(
-		cfg.Goproxy.QiniuStorageBucket,
+		cfg.Qiniu.StorageBucket,
 		filename,
 	)
 	if err != nil && err.Error() == "no such file or directory" {
@@ -169,7 +140,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 		}
 
 		if fileInfo, err = qiniuStorageBucketManager.Stat(
-			cfg.Goproxy.QiniuStorageBucket,
+			cfg.Qiniu.StorageBucket,
 			filename,
 		); err != nil {
 			return err
@@ -182,7 +153,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 		http.MethodGet,
 		storage.MakePrivateURL(
 			qiniuMac,
-			cfg.Goproxy.QiniuStorageBucketAccessEndpoint,
+			cfg.Qiniu.StorageBucketAccessEndpoint,
 			filename,
 			time.Now().Add(time.Hour).Unix(),
 		),
@@ -415,7 +386,7 @@ func uploadFile(
 		(&storage.PutPolicy{
 			Scope: fmt.Sprintf(
 				"%s:%s",
-				cfg.Goproxy.QiniuStorageBucket,
+				cfg.Qiniu.StorageBucket,
 				filename,
 			),
 		}).UploadToken(qiniuMac),

@@ -12,11 +12,14 @@ i18n_enabled = true
 [zerolog]
 logger_level = "debug"
 
+# Qiniu
+[qiniu]
+access_key = "<ACCESS_KEY>"
+secret_key = "<SECRET_KEY>"
+storage_bucket = "<STORAGE_BUCKET>"
+storage_bucket_access_endpoint = "<STORAGE_BUCKET_ACCESS_ENDPOINT>"
+
 # Goproxy
 [goproxy]
 go_bin_name = "go"
 max_go_bin_workers = 8
-qiniu_access_key = "<QINIU_ACCESS_KEY>"
-qiniu_secret_key = "<QINIU_SECRET_KEY>"
-qiniu_storage_bucket = "<QINIU_STORAGE_BUCKET>"
-qiniu_storage_bucket_access_endpoint = "<QINIU_STORAGE_BUCKET_ACCESS_ENDPOINT>"
