@@ -31,7 +31,6 @@ import (
 
 var (
 	goBinWorkerChan = make(chan struct{}, cfg.Goproxy.MaxGoBinWorkers)
-	goproxyRoot     = filepath.Join(os.TempDir(), "goproxy")
 
 	qiniuMac                  *qbox.Mac
 	qiniuStorageConfig        *storage.Config
@@ -75,26 +74,22 @@ func init() {
 		qiniuStorageConfig,
 	)
 
-	if err := os.RemoveAll(goproxyRoot); err != nil && !os.IsNotExist(err) {
+	if err := os.Setenv("GO111MODULE", "on"); err != nil {
 		log.Fatal().Err(err).
 			Str("app_name", a.AppName).
-			Msg("failed to remove goproxy root")
+			Msg("failed to set $GO111MODULE")
 	}
 
-	if err := os.Mkdir(goproxyRoot, 0700); err != nil {
+	if err := os.Setenv("GOPROXY", "direct"); err != nil {
 		log.Fatal().Err(err).
 			Str("app_name", a.AppName).
-			Msg("failed to create goproxy root")
+			Msg("failed to set $GOPROXY")
 	}
 
-	if err := ioutil.WriteFile(
-		filepath.Join(goproxyRoot, "go.mod"),
-		[]byte("module goproxy"),
-		0700,
-	); err != nil {
+	if err := os.Setenv("GOSUMDB", "off"); err != nil {
 		log.Fatal().Err(err).
 			Str("app_name", a.AppName).
-			Msg("failed to create go.mod in goproxy root")
+			Msg("failed to set $GOSUMDB")
 	}
 
 	a.BATCH(
@@ -244,11 +239,11 @@ func modList(ctx context.Context, modulePath string) (*modListResult, error) {
 		<-goBinWorkerChan
 	}()
 
-	tempDir, err := ioutil.TempDir(goproxyRoot, "")
+	goproxyRoot, err := ioutil.TempDir("", "goproxy")
 	if err != nil {
 		return nil, err
 	}
-	defer os.RemoveAll(tempDir)
+	defer os.RemoveAll(goproxyRoot)
 
 	cmd := exec.CommandContext(
 		ctx,
@@ -261,8 +256,8 @@ func modList(ctx context.Context, modulePath string) (*modListResult, error) {
 	)
 	cmd.Env = append(
 		os.Environ(),
-		fmt.Sprint("GOCACHE=", filepath.Join(tempDir, "gocache")),
-		fmt.Sprint("GOPATH=", filepath.Join(tempDir, "gopath")),
+		fmt.Sprint("GOCACHE=", filepath.Join(goproxyRoot, "gocache")),
+		fmt.Sprint("GOPATH=", filepath.Join(goproxyRoot, "gopath")),
 	)
 	cmd.Dir = goproxyRoot
 	stdout, err := cmd.Output()
@@ -306,11 +301,11 @@ func modDownload(
 		<-goBinWorkerChan
 	}()
 
-	tempDir, err := ioutil.TempDir("", "goproxy")
+	goproxyRoot, err := ioutil.TempDir("", "goproxy")
 	if err != nil {
 		return nil, err
 	}
-	defer os.RemoveAll(tempDir)
+	defer os.RemoveAll(goproxyRoot)
 
 	cmd := exec.CommandContext(
 		ctx,
@@ -322,8 +317,8 @@ func modDownload(
 	)
 	cmd.Env = append(
 		os.Environ(),
-		fmt.Sprint("GOCACHE=", filepath.Join(tempDir, "gocache")),
-		fmt.Sprint("GOPATH=", filepath.Join(tempDir, "gopath")),
+		fmt.Sprint("GOCACHE=", filepath.Join(goproxyRoot, "gocache")),
+		fmt.Sprint("GOPATH=", filepath.Join(goproxyRoot, "gopath")),
 	)
 	cmd.Dir = goproxyRoot
 	stdout, err := cmd.Output()
