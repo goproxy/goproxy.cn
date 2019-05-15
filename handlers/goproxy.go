@@ -85,14 +85,9 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 		return a.NotFoundHandler(req, res)
 	}
 
-	modulePath, err := module.UnescapePath(filenameParts[0])
-	if err != nil {
-		return a.NotFoundHandler(req, res)
-	}
-
 	switch filenameParts[1] {
 	case "v/list", "latest":
-		mlr, err := modList(req.Context, modulePath)
+		mlr, err := modList(req.Context, filenameParts[0])
 		if err != nil {
 			if err == errModuleNotFound {
 				return a.NotFoundHandler(req, res)
@@ -123,15 +118,11 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 			return a.NotFoundHandler(req, res)
 		}
 
-		moduleVersion, err := module.UnescapeVersion(
+		if _, err := modDownload(
+			req.Context,
+			filenameParts[0],
 			strings.TrimSuffix(filenameBase, filenameExt),
-		)
-		if err != nil {
-			return a.NotFoundHandler(req, res)
-		}
-
-		_, err = modDownload(req.Context, modulePath, moduleVersion)
-		if err != nil {
+		); err != nil {
 			if err == errModuleNotFound {
 				return a.NotFoundHandler(req, res)
 			}
@@ -204,11 +195,19 @@ type modListResult struct {
 }
 
 // modList executes `go list -json -m -versions modulePath@latest`.
-func modList(ctx context.Context, modulePath string) (*modListResult, error) {
+func modList(
+	ctx context.Context,
+	escapedModulePath string,
+) (*modListResult, error) {
 	goBinWorkerChan <- struct{}{}
 	defer func() {
 		<-goBinWorkerChan
 	}()
+
+	modulePath, err := module.UnescapePath(escapedModulePath)
+	if err != nil {
+		return nil, errModuleNotFound
+	}
 
 	goproxyRoot, err := ioutil.TempDir("", "goproxy")
 	if err != nil {
@@ -264,13 +263,23 @@ type modDownloadResult struct {
 // modDownload executes `go mod download -json modulePath@moduleVersion`.
 func modDownload(
 	ctx context.Context,
-	modulePath string,
-	moduleVersion string,
+	escapedModulePath string,
+	escapedModuleVersion string,
 ) (*modDownloadResult, error) {
 	goBinWorkerChan <- struct{}{}
 	defer func() {
 		<-goBinWorkerChan
 	}()
+
+	modulePath, err := module.UnescapePath(escapedModulePath)
+	if err != nil {
+		return nil, errModuleNotFound
+	}
+
+	moduleVersion, err := module.UnescapeVersion(escapedModuleVersion)
+	if err != nil {
+		return nil, errModuleNotFound
+	}
 
 	goproxyRoot, err := ioutil.TempDir("", "goproxy")
 	if err != nil {
@@ -308,16 +317,6 @@ func modDownload(
 
 	mdr := &modDownloadResult{}
 	if err := json.Unmarshal(stdout, mdr); err != nil {
-		return nil, err
-	}
-
-	escapedModulePath, err := module.EscapePath(modulePath)
-	if err != nil {
-		return nil, err
-	}
-
-	escapedModuleVersion, err := module.EscapeVersion(moduleVersion)
-	if err != nil {
 		return nil, err
 	}
 
