@@ -31,7 +31,7 @@ import (
 var (
 	goBinWorkerChan = make(chan struct{}, cfg.Goproxy.MaxGoBinWorkers)
 
-	invalidModOutputKeywords = [][]byte{
+	modOutputNotFoundKeywords = [][]byte{
 		[]byte("could not read username"),
 		[]byte("invalid"),
 		[]byte("malformed"),
@@ -86,8 +86,8 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 	}
 
 	switch filenameParts[1] {
-	case "v/list", "latest":
-		mlr, err := modList(req.Context, filenameParts[0])
+	case "latest":
+		mlr, err := modList(req.Context, filenameParts[0], false)
 		if err != nil {
 			if err == errModuleNotFound {
 				return a.NotFoundHandler(req, res)
@@ -96,13 +96,18 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 			return err
 		}
 
-		switch filenameParts[1] {
-		case "v/list":
-			return res.WriteString(strings.Join(mlr.Versions, "\n"))
-		case "latest":
-			mlr.Versions = nil // No need
-			return res.WriteJSON(mlr)
+		return res.WriteJSON(mlr)
+	case "v/list":
+		mlr, err := modList(req.Context, filenameParts[0], true)
+		if err != nil {
+			if err == errModuleNotFound {
+				return a.NotFoundHandler(req, res)
+			}
+
+			return err
 		}
+
+		return res.WriteString(strings.Join(mlr.Versions, "\n"))
 	}
 
 	fileInfo, err := qiniuStorageBucketManager.Stat(
@@ -189,21 +194,17 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 // modListResult is the result of
 // `go list -json -m -versions <MODULE_PATH>@latest`.
 type modListResult struct {
-	Versions []string `json:"Versions,omitempty"`
 	Version  string   `json:"Version"`
 	Time     string   `json:"Time"`
+	Versions []string `json:"Versions,omitempty"`
 }
 
 // modList executes `go list -json -m -versions modulePath@latest`.
 func modList(
 	ctx context.Context,
 	escapedModulePath string,
+	allVersions bool,
 ) (*modListResult, error) {
-	goBinWorkerChan <- struct{}{}
-	defer func() {
-		<-goBinWorkerChan
-	}()
-
 	modulePath, err := module.UnescapePath(escapedModulePath)
 	if err != nil {
 		return nil, errModuleNotFound
@@ -215,33 +216,16 @@ func modList(
 	}
 	defer os.RemoveAll(goproxyRoot)
 
-	cmd := exec.CommandContext(
-		ctx,
-		cfg.Goproxy.GoBinName,
-		"list",
-		"-json",
-		"-m",
-		"-versions",
-		modulePath+"@latest",
-	)
-	cmd.Env = append(
-		os.Environ(),
-		fmt.Sprint("GOCACHE=", filepath.Join(goproxyRoot, "gocache")),
-		fmt.Sprint("GOPATH=", filepath.Join(goproxyRoot, "gopath")),
-	)
-	cmd.Dir = goproxyRoot
-	stdout, err := cmd.Output()
+	args := []string{"list", "-json", "-m"}
+	if allVersions {
+		args = append(args, "-versions")
+	}
+
+	args = append(args, fmt.Sprint(modulePath, "@latest"))
+
+	stdout, err := executeGoCommand(ctx, goproxyRoot, args...)
 	if err != nil {
-		output := stdout
-		if ee, ok := err.(*exec.ExitError); ok {
-			output = append(output, ee.Stderr...)
-		}
-
-		if invalidModOutput(output) {
-			return nil, errModuleNotFound
-		}
-
-		return nil, fmt.Errorf("modList: %v: %s", err, output)
+		return nil, err
 	}
 
 	mlr := &modListResult{}
@@ -266,11 +250,6 @@ func modDownload(
 	escapedModulePath string,
 	escapedModuleVersion string,
 ) (*modDownloadResult, error) {
-	goBinWorkerChan <- struct{}{}
-	defer func() {
-		<-goBinWorkerChan
-	}()
-
 	modulePath, err := module.UnescapePath(escapedModulePath)
 	if err != nil {
 		return nil, errModuleNotFound
@@ -287,32 +266,16 @@ func modDownload(
 	}
 	defer os.RemoveAll(goproxyRoot)
 
-	cmd := exec.CommandContext(
+	stdout, err := executeGoCommand(
 		ctx,
-		cfg.Goproxy.GoBinName,
+		goproxyRoot,
 		"mod",
 		"download",
 		"-json",
-		modulePath+"@"+moduleVersion,
+		fmt.Sprint(modulePath, "@", moduleVersion),
 	)
-	cmd.Env = append(
-		os.Environ(),
-		fmt.Sprint("GOCACHE=", filepath.Join(goproxyRoot, "gocache")),
-		fmt.Sprint("GOPATH=", filepath.Join(goproxyRoot, "gopath")),
-	)
-	cmd.Dir = goproxyRoot
-	stdout, err := cmd.Output()
 	if err != nil {
-		output := stdout
-		if ee, ok := err.(*exec.ExitError); ok {
-			output = append(output, ee.Stderr...)
-		}
-
-		if invalidModOutput(output) {
-			return nil, errModuleNotFound
-		}
-
-		return nil, fmt.Errorf("modDownload: %v: %s", err, output)
+		return nil, err
 	}
 
 	mdr := &modDownloadResult{}
@@ -359,16 +322,42 @@ func modDownload(
 	return mdr, nil
 }
 
-// invalidModOutput reports whether the mo is a invalid mod output.
-func invalidModOutput(mo []byte) bool {
-	mo = bytes.ToLower(mo)
-	for _, k := range invalidModOutputKeywords {
-		if bytes.Contains(mo, k) {
-			return true
+// executeGoCommand executes go command with the args.
+func executeGoCommand(
+	ctx context.Context,
+	goproxyRoot string,
+	args ...string,
+) ([]byte, error) {
+	goBinWorkerChan <- struct{}{}
+	defer func() {
+		<-goBinWorkerChan
+	}()
+
+	cmd := exec.CommandContext(ctx, cfg.Goproxy.GoBinName, args...)
+	cmd.Env = append(
+		os.Environ(),
+		fmt.Sprint("GOCACHE=", filepath.Join(goproxyRoot, "gocache")),
+		fmt.Sprint("GOPATH=", filepath.Join(goproxyRoot, "gopath")),
+	)
+	cmd.Dir = goproxyRoot
+	stdout, err := cmd.Output()
+	if err != nil {
+		output := stdout
+		if ee, ok := err.(*exec.ExitError); ok {
+			output = append(output, ee.Stderr...)
 		}
+
+		lowercasedOutput := bytes.ToLower(output)
+		for _, k := range modOutputNotFoundKeywords {
+			if bytes.Contains(lowercasedOutput, k) {
+				return nil, errModuleNotFound
+			}
+		}
+
+		return nil, fmt.Errorf("modList: %v: %s", err, output)
 	}
 
-	return false
+	return stdout, nil
 }
 
 // uploadFile uploads the localFilename as the contentType to the Qiniu storage
