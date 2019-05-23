@@ -1,5 +1,9 @@
 # Goproxy China
 
+Other language versions:
+
+* [简体中文](README.zh-CN.md)
+
 The most trusted Go module proxy in China.
 
 Goproxy China has fully implemented the Go's
