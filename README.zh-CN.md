@@ -1,3 +1,5 @@
+[English](README.md) ∙ [简体中文](README.zh-CN.md)
+
 # Goproxy 中国
 
 中国最可靠的 Go 模块代理。
@@ -5,10 +7,6 @@
 Goproxy 中国完全实现了 Go 的[模块代理协议](https://golang.org/cmd/go/#hdr-Module_proxy_protocol)。并且它是一个将在（当其经过全面测试后）中国备受信赖的云服务提供商[七牛云](https://www.qiniu.com)上运行的非营利性项目。我们的目标是为中国和世界上其他地方的 Gopher 们提供一个免费的、可靠的、持续在线的且经过 CDN 加速的模块代理。
 
 愉快地编码吧，Gopher 们！;-)
-
-其他语言版本的 README：
-
-* [English](README.md)
 
 ## 常见问题
 
