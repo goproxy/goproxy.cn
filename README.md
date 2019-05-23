@@ -1,9 +1,5 @@
 # Goproxy China
 
-Other language versions:
-
-* [简体中文](README.zh-CN.md)
-
 The most trusted Go module proxy in China.
 
 Goproxy China has fully implemented the Go's
@@ -14,6 +10,10 @@ goal is to provide a free, trusted, always on, and CDNed Go module proxy for
 Gophers in China and the rest of the world.
 
 Happy coding, Gophers! ;-)
+
+README in other languages:
+
+* [简体中文](README.zh-CN.md)
 
 ## FAQ
 
