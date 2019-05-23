@@ -45,6 +45,10 @@ var (
 		// commands of the Goproxy that are allowed to execute at the
 		// same time.
 		MaxGoBinWorkers int `mapstructure:"max_go_bin_workers"`
+
+		// SupportedSUMDBHosts is the supported checksum database host
+		// of the Goproxy.
+		SupportedSUMDBHosts []string `mapstructure:"supported_sumdb_hosts"`
 	}
 )
 

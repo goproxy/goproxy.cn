@@ -23,3 +23,4 @@ storage_bucket_access_endpoint = "<STORAGE_BUCKET_ACCESS_ENDPOINT>"
 [goproxy]
 go_bin_name = "go"
 max_go_bin_workers = 8
+supported_sumdb_hosts = ["sum.golang.org"]
