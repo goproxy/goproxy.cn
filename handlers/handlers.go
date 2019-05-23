@@ -92,12 +92,15 @@ func init() {
 			Msg("failed to set $GOSUMDB")
 	}
 
-	a.FILE("/robots.txt", "robots.txt")
-
+	a.BATCH(
+		[]string{http.MethodGet, http.MethodHead},
+		"/",
+		indexPageHandler,
+	)
 	a.BATCH(
 		[]string{http.MethodGet, http.MethodHead},
 		"/*",
-		mainHandler,
+		goproxyHandler,
 		cacheman.Gas(cacheman.GasConfig{
 			MustRevalidate: true,
 			NoCache:        true,
@@ -108,12 +111,13 @@ func init() {
 	)
 }
 
-// mainHandler handles requests to perform a Go module proxy action.
-func mainHandler(req *air.Request, res *air.Response) error {
-	if req.Path == "/" {
-		return res.Redirect("https://github.com/goproxy/goproxy.cn")
-	}
+// indexPageHandler handles requests to get index page.
+func indexPageHandler(req *air.Request, res *air.Response) error {
+	return res.Redirect("https://github.com/goproxy/goproxy.cn")
+}
 
+// goproxyHandler handles requests to perform a Go module proxy action.
+func goproxyHandler(req *air.Request, res *air.Response) error {
 	filename := req.Param("*").Value().String()
 	filenameParts := strings.Split(filename, "/@")
 	if len(filenameParts) != 2 {

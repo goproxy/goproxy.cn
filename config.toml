@@ -5,8 +5,6 @@ debug_mode = true
 address = "localhost:8080"
 minifier_enabled = true
 gzip_enabled = true
-coffer_enabled = true
-i18n_enabled = true
 
 # Zerolog
 [zerolog]
