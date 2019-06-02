@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/air-gases/cacheman"
+	"github.com/air-gases/limiter"
 	"github.com/aofei/air"
 	"github.com/cespare/xxhash/v2"
 	"github.com/goproxy/goproxy.cn/cfg"
@@ -101,6 +102,10 @@ func init() {
 		[]string{http.MethodGet, http.MethodHead},
 		"/*",
 		goproxyHandler,
+		limiter.RateGas(limiter.RateGasConfig{
+			MaxRequests:   1200,
+			ResetInterval: time.Hour,
+		}),
 		cacheman.Gas(cacheman.GasConfig{
 			MustRevalidate: true,
 			NoCache:        true,

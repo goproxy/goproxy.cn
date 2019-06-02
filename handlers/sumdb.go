@@ -6,8 +6,10 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/air-gases/cacheman"
+	"github.com/air-gases/limiter"
 	"github.com/aofei/air"
 	"github.com/goproxy/goproxy.cn/cfg"
 	"golang.org/x/net/idna"
@@ -26,6 +28,10 @@ func init() {
 		[]string{http.MethodGet, http.MethodHead},
 		"/sumdb/*",
 		sumdbHandler,
+		limiter.RateGas(limiter.RateGasConfig{
+			MaxRequests:   1200,
+			ResetInterval: time.Hour,
+		}),
 		cacheman.Gas(cacheman.GasConfig{
 			MustRevalidate: true,
 			NoCache:        true,
