@@ -14,6 +14,10 @@ Goproxy 中国完全实现了 Go 的[模块代理协议](https://golang.org/cmd/
 
 答：由于中国政府的网络监管系统，Go 生态系统中有着许多中国 Gopher 们无法获取的模块，比如最著名的 `golang.org/x/...`。并且在中国大陆从 GitHub 获取模块的速度也有点慢。因此，我们创建了 Goproxy 中国，使在中国的 Gopher 们能更好地使用 Go 模块。事实上，由于 [goproxy.cn](https://goproxy.cn) 将通过 CDN 加速，所以其他国家的 Gopher 们也可以使用它。
 
+**问：使用 Goproxy 中国是否安全？**
+
+答：当然，和所有其他的 Go 模块代理一样，我们只是将模块原封不动地缓存起来，所以我们可以向你保证它们绝对不会在我们这边被篡改。不过，如果你还是不能够完全信任我们。那么你可以使用你信任的校验和数据库（比如 [sum.golang.org](https://sum.golang.org)）来确保你从我们这里获取的模块没有被篡改过，自从 Goproxy 中国已经支持了[代理校验和数据库](https://go.googlesource.com/proposal/+/master/design/25530-sumdb.md#proxying-a-checksum-database)。
+
 **问：Goproxy 中国在中国是合法的吗？**
 
 答：Goproxy 中国将会是一个由商业支持的项目而不是一个个人项目，这也就意味着它在中国将完全合法。

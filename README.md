@@ -25,6 +25,16 @@ in China better use Go modules. In fact, since the
 [goproxy.cn](https://goproxy.cn) will be CDNed, Gophers in other countries can
 also use it.
 
+**Q: Is it safe to use Goproxy China?**
+
+A: Of course, as with all other Go module proxies, we just cache the modules as
+they are, so we can assure you that they will never be tampered with on our
+side. However, if you still can't fully trust us. Then you can use your trusted
+checksum databases (such as the [sum.golang.org](https://sum.golang.org)) to
+ensure that the modules you get from us have not been tampered with, since
+Goproxy China has supported
+[proxying checksum databases](https://go.googlesource.com/proposal/+/master/design/25530-sumdb.md#proxying-a-checksum-database).
+
 **Q: Is Goproxy China legal in China?**
 
 A: The Goproxy China will be a business-supported project rather than a personal
