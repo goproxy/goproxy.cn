@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -72,8 +73,13 @@ func sumdbHandler(req *air.Request, res *air.Response) error {
 	}
 	defer sumdbRes.Body.Close()
 
-	if sumdbRes.StatusCode != http.StatusOK {
+	switch sumdbRes.StatusCode {
+	case http.StatusOK:
+	case http.StatusNotFound, http.StatusGone:
 		return a.NotFoundHandler(req, res)
+	default:
+		res.Status = http.StatusBadGateway
+		return errors.New(http.StatusText(res.Status))
 	}
 
 	res.Header.Set("Content-Type", sumdbRes.Header.Get("Content-Type"))
