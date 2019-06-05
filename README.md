@@ -11,6 +11,12 @@ well-trusted cloud service provider [Qiniu Cloud](https://www.qiniu.com). Our
 goal is to provide a free, trusted, always on, and CDNed Go module proxy for
 Gophers in China and the rest of the world.
 
+Note that Goproxy China will (and will only) focus on the development of the web
+application that serves at the [https://goproxy.cn](https://goproxy.cn). If you
+are looking for a dead simple way to build your own Go module proxy, then you
+should take a look at [Goproxy](https://github.com/goproxy/goproxy) which is
+Goproxy China based on.
+
 Happy coding, Gophers! ;-)
 
 ## FAQ

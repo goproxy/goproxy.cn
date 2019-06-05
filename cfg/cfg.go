@@ -28,12 +28,11 @@ var (
 		// SecretKey is the secret key of the Qiniu.
 		SecretKey string `mapstructure:"secret_key"`
 
-		// StorageBucket is the storage bucket of the Qiniu.
-		StorageBucket string `mapstructure:"storage_bucket"`
+		// BucketName is the bucket name of the Qiniu.
+		BucketName string `mapstructure:"bucket_name"`
 
-		// StorageBucketAccessEndpoint is the storage bucket access
-		// endpoint of the Qiniu.
-		StorageBucketAccessEndpoint string `mapstructure:"storage_bucket_access_endpoint"`
+		// BucketEndpoint is the bucket endpoint of the Qiniu.
+		BucketEndpoint string `mapstructure:"bucket_endpoint"`
 	}
 
 	// Goproxy is the Goproxy configuration items.

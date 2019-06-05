@@ -6,6 +6,8 @@
 
 Goproxy 中国完全实现了 Go 的[模块代理协议](https://golang.org/cmd/go/#hdr-Module_proxy_protocol)。并且它是一个将在（当其经过全面测试后）中国备受信赖的云服务提供商[七牛云](https://www.qiniu.com)上运行的非营利性项目。我们的目标是为中国和世界上其他地方的 Gopher 们提供一个免费的、可靠的、持续在线的且经过 CDN 加速的模块代理。
 
+请注意，Goproxy 中国将（且只将）专注于服务在 [https://goproxy.cn](https://goproxy.cn) 的 Web 应用本身的开发。如果你正在寻找一种极其简单的方法来搭建你自己的 Go 模块代理，那么你应该看一下 [Goproxy](https://github.com/goproxy/goproxy)，Goproxy 中国就是基于它开发的。
+
 愉快地编码吧，Gopher 们！;-)
 
 ## 常见问题

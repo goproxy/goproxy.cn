@@ -14,8 +14,8 @@ logger_level = "debug"
 [qiniu]
 access_key = "<ACCESS_KEY>"
 secret_key = "<SECRET_KEY>"
-storage_bucket = "<STORAGE_BUCKET>"
-storage_bucket_access_endpoint = "<STORAGE_BUCKET_ACCESS_ENDPOINT>"
+bucket_name = "<BUCKET_NAME>"
+bucket_endpoint = "<BUCKET_ENDPOINT>"
 
 # Goproxy
 [goproxy]
