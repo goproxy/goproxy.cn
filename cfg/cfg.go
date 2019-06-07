@@ -1,13 +1,17 @@
 package cfg
 
 import (
+	"errors"
 	"flag"
 	"fmt"
+	stdLog "log"
+	"strings"
 
 	"github.com/BurntSushi/toml"
 	"github.com/aofei/air"
 	"github.com/mitchellh/mapstructure"
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -18,21 +22,6 @@ var (
 	Zerolog struct {
 		// LoggerLevel is the logger level of the Zerolog.
 		LoggerLevel string `mapstructure:"logger_level"`
-	}
-
-	// Qiniu is the Qiniu configuration items.
-	Qiniu struct {
-		// AccessKey is the access key of the Qiniu.
-		AccessKey string `mapstructure:"access_key"`
-
-		// SecretKey is the secret key of the Qiniu.
-		SecretKey string `mapstructure:"secret_key"`
-
-		// BucketName is the bucket name of the Qiniu.
-		BucketName string `mapstructure:"bucket_name"`
-
-		// BucketEndpoint is the bucket endpoint of the Qiniu.
-		BucketEndpoint string `mapstructure:"bucket_endpoint"`
 	}
 
 	// Goproxy is the Goproxy configuration items.
@@ -48,6 +37,18 @@ var (
 		// SupportedSUMDBHosts is the supported checksum database host
 		// of the Goproxy.
 		SupportedSUMDBHosts []string `mapstructure:"supported_sumdb_hosts"`
+
+		// KodoEndpoint is the endpoint of the Qiniu Cloud Kodo.
+		KodoEndpoint string `mapstructure:"kodo_endpoint"`
+
+		// KodoAccessKey is the access key of the Qiniu Cloud Kodo.
+		KodoAccessKey string `mapstructure:"kodo_access_key"`
+
+		// KodoSecretKey is the secret key of the Qiniu Cloud Kodo.
+		KodoSecretKey string `mapstructure:"kodo_secret_key"`
+
+		// KodoBucketName is the bucket name of the Qiniu Cloud Kodo.
+		KodoBucketName string `mapstructure:"kodo_bucket_name"`
 	}
 )
 
@@ -69,6 +70,8 @@ func init() {
 			err,
 		))
 	}
+
+	a.ErrorLogger = stdLog.New(&errorLogWriter{}, "", 0)
 
 	if err := mapstructure.Decode(m["zerolog"], &Zerolog); err != nil {
 		panic(fmt.Errorf(
@@ -107,4 +110,16 @@ func init() {
 	if a.DebugMode {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
+}
+
+// errorLogWriter is an error log writer.
+type errorLogWriter struct{}
+
+// Write implements the `io.Writer`.
+func (elw *errorLogWriter) Write(b []byte) (int, error) {
+	log.Error().Err(errors.New(strings.TrimSuffix(string(b), "\n"))).
+		Str("app_name", a.AppName).
+		Msg("air error")
+
+	return len(b), nil
 }

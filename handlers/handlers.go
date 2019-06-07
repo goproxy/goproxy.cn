@@ -39,10 +39,10 @@ func init() {
 	g.GoBinName = cfg.Goproxy.GoBinName
 	g.MaxGoBinWorkers = cfg.Goproxy.MaxGoBinWorkers
 	g.Cacher = &cachers.Kodo{
-		AccessKey:      cfg.Qiniu.AccessKey,
-		SecretKey:      cfg.Qiniu.SecretKey,
-		BucketName:     cfg.Qiniu.BucketName,
-		BucketEndpoint: cfg.Qiniu.BucketEndpoint,
+		Endpoint:   cfg.Goproxy.KodoEndpoint,
+		AccessKey:  cfg.Goproxy.KodoAccessKey,
+		SecretKey:  cfg.Goproxy.KodoSecretKey,
+		BucketName: cfg.Goproxy.KodoBucketName,
 	}
 
 	g.SupportedSUMDBHosts = cfg.Goproxy.SupportedSUMDBHosts
