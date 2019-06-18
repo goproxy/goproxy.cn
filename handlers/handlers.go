@@ -3,9 +3,7 @@ package handlers
 import (
 	"net/http"
 	"os"
-	"time"
 
-	"github.com/air-gases/limiter"
 	"github.com/aofei/air"
 	"github.com/goproxy/goproxy"
 	"github.com/goproxy/goproxy.cn/cfg"
@@ -53,15 +51,7 @@ func init() {
 		"/",
 		indexPageHandler,
 	)
-	a.BATCH(
-		nil,
-		"/*",
-		air.WrapHTTPHandler(g),
-		limiter.RateGas(limiter.RateGasConfig{
-			MaxRequests:   1200,
-			ResetInterval: time.Hour,
-		}),
-	)
+	a.BATCH(nil, "/*", air.WrapHTTPHandler(g))
 }
 
 // indexPageHandler handles requests to get index page.
