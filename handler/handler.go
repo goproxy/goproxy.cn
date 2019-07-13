@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import (
 	"net/http"
@@ -7,7 +7,7 @@ import (
 	"github.com/aofei/air"
 	"github.com/goproxy/goproxy"
 	"github.com/goproxy/goproxy.cn/cfg"
-	"github.com/goproxy/goproxy/cachers"
+	"github.com/goproxy/goproxy/cacher"
 	"github.com/rs/zerolog/log"
 )
 
@@ -36,7 +36,7 @@ func init() {
 	g := goproxy.New()
 	g.GoBinName = cfg.Goproxy.GoBinName
 	g.MaxGoBinWorkers = cfg.Goproxy.MaxGoBinWorkers
-	g.Cacher = &cachers.Kodo{
+	g.Cacher = &cacher.Kodo{
 		Endpoint:   cfg.Goproxy.KodoEndpoint,
 		AccessKey:  cfg.Goproxy.KodoAccessKey,
 		SecretKey:  cfg.Goproxy.KodoSecretKey,

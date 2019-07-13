@@ -13,7 +13,7 @@ import (
 	"github.com/air-gases/logger"
 	"github.com/air-gases/redirector"
 	"github.com/aofei/air"
-	_ "github.com/goproxy/goproxy.cn/handlers"
+	_ "github.com/goproxy/goproxy.cn/handler"
 	"github.com/rs/zerolog/log"
 )
 
