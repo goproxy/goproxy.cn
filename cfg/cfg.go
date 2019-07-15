@@ -4,7 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	stdLog "log"
+	stdlog "log"
 	"strings"
 
 	"github.com/BurntSushi/toml"
@@ -71,7 +71,7 @@ func init() {
 		))
 	}
 
-	a.ErrorLogger = stdLog.New(&errorLogWriter{}, "", 0)
+	a.ErrorLogger = stdlog.New(&errorLogWriter{}, "", 0)
 
 	if err := mapstructure.Decode(m["zerolog"], &Zerolog); err != nil {
 		panic(fmt.Errorf(
