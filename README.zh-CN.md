@@ -18,7 +18,7 @@ Goproxy 中国完全实现了 Go 的[模块代理协议](https://golang.org/cmd/
 
 **问：使用 Goproxy 中国是否安全？**
 
-答：当然，和所有其他的 Go 模块代理一样，我们只是将模块原封不动地缓存起来，所以我们可以向你保证它们绝对不会在我们这边被篡改。不过，如果你还是不能够完全信任我们。那么你可以使用你信任的校验和数据库（比如 [sum.golang.org](https://sum.golang.org)）来确保你从我们这里获取的模块没有被篡改过，自从 Goproxy 中国已经支持了[代理校验和数据库](https://go.googlesource.com/proposal/+/master/design/25530-sumdb.md#proxying-a-checksum-database)。
+答：当然，和所有其他的 Go 模块代理一样，我们只是将模块原封不动地缓存起来，所以我们可以向你保证它们绝对不会在我们这边被篡改。不过，如果你还是不能够完全信任我们，那么你可以使用最值得信任的校验和数据库 [sum.golang.org](https://sum.golang.org) 来确保你从我们这里获取的模块没有被篡改过，自从 Goproxy 中国已经支持了[代理校验和数据库](https://go.googlesource.com/proposal/+/master/design/25530-sumdb.md#proxying-a-checksum-database)。
 
 **问：Goproxy 中国在中国是合法的吗？**
 
@@ -26,7 +26,7 @@ Goproxy 中国完全实现了 Go 的[模块代理协议](https://golang.org/cmd/
 
 **问：为什么不使用 [proxy.golang.org](https://proxy.golang.org)？**
 
-答：因为 [proxy.golang.org](https://proxy.golang.org) 在中国被屏蔽了，所以，不使用。
+答：因为 [proxy.golang.org](https://proxy.golang.org) 在中国大陆被屏蔽了，所以，不使用。但是，如果你不在中国大陆，那么我们建议你优先考虑使用 [proxy.golang.org](https://proxy.golang.org)，毕竟它看起来更加官方。一旦你进入了中国大陆，我们希望你能在第一时间想到 [goproxy.cn](https://goproxy.cn)，这也是我们为什么选择 `.cn` 作为域名后缀的主要原因。
 
 ## 用法
 

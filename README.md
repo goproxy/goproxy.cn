@@ -35,10 +35,10 @@ also use it.
 
 A: Of course, as with all other Go module proxies, we just cache the modules as
 they are, so we can assure you that they will never be tampered with on our
-side. However, if you still can't fully trust us. Then you can use your trusted
-checksum databases (such as the [sum.golang.org](https://sum.golang.org)) to
-ensure that the modules you get from us have not been tampered with, since
-Goproxy China has supported
+side. However, if you still can't fully trust us, then you can use the most
+trusted checksum database [sum.golang.org](https://sum.golang.org) to ensure
+that the modules you get from us have not been tampered with, since Goproxy
+China has supported
 [proxying checksum databases](https://go.googlesource.com/proposal/+/master/design/25530-sumdb.md#proxying-a-checksum-database).
 
 **Q: Is Goproxy China legal in China?**
@@ -49,7 +49,12 @@ project. This means that it will be **fully legal** in China.
 **Q: Why not use the [proxy.golang.org](https://proxy.golang.org)?**
 
 A: The [proxy.golang.org](https://proxy.golang.org) has been blocked in the
-mainland of China. So, no.
+mainland of China. So, no. However, if you're not in the mainland of China, then
+we recommend that you give priority to using the
+[proxy.golang.org](https://proxy.golang.org), after all, it looks more official.
+Once you enter the mainland of China, we hope that you'll think of the
+[goproxy.cn](https://goproxy.cn) in the first place, which is the main reason why
+we choose the `.cn` as the domain name extension.
 
 ## Usage
 
