@@ -13,8 +13,6 @@ logger_level = "debug"
 # Goproxy
 [goproxy]
 go_bin_name = "go"
-max_go_bin_workers = 8
-supported_sumdb_hosts = ["sum.golang.org"]
 kodo_endponit = "<KODO_ENDPOINT>"
 kodo_access_key = "<KODO_ACCESS_KEY>"
 kodo_secret_key = "<KODO_SECRET_KEY>"

@@ -15,7 +15,6 @@ var a = air.Default
 func init() {
 	g := goproxy.New()
 	g.GoBinName = cfg.Goproxy.GoBinName
-	g.MaxGoBinWorkers = cfg.Goproxy.MaxGoBinWorkers
 	g.Cacher = &cacher.Kodo{
 		Endpoint:   cfg.Goproxy.KodoEndpoint,
 		AccessKey:  cfg.Goproxy.KodoAccessKey,
@@ -23,7 +22,6 @@ func init() {
 		BucketName: cfg.Goproxy.KodoBucketName,
 	}
 
-	g.SupportedSUMDBHosts = cfg.Goproxy.SupportedSUMDBHosts
 	g.ErrorLogger = a.ErrorLogger
 
 	a.BATCH(

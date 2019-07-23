@@ -26,7 +26,7 @@ Goproxy 中国完全实现了 Go 的[模块代理协议](https://golang.org/cmd/
 
 **问：为什么不使用 [proxy.golang.org](https://proxy.golang.org)？**
 
-答：因为 [proxy.golang.org](https://proxy.golang.org) 在中国大陆被屏蔽了，所以，不使用。但是，如果你不在中国大陆，那么我们建议你优先考虑使用 [proxy.golang.org](https://proxy.golang.org)，毕竟它看起来更加官方。一旦你进入了中国大陆，我们希望你能在第一时间想到 [goproxy.cn](https://goproxy.cn)，这也是我们为什么选择 `.cn` 作为域名后缀的主要原因。
+答：因为 [proxy.golang.org](https://proxy.golang.org) 在中国大陆被屏蔽了，所以，不使用。但是，如果你不在中国大陆，那么我们建议你优先考虑使用 [proxy.golang.org](https://proxy.golang.org)，毕竟它看起来更加官方。一旦你进入了中国大陆，我们希望你能在第一时间想到 [goproxy.cn](https://goproxy.cn)，这也是我们选择 `.cn` 作为域名后缀的主要原因。
 
 ## 用法
 

@@ -29,15 +29,6 @@ var (
 		// GoBinName is the name of the Go binary of the Goproxy.
 		GoBinName string `mapstructure:"go_bin_name"`
 
-		// MaxGoBinWorkers is the maximum number of the Go binary
-		// commands of the Goproxy that are allowed to execute at the
-		// same time.
-		MaxGoBinWorkers int `mapstructure:"max_go_bin_workers"`
-
-		// SupportedSUMDBHosts is the supported checksum database host
-		// of the Goproxy.
-		SupportedSUMDBHosts []string `mapstructure:"supported_sumdb_hosts"`
-
 		// KodoEndpoint is the endpoint of the Qiniu Cloud Kodo.
 		KodoEndpoint string `mapstructure:"kodo_endpoint"`
 
