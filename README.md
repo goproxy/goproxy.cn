@@ -6,29 +6,36 @@ The most trusted Go module proxy in China.
 
 Goproxy China has fully implemented the Go's
 [module proxy protocol](https://golang.org/cmd/go/#hdr-Module_proxy_protocol).
-And it's a non-profit project that will (when it is fully tested) run on China's
-well-trusted cloud service provider [Qiniu Cloud](https://www.qiniu.com). Our
-goal is to provide a free, trusted, always on, and CDNed Go module proxy for
-Gophers in China and the rest of the world.
+And it's a non-profit project supported by China's well-trusted cloud service
+provider [Qiniu Cloud](https://www.qiniu.com). Our goal is to provide a free,
+trusted, always on, and CDNed Go module proxy for Gophers in China and the rest
+of the world.
 
-Note that Goproxy China will (and will only) focus on the development of the web
-application that serves at the [https://goproxy.cn](https://goproxy.cn). If you
-are looking for a dead simple way to build your own Go module proxy, then you
-should take a look at [Goproxy](https://github.com/goproxy/goproxy) which is
-Goproxy China based on.
+Goproxy China only focuses on the development of the web application
+that serves at the [https://goproxy.cn](https://goproxy.cn). If you're looking
+for a dead simple way to build your own Go module proxy, then you should take a
+look at [Goproxy](https://github.com/goproxy/goproxy) which is Goproxy China
+based on.
 
 Happy coding, Gophers! ;-)
+
+## Credits
+
+* Author: [Aofei Sheng](https://aofeisheng.com)
+* Maintainer: [Aofei Sheng](https://aofeisheng.com)
+* Sponsor: [Qiniu Cloud](https://www.qiniu.com)
+* Promoters: [Shiwei Xu (Qiniu Cloud's founder-CEO)](https://baike.baidu.com/item/许式伟), Chuntang Tao and [Lifu Mao](https://github.com/forrest-mao)
 
 ## FAQ
 
 **Q: Why create Goproxy China?**
 
-A: Due to the Chinese government's network supervision system, there are lot of
+A: Due to the Chinese government's network supervision system, there're lot of
 modules in the Go ecosystem that Chinese Gophers cannot `go get`, such as the
 most famous `golang.org/x/...`. And the speed of getting modules from GitHub in
 the mainland of China is a bit slow. So we created Goproxy China to make Gophers
 in China better use Go modules. In fact, since the
-[goproxy.cn](https://goproxy.cn) will be CDNed, Gophers in other countries can
+[goproxy.cn](https://goproxy.cn) has been CDNed, Gophers in other countries can
 also use it.
 
 **Q: Is it safe to use Goproxy China?**
@@ -43,8 +50,10 @@ China has supported
 
 **Q: Is Goproxy China legal in China?**
 
-A: The Goproxy China will be a business-supported project rather than a personal
-project. This means that it will be **fully legal** in China.
+A: Goproxy China is a business-supported project rather than a personal project.
+And it has been ICP filed in the MIIT of China (ICP license:
+[沪ICP备11037377号-56](http://beian.miit.gov.cn)), which means it's **fully
+legal** in China.
 
 **Q: Why not use the [proxy.golang.org](https://proxy.golang.org)?**
 

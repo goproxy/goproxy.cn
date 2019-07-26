@@ -4,17 +4,24 @@
 
 中国最可靠的 Go 模块代理。
 
-Goproxy 中国完全实现了 Go 的[模块代理协议](https://golang.org/cmd/go/#hdr-Module_proxy_protocol)。并且它是一个将在（当其经过全面测试后）中国备受信赖的云服务提供商[七牛云](https://www.qiniu.com)上运行的非营利性项目。我们的目标是为中国和世界上其他地方的 Gopher 们提供一个免费的、可靠的、持续在线的且经过 CDN 加速的模块代理。
+Goproxy 中国完全实现了 Go 的[模块代理协议](https://golang.org/cmd/go/#hdr-Module_proxy_protocol)。并且它是一个由中国备受信赖的云服务提供商[七牛云](https://www.qiniu.com)支持的非营利性项目。我们的目标是为中国和世界上其他地方的 Gopher 们提供一个免费的、可靠的、持续在线的且经过 CDN 加速的模块代理。
 
-请注意，Goproxy 中国将（且只将）专注于服务在 [https://goproxy.cn](https://goproxy.cn) 的 Web 应用本身的开发。如果你正在寻找一种极其简单的方法来搭建你自己的 Go 模块代理，那么你应该看一下 [Goproxy](https://github.com/goproxy/goproxy)，Goproxy 中国就是基于它开发的。
+请注意，Goproxy 中国只专注于服务在 [https://goproxy.cn](https://goproxy.cn) 的 Web 应用本身的开发。如果你正在寻找一种极其简单的方法来搭建你自己的 Go 模块代理，那么你应该看一下 [Goproxy](https://github.com/goproxy/goproxy)，Goproxy 中国就是基于它开发的。
 
 愉快地编码吧，Gopher 们！;-)
+
+## 功劳
+
+* 作者：[盛傲飞](https://aofeisheng.com)
+* 维护者：[盛傲飞](https://aofeisheng.com)
+* 赞助商：[七牛云](https://www.qiniu.com)
+* 推动者：[许式伟（七牛云的创始人兼首席执行官）](https://baike.baidu.com/item/许式伟)、陶纯堂和[茂力夫](https://github.com/forrest-mao)
 
 ## 常见问题
 
 **问：为什么创建 Goproxy 中国？**
 
-答：由于中国政府的网络监管系统，Go 生态系统中有着许多中国 Gopher 们无法获取的模块，比如最著名的 `golang.org/x/...`。并且在中国大陆从 GitHub 获取模块的速度也有点慢。因此，我们创建了 Goproxy 中国，使在中国的 Gopher 们能更好地使用 Go 模块。事实上，由于 [goproxy.cn](https://goproxy.cn) 将通过 CDN 加速，所以其他国家的 Gopher 们也可以使用它。
+答：由于中国政府的网络监管系统，Go 生态系统中有着许多中国 Gopher 们无法获取的模块，比如最著名的 `golang.org/x/...`。并且在中国大陆从 GitHub 获取模块的速度也有点慢。因此，我们创建了 Goproxy 中国，使在中国的 Gopher 们能更好地使用 Go 模块。事实上，由于 [goproxy.cn](https://goproxy.cn) 已通过 CDN 加速，所以其他国家的 Gopher 们也可以使用它。
 
 **问：使用 Goproxy 中国是否安全？**
 
@@ -22,7 +29,7 @@ Goproxy 中国完全实现了 Go 的[模块代理协议](https://golang.org/cmd/
 
 **问：Goproxy 中国在中国是合法的吗？**
 
-答：Goproxy 中国将会是一个由商业支持的项目而不是一个个人项目，这也就意味着它在中国将完全合法。
+答：Goproxy 中国是一个由商业支持的项目而不是一个个人项目。并且它已经 ICP 备案在中华人民共和国工业和信息化部（ICP 备案号：[沪ICP备11037377号-56](http://beian.miit.gov.cn)），这也就意味着它在中国完全合法。
 
 **问：为什么不使用 [proxy.golang.org](https://proxy.golang.org)？**
 
