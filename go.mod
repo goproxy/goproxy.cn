@@ -5,6 +5,7 @@ require (
 	github.com/air-gases/defibrillator v0.12.3
 	github.com/air-gases/limiter v0.12.3
 	github.com/air-gases/logger v0.12.3
+	github.com/air-gases/redirector v0.12.3
 	github.com/aofei/air v0.12.3
 	github.com/goproxy/goproxy v0.0.0-20190725155555-161cd44d7418
 	github.com/mitchellh/mapstructure v1.1.2

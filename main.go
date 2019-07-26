@@ -11,6 +11,7 @@ import (
 	"github.com/air-gases/defibrillator"
 	"github.com/air-gases/limiter"
 	"github.com/air-gases/logger"
+	"github.com/air-gases/redirector"
 	"github.com/aofei/air"
 	_ "github.com/goproxy/goproxy.cn/handler"
 	"github.com/rs/zerolog/log"
@@ -25,6 +26,7 @@ func main() {
 	a.Pregases = []air.Gas{
 		logger.Gas(logger.GasConfig{}),
 		defibrillator.Gas(defibrillator.GasConfig{}),
+		redirector.WWW2NonWWWGas(redirector.WWW2NonWWWGasConfig{}),
 		limiter.BodySizeGas(limiter.BodySizeGasConfig{
 			MaxBytes: 1 << 20,
 		}),

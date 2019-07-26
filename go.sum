@@ -12,6 +12,8 @@ github.com/air-gases/limiter v0.12.3 h1:B75kCk29pPnqGwH/z38y97fx+GBs2s0xI6Y+BOkd
 github.com/air-gases/limiter v0.12.3/go.mod h1:UEQZVVHP2tA2Rh+BicE61OkGv/45Wu9euJX2PDg9wVg=
 github.com/air-gases/logger v0.12.3 h1:rVbuNN0Lpg2EXsX91sfVKl3L++FpxtZzIMxkNjzDxiI=
 github.com/air-gases/logger v0.12.3/go.mod h1:xbZeRlGgg0pr+CwuzfjlHs3Xb9SU/lvXyeq3/9zui/k=
+github.com/air-gases/redirector v0.12.3 h1:EivgZk2H6P7zCtsBRfZfE8CWRSjCA/LQrDh3ASKbeQM=
+github.com/air-gases/redirector v0.12.3/go.mod h1:Ebsd3r2fonN4hpDqvuhOL0JmIf8LrP2DL0S1JD36JGE=
 github.com/allegro/bigcache v1.2.1-0.20190218064605-e24eb225f156/go.mod h1:Cb/ax3seSYIx7SuZdm2G2xzfwmv3TPSk2ucNfQESPXM=
 github.com/allegro/bigcache v1.2.1 h1:hg1sY1raCwic3Vnsvje6TT7/pnZba83LeFck5NrFKSc=
 github.com/allegro/bigcache v1.2.1/go.mod h1:Cb/ax3seSYIx7SuZdm2G2xzfwmv3TPSk2ucNfQESPXM=
