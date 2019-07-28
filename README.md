@@ -4,6 +4,8 @@
 
 The most trusted Go module proxy in China.
 
+![39C6C4A2-AF08-4B00-915D-2FCA96767E16](https://user-images.githubusercontent.com/5037285/62007948-66cdad00-b186-11e9-899e-01ccb76951d9.jpeg)
+
 Goproxy China has fully implemented the Go's
 [module proxy protocol](https://golang.org/cmd/go/#hdr-Module_proxy_protocol).
 And it's a non-profit project supported by China's well-trusted cloud service
