@@ -24,7 +24,9 @@ func main() {
 	a.ErrorHandler = errorHandler
 
 	a.Pregases = []air.Gas{
-		logger.Gas(logger.GasConfig{}),
+		logger.Gas(logger.GasConfig{
+			IncludeClientAddress: true,
+		}),
 		defibrillator.Gas(defibrillator.GasConfig{}),
 		redirector.WWW2NonWWWGas(redirector.WWW2NonWWWGasConfig{}),
 		limiter.BodySizeGas(limiter.BodySizeGasConfig{
