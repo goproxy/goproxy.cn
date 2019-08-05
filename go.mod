@@ -7,9 +7,7 @@ require (
 	github.com/air-gases/logger v0.12.3
 	github.com/air-gases/redirector v0.12.3
 	github.com/aofei/air v0.12.3
-	github.com/goproxy/goproxy v0.0.0-20190729102355-ad50b8c81316
+	github.com/goproxy/goproxy v0.0.0-20190804080954-accc2313f615
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/rs/zerolog v1.14.3
-	github.com/tdewolff/minify/v2 v2.5.1 // indirect
-	github.com/tdewolff/test v1.0.3 // indirect
 )
