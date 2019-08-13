@@ -29,10 +29,10 @@ func init() {
 	g := goproxy.New()
 	g.GoBinName = cfg.Goproxy.GoBinName
 	g.Cacher = &cacher.Kodo{
-		Endpoint:   cfg.Goproxy.KodoEndpoint,
-		AccessKey:  cfg.Goproxy.KodoAccessKey,
-		SecretKey:  cfg.Goproxy.KodoSecretKey,
-		BucketName: cfg.Goproxy.KodoBucketName,
+		Endpoint:   cfg.Kodo.Endpoint,
+		AccessKey:  cfg.Kodo.AccessKey,
+		SecretKey:  cfg.Kodo.SecretKey,
+		BucketName: cfg.Kodo.BucketName,
 	}
 
 	g.ErrorLogger = a.ErrorLogger

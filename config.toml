@@ -5,15 +5,20 @@ debug_mode = true
 address = "localhost:8080"
 minifier_enabled = true
 gzip_enabled = true
+coffer_enabled = true
+i18n_enabled = true
 
 # Zerolog
 [zerolog]
 logger_level = "debug"
 
+# Qiniu Cloud Kodo
+[kodo]
+endpoint = "<ENDPOINT>"
+access_key = "<ACCESS_KEY>"
+secret_key = "<SECRET_KEY>"
+bucket_name = "<BUCKET_NAME>"
+
 # Goproxy
 [goproxy]
 go_bin_name = "go"
-kodo_endpoint = "<KODO_ENDPOINT>"
-kodo_access_key = "<KODO_ACCESS_KEY>"
-kodo_secret_key = "<KODO_SECRET_KEY>"
-kodo_bucket_name = "<KODO_BUCKET_NAME>"
