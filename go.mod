@@ -2,12 +2,13 @@ module github.com/goproxy/goproxy.cn
 
 require (
 	github.com/BurntSushi/toml v0.3.1
+	github.com/air-gases/cacheman v0.7.4
 	github.com/air-gases/defibrillator v0.12.4
 	github.com/air-gases/limiter v0.12.4
 	github.com/air-gases/logger v0.12.4
 	github.com/air-gases/redirector v0.12.4
 	github.com/aofei/air v0.12.4
-	github.com/goproxy/goproxy v0.0.0-20190809144859-080f99010796
+	github.com/goproxy/goproxy v0.0.0-20190812143559-921935e9a7e6
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/rs/zerolog v1.14.3
 )
