@@ -50,7 +50,7 @@ $ export GOPROXY=https://goproxy.cn
 或者
 
 ```bash
-$ echo "GOPROXY=https://goproxy.cn" >> ~/.profile && source ~/.profile
+$ echo "export GOPROXY=https://goproxy.cn" >> ~/.profile && source ~/.profile
 ```
 
 完成。

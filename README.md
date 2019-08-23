@@ -80,7 +80,7 @@ $ export GOPROXY=https://goproxy.cn
 or
 
 ```bash
-$ echo "GOPROXY=https://goproxy.cn" >> ~/.profile && source ~/.profile
+$ echo "export GOPROXY=https://goproxy.cn" >> ~/.profile && source ~/.profile
 ```
 
 done.
