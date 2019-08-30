@@ -22,3 +22,4 @@ bucket_name = "<BUCKET_NAME>"
 # Goproxy
 [goproxy]
 go_bin_name = "go"
+local_cache_root = "/tmp"

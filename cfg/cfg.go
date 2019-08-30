@@ -43,6 +43,9 @@ var (
 	Goproxy struct {
 		// GoBinName is the name of the Go binary of the Goproxy.
 		GoBinName string `mapstructure:"go_bin_name"`
+
+		// LocalCacheRoot is the root of the local caches.
+		LocalCacheRoot string `mapstructure:"local_cache_root"`
 	}
 )
 
