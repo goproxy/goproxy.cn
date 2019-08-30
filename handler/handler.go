@@ -2,10 +2,6 @@ package handler
 
 import (
 	"context"
-	"crypto/md5"
-	"encoding/hex"
-	"errors"
-	"fmt"
 	"hash"
 	"io"
 	"io/ioutil"
@@ -19,6 +15,7 @@ import (
 	"github.com/aofei/air"
 	"github.com/goproxy/goproxy"
 	"github.com/goproxy/goproxy.cn/cfg"
+	"github.com/goproxy/goproxy/cacher"
 	"github.com/qiniu/api.v7/auth/qbox"
 	"github.com/qiniu/api.v7/storage"
 	"github.com/rs/zerolog/log"
@@ -33,9 +30,6 @@ var (
 
 	// kodoMac is the credentials of the Qiniu Cloud Kodo.
 	kodoMac *qbox.Mac
-
-	// kodoConfig is the configuration of the Qiniu Cloud Kodo.
-	kodoConfig *storage.Config
 
 	// kodoBucketManager is the manager of the Qiniu Cloud Kodo.
 	kodoBucketManager *storage.BucketManager
@@ -53,7 +47,15 @@ var (
 
 func init() {
 	g.GoBinName = cfg.Goproxy.GoBinName
-	g.Cacher = &cacher{}
+	g.Cacher = &kodoCacher{
+		kodoCacher: &cacher.Kodo{
+			Endpoint:   cfg.Kodo.Endpoint,
+			AccessKey:  cfg.Kodo.AccessKey,
+			SecretKey:  cfg.Kodo.SecretKey,
+			BucketName: cfg.Kodo.BucketName,
+		},
+	}
+
 	g.ErrorLogger = a.ErrorLogger
 
 	kodoMac = qbox.NewMac(cfg.Kodo.AccessKey, cfg.Kodo.SecretKey)
@@ -68,11 +70,9 @@ func init() {
 			Msg("failed to get qiniu cloud kodo region")
 	}
 
-	kodoConfig = &storage.Config{
+	kodoBucketManager = storage.NewBucketManager(kodoMac, &storage.Config{
 		Region: kodoRegion,
-	}
-
-	kodoBucketManager = storage.NewBucketManager(kodoMac, kodoConfig)
+	})
 
 	a.FILE("/robots.txt", "robots.txt")
 	a.FILE("/favicon.ico", "favicon.ico", cachemanGas)
@@ -99,7 +99,7 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 		} else if fi.Fsize > 10<<20 { // File size > 10 MB
 			fu := storage.MakePrivateURL(
 				kodoMac,
-				cfg.Kodo.Endpoint,
+				cfg.Kodo.BucketEndpoint,
 				fk,
 				time.Now().Add(time.Hour).Unix(),
 			)
@@ -112,66 +112,27 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 	return nil
 }
 
-// cacher implements the `goproxy.Cacher`.
-type cacher struct{}
+// kodoCacher implements the `goproxy.Cacher`.
+type kodoCacher struct {
+	// kodoCacher is the underlying cacher.
+	kodoCacher *cacher.Kodo
+}
 
 // NewHash implements the `goproxy.Cacher`.
-func (*cacher) NewHash() hash.Hash {
-	return md5.New()
+func (kc *kodoCacher) NewHash() hash.Hash {
+	return kc.kodoCacher.NewHash()
 }
 
 // Cache implements the `goproxy.Cacher`.
-func (*cacher) Cache(ctx context.Context, name string) (goproxy.Cache, error) {
-	fileInfo, err := kodoBucketManager.Stat(cfg.Kodo.BucketName, name)
-	if err != nil {
-		if isKodoFileNotExist(err) {
-			return nil, goproxy.ErrCacheNotFound
-		}
-
-		return nil, err
-	}
-
-	deadline, ok := ctx.Deadline()
-	if !ok {
-		deadline = time.Now().Add(time.Hour)
-	}
-
-	fileURL := storage.MakePrivateURL(
-		kodoMac,
-		cfg.Kodo.Endpoint,
-		name,
-		deadline.Unix(),
-	)
-
-	req, err := http.NewRequest(http.MethodHead, fileURL, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := http.DefaultClient.Do(req.WithContext(ctx))
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	checksum, err := hex.DecodeString(res.Header.Get("x-qn-meta-checksum"))
-	if err != nil {
-		return nil, err
-	}
-
-	return &cache{
-		ctx:      ctx,
-		url:      fileURL,
-		name:     name,
-		mimeType: fileInfo.MimeType,
-		size:     fileInfo.Fsize,
-		modTime:  time.Unix(fileInfo.PutTime*100/int64(time.Second), 0),
-		checksum: checksum,
-	}, nil
+func (kc *kodoCacher) Cache(
+	ctx context.Context,
+	name string,
+) (goproxy.Cache, error) {
+	return kc.kodoCacher.Cache(ctx, name)
 }
 
 // SetCache implements the `goproxy.Cacher`.
-func (*cacher) SetCache(ctx context.Context, c goproxy.Cache) error {
+func (kc *kodoCacher) SetCache(ctx context.Context, c goproxy.Cache) error {
 	localCache, err := ioutil.TempFile(cfg.Goproxy.LocalCacheRoot, "")
 	if err != nil {
 		return err
@@ -202,34 +163,30 @@ func (*cacher) SetCache(ctx context.Context, c goproxy.Cache) error {
 		)
 		defer cancel()
 
-		scope := fmt.Sprintf("%s:%s", cfg.Kodo.BucketName, c.Name())
-		checksumString := hex.EncodeToString(c.Checksum())
-		storage.NewFormUploader(kodoConfig).PutFile(
-			ctx,
-			nil,
-			(&storage.PutPolicy{
-				Scope: scope,
-			}).UploadToken(kodoMac),
-			c.Name(),
-			localCache.Name(),
-			&storage.PutExtra{
-				Params: map[string]string{
-					"x-qn-meta-checksum": checksumString,
-				},
-				MimeType: c.MIMEType(),
-			},
-		)
+		lc, err := os.Open(localCache.Name())
+		if err != nil {
+			return
+		}
+
+		dc := &diskCache{
+			file:     lc,
+			name:     c.Name(),
+			mimeType: c.MIMEType(),
+			size:     c.Size(),
+			modTime:  c.ModTime(),
+			checksum: c.Checksum(),
+		}
+		defer dc.Close()
+
+		kc.kodoCacher.SetCache(ctx, dc)
 	}()
 
 	return nil
 }
 
-// cache implements the `goproxy.Cache`. It is the cache unit of the `cacher`.
-type cache struct {
-	ctx      context.Context
-	url      string
-	offset   int64
-	closed   bool
+// diskCache implements the `goproxy.Cache`.
+type diskCache struct {
+	file     *os.File
 	name     string
 	mimeType string
 	size     int64
@@ -238,96 +195,43 @@ type cache struct {
 }
 
 // Read implements the `goproxy.Cache`.
-func (c *cache) Read(b []byte) (int, error) {
-	if c.closed {
-		return 0, os.ErrClosed
-	} else if c.offset >= c.size {
-		return 0, io.EOF
-	}
-
-	req, err := http.NewRequest(http.MethodGet, c.url, nil)
-	if err != nil {
-		return 0, err
-	}
-
-	req.Header.Set("Range", fmt.Sprintf("bytes=%d-", c.offset))
-
-	res, err := http.DefaultClient.Do(req.WithContext(c.ctx))
-	if err != nil {
-		return 0, err
-	}
-	defer res.Body.Close()
-
-	n, err := res.Body.Read(b)
-	c.offset += int64(n)
-
-	return n, err
+func (dc *diskCache) Read(b []byte) (int, error) {
+	return dc.file.Read(b)
 }
 
 // Seek implements the `goproxy.Cache`.
-func (c *cache) Seek(offset int64, whence int) (int64, error) {
-	if c.closed {
-		return 0, os.ErrClosed
-	}
-
-	switch whence {
-	case io.SeekStart:
-	case io.SeekCurrent:
-		offset += c.offset
-	case io.SeekEnd:
-		offset += c.size
-	default:
-		return 0, errors.New("invalid whence")
-	}
-
-	if offset < 0 {
-		return 0, errors.New("negative position")
-	}
-
-	c.offset = offset
-
-	return c.offset, nil
+func (dc *diskCache) Seek(offset int64, whence int) (int64, error) {
+	return dc.file.Seek(offset, whence)
 }
 
 // Close implements the `goproxy.Cache`.
-func (c *cache) Close() error {
-	if c.closed {
-		return os.ErrClosed
-	}
-
-	c.closed = true
-
-	return nil
+func (dc *diskCache) Close() error {
+	return dc.file.Close()
 }
 
 // Name implements the `goproxy.Cache`.
-func (c *cache) Name() string {
-	return c.name
+func (dc *diskCache) Name() string {
+	return dc.name
 }
 
 // MIMEType implements the `goproxy.Cache`.
-func (c *cache) MIMEType() string {
-	return c.mimeType
+func (dc *diskCache) MIMEType() string {
+	return dc.mimeType
 }
 
 // Size implements the `goproxy.Cache`.
-func (c *cache) Size() int64 {
-	return c.size
+func (dc *diskCache) Size() int64 {
+	return dc.size
 }
 
 // ModTime implements the `goproxy.Cache`.
-func (c *cache) ModTime() time.Time {
-	return c.modTime
+func (dc *diskCache) ModTime() time.Time {
+	return dc.modTime
 }
 
 // Checksum implements the `goproxy.Cache`.
-func (c *cache) Checksum() []byte {
-	return c.checksum
-}
-
-// isKodoFileNotExist reports whether the err means a Kodo file is not exist.
-func isKodoFileNotExist(err error) bool {
-	return err != nil && err.Error() == "no such file or directory"
+func (dc *diskCache) Checksum() []byte {
+	return dc.checksum
 }
 
 // splitPathQuery splits the p of the form "path?query" into path and query.
@@ -341,4 +245,9 @@ func splitPathQuery(p string) (path, query string) {
 	}
 
 	return p, ""
+}
+
+// isKodoFileNotExist reports whether the err means a Kodo file is not exist.
+func isKodoFileNotExist(err error) bool {
+	return err != nil && err.Error() == "no such file or directory"
 }

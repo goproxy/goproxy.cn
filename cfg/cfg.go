@@ -37,6 +37,9 @@ var (
 
 		// BucketName is the bucket name of the Qiniu Cloud Kodo.
 		BucketName string `mapstructure:"bucket_name"`
+
+		// BucketEndpoint is the bucket endpint of the Qiniu Cloud Kodo.
+		BucketEndpoint string `mapstructure:"bucket_endpoint"`
 	}
 
 	// Goproxy is the Goproxy configuration items.

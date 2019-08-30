@@ -18,6 +18,7 @@ endpoint = "<ENDPOINT>"
 access_key = "<ACCESS_KEY>"
 secret_key = "<SECRET_KEY>"
 bucket_name = "<BUCKET_NAME>"
+bucket_endpoint = "<BUCKET_ENDPOINT>"
 
 # Goproxy
 [goproxy]
