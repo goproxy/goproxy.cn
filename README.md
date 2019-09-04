@@ -69,6 +69,16 @@ we choose the `.cn` as the domain name extension.
 
 ## Usage
 
+### Go 1.13 and above (RECOMMENDED)
+
+Open your terminal and execute
+
+```bash
+$ go env -w GOPROXY=https://goproxy.cn,direct
+```
+
+done.
+
 ### macOS or Linux
 
 Open your terminal and execute

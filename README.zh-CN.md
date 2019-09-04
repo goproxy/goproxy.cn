@@ -39,6 +39,16 @@ Goproxy 中国完全实现了 Go 的[模块代理协议](https://golang.org/cmd/
 
 ## 用法
 
+### Go 1.13 及以上（推荐）
+
+打开你的终端并执行：
+
+```bash
+$ go env -w GOPROXY=https://goproxy.cn,direct
+```
+
+完成。
+
 ### macOS 或 Linux
 
 打开你的终端并执行：
