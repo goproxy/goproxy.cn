@@ -57,6 +57,7 @@ func init() {
 	}
 
 	g.ErrorLogger = a.ErrorLogger
+	g.DisableNotFoundLog = true
 
 	kodoMac = qbox.NewMac(cfg.Kodo.AccessKey, cfg.Kodo.SecretKey)
 
