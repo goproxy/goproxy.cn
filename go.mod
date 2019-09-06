@@ -10,9 +10,10 @@ require (
 	github.com/air-gases/logger v0.12.5
 	github.com/air-gases/redirector v0.12.5
 	github.com/aofei/air v0.12.5
-	github.com/goproxy/goproxy v0.0.0-20190905180159-689264d3a01f
+	github.com/goproxy/goproxy v0.0.0-20190906124933-bb92c50db358
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/qiniu/api.v7 v0.0.0-20190520053455-bea02cd22bf4
 	github.com/rs/zerolog v1.15.0
+	github.com/tdewolff/minify/v2 v2.5.2 // indirect
 	gopkg.in/ini.v1 v1.46.0 // indirect
 )
