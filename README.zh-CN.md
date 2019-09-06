@@ -39,6 +39,8 @@ Goproxy 中国完全实现了 Go 的[模块代理协议](https://golang.org/cmd/
 
 ## 用法
 
+虽然下面的内容主要是讲解如何设置 `GOPROXY`，但是我们也推荐你在使用 Go 模块时将 `GO111MODULE` 设置为 `on` 而不是 `auto`。
+
 ### Go 1.13 及以上（推荐）
 
 打开你的终端并执行：

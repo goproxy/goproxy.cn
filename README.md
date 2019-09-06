@@ -69,6 +69,10 @@ we choose the `.cn` as the domain name extension.
 
 ## Usage
 
+Although the following content only explains how to set `GOPROXY`, but we also
+recommend that you set `GO111MODULE` to `on` instead of `auto` when you are
+working with Go modules.
+
 ### Go 1.13 and above (RECOMMENDED)
 
 Open your terminal and execute
