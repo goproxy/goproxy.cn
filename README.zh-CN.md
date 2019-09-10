@@ -17,7 +17,7 @@ Goproxy 中国完全实现了 Go 的[模块代理协议](https://golang.org/cmd/
 * 作者：[盛傲飞](https://aofeisheng.com)
 * 维护者：[盛傲飞](https://aofeisheng.com)
 * 赞助商：[七牛云](https://www.qiniu.com)
-* 推动者：[许式伟（七牛云的创始人兼首席执行官）](https://baike.baidu.com/item/许式伟)、[谢孟军（Gopher China 的组织者）](https://github.com/astaxie)、陶纯堂和[茂力夫](https://github.com/forrest-mao)
+* 推动者：[许式伟（七牛云的创始人兼首席执行官）](https://baike.baidu.com/item/许式伟)、[谢孟军（Gopher China 的组织者）](https://github.com/astaxie)、陶纯堂和[茅力夫](https://github.com/forrest-mao)
 
 ## 常见问题
 
