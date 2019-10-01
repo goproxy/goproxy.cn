@@ -47,6 +47,7 @@ var (
 
 func init() {
 	g.GoBinName = cfg.Goproxy.GoBinName
+	g.MaxGoBinWorkers = cfg.Goproxy.MaxGoBinWorkers
 	g.Cacher = &kodoCacher{
 		kodoCacher: &cacher.Kodo{
 			Endpoint:   cfg.Kodo.Endpoint,

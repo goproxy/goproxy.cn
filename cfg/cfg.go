@@ -47,6 +47,11 @@ var (
 		// GoBinName is the name of the Go binary of the Goproxy.
 		GoBinName string `mapstructure:"go_bin_name"`
 
+		// MaxGoBinWorkers is the maximum number of the Go binary
+		// commands that are allowed to execute at the same time of the
+		// Goproxy.
+		MaxGoBinWorkers int `mapstructure:"max_go_bin_workers"`
+
 		// MaxZIPCacheBytes is the maximum number of bytes of the ZIP
 		// cache that will be stored in the cacher of the Goproxy.
 		MaxZIPCacheBytes int `mapstructure:"max_zip_cache_bytes"`

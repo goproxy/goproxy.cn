@@ -14,5 +14,6 @@ require (
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/qiniu/api.v7 v0.0.0-20190520053455-bea02cd22bf4
 	github.com/rs/zerolog v1.15.0
+	golang.org/x/sys v0.0.0-20191001151750-bb3f8db39f24 // indirect
 	google.golang.org/appengine v1.6.4 // indirect
 )

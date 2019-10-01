@@ -23,5 +23,6 @@ bucket_endpoint = "<BUCKET_ENDPOINT>"
 # Goproxy
 [goproxy]
 go_bin_name = "go"
+max_go_bin_workers = 8
 max_zip_cache_bytes = 104857600
 local_cache_root = "/tmp"
