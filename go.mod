@@ -10,8 +10,9 @@ require (
 	github.com/air-gases/logger v0.13.0
 	github.com/air-gases/redirector v0.13.0
 	github.com/aofei/air v0.13.0
-	github.com/goproxy/goproxy v0.0.0-20190915171140-5941b87b630e
+	github.com/goproxy/goproxy v0.0.0-20191001152237-556dc35cb4f6
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/qiniu/api.v7 v0.0.0-20190520053455-bea02cd22bf4
 	github.com/rs/zerolog v1.15.0
+	google.golang.org/appengine v1.6.4 // indirect
 )

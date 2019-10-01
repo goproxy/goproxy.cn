@@ -47,7 +47,12 @@ var (
 		// GoBinName is the name of the Go binary of the Goproxy.
 		GoBinName string `mapstructure:"go_bin_name"`
 
-		// LocalCacheRoot is the root of the local caches.
+		// MaxZIPCacheBytes is the maximum number of bytes of the ZIP
+		// cache that will be stored in the cacher of the Goproxy.
+		MaxZIPCacheBytes int `mapstructure:"max_zip_cache_bytes"`
+
+		// LocalCacheRoot is the root of the local caches of the
+		// Goproxy.
 		LocalCacheRoot string `mapstructure:"local_cache_root"`
 	}
 )

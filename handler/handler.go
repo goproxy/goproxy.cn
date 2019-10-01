@@ -56,6 +56,7 @@ func init() {
 		},
 	}
 
+	g.MaxZIPCacheBytes = cfg.Goproxy.MaxZIPCacheBytes
 	g.ErrorLogger = a.ErrorLogger
 	g.DisableNotFoundLog = true
 
