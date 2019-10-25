@@ -81,17 +81,19 @@ func init() {
 	a.FILE("/favicon.ico", "favicon.ico", cachemanGas)
 	a.FILE("/apple-touch-icon.png", "apple-touch-icon.png", cachemanGas)
 	a.FILES("/assets", a.CofferAssetRoot, cachemanGas)
-	a.BATCH(getHeadMethods, "/", indexPageHandler, cachemanGas)
-	a.BATCH(nil, "/*", goproxyHandler)
+	a.BATCH(getHeadMethods, "/", indexPage, cachemanGas)
+	a.BATCH(nil, "/*", proxy)
 }
 
-// indexPageHandler handles requests to get index page.
-func indexPageHandler(req *air.Request, res *air.Response) error {
-	return res.Redirect("https://github.com/goproxy/goproxy.cn")
+// indexPage handles requests to get index page.
+func indexPage(req *air.Request, res *air.Response) error {
+	const indexPageURLBase = "https://github.com/goproxy/goproxy.cn" +
+		"/blob/master/README.md"
+	return res.Redirect(req.LocalizedString(indexPageURLBase))
 }
 
-// goproxyHandler handles requests to play with Go module proxy.
-func goproxyHandler(req *air.Request, res *air.Response) error {
+// proxy handles requests to play with Go module proxy.
+func proxy(req *air.Request, res *air.Response) error {
 	if p, _ := splitPathQuery(req.Path); path.Ext(p) == ".zip" {
 		fk := strings.TrimLeft(path.Clean(p), "/")
 		fi, err := kodoBucketManager.Stat(cfg.Kodo.BucketName, fk)
