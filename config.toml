@@ -12,13 +12,12 @@ i18n_enabled = true
 [zerolog]
 logger_level = "debug"
 
-# Qiniu Cloud Kodo
-[kodo]
-endpoint = "<ENDPOINT>"
+# Qiniu Cloud
+[qiniu]
 access_key = "<ACCESS_KEY>"
 secret_key = "<SECRET_KEY>"
-bucket_name = "<BUCKET_NAME>"
-bucket_endpoint = "<BUCKET_ENDPOINT>"
+kodo_bucket_name = "<KODO_BUCKET_NAME>"
+kodo_bucket_endpoint = "<KODO_BUCKET_ENDPOINT>"
 
 # Goproxy
 [goproxy]
