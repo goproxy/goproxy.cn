@@ -105,20 +105,18 @@ func indexPage(req *air.Request, res *air.Response) error {
 func proxy(req *air.Request, res *air.Response) error {
 	if p, _ := splitPathQuery(req.Path); path.Ext(p) == ".zip" {
 		fn := strings.TrimLeft(path.Clean(p), "/")
-		if fi, err := qiniuKodoBucketManager.Stat(
+		if _, err := qiniuKodoBucketManager.Stat(
 			cfg.Qiniu.KodoBucketName,
 			fn,
-		); err != nil {
-			if !isKodoFileNotExist(err) {
-				return err
-			}
-		} else if fi.Fsize > 10<<20 { // File size > 10 MB
+		); err == nil {
 			return res.Redirect(storage.MakePrivateURL(
 				qiniuMac,
 				cfg.Qiniu.KodoBucketEndpoint,
 				fn,
 				time.Now().Add(time.Hour).Unix(),
 			))
+		} else if !isKodoFileNotExist(err) {
+			return err
 		}
 	}
 
