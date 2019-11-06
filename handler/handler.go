@@ -182,13 +182,8 @@ func (kc *kodoCacher) Cache(
 	}
 
 	return &kodoCache{
-		ctx: ctx,
-		url: storage.MakePrivateURL(
-			kc.bucketManager.Mac,
-			kc.bucketEndpoint,
-			name,
-			deadline.Unix(),
-		),
+		ctx:      ctx,
+		url:      url,
 		name:     name,
 		mimeType: fi.MimeType,
 		size:     fi.Fsize,
