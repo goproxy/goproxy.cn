@@ -32,6 +32,9 @@ var (
 		// SecretKey is the secret key of the Qiniu Cloud.
 		SecretKey string `mapstructure:"secret_key"`
 
+		// KodoEndpoint is the endpint of the Qiniu Cloud Kodo.
+		KodoEndpoint string `mapstructure:"kodo_endpoint"`
+
 		// KodoBucketName is the bucket name of the Qiniu Cloud Kodo.
 		KodoBucketName string `mapstructure:"kodo_bucket_name"`
 

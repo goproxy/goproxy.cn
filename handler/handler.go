@@ -2,11 +2,6 @@ package handler
 
 import (
 	"context"
-	"crypto/md5"
-	"encoding/hex"
-	"errors"
-	"fmt"
-	"hash"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -19,6 +14,7 @@ import (
 	"github.com/aofei/air"
 	"github.com/goproxy/goproxy"
 	"github.com/goproxy/goproxy.cn/cfg"
+	"github.com/goproxy/goproxy/cacher"
 	"github.com/qiniu/api.v7/v7/auth/qbox"
 	"github.com/qiniu/api.v7/v7/storage"
 	"github.com/rs/zerolog/log"
@@ -74,11 +70,13 @@ func init() {
 
 	g.GoBinName = cfg.Goproxy.GoBinName
 	g.MaxGoBinWorkers = cfg.Goproxy.MaxGoBinWorkers
-	g.Cacher = &kodoCacher{
-		bucketName:     cfg.Qiniu.KodoBucketName,
-		bucketEndpoint: cfg.Qiniu.KodoBucketEndpoint,
-		bucketManager:  qiniuKodoBucketManager,
-		formUploader:   storage.NewFormUploader(qiniuKodoConfig),
+	g.Cacher = &localCacher{
+		Cacher: &cacher.Kodo{
+			Endpoint:   cfg.Qiniu.KodoEndpoint,
+			AccessKey:  cfg.Qiniu.AccessKey,
+			SecretKey:  cfg.Qiniu.SecretKey,
+			BucketName: cfg.Qiniu.KodoBucketName,
+		},
 		localCacheRoot: cfg.Goproxy.LocalCacheRoot,
 	}
 
@@ -125,76 +123,16 @@ func proxy(req *air.Request, res *air.Response) error {
 	return nil
 }
 
-// kodoCacher implements the `goproxy.Cacher`.
-type kodoCacher struct {
-	bucketName     string
-	bucketEndpoint string
-	bucketManager  *storage.BucketManager
-	formUploader   *storage.FormUploader
+// localCacher implements the `goproxy.Cacher`.
+type localCacher struct {
+	goproxy.Cacher
+
 	localCacheRoot string
 }
 
-// NewHash implements the `goproxy.Cacher`.
-func (kc *kodoCacher) NewHash() hash.Hash {
-	return md5.New()
-}
-
-// Cache implements the `goproxy.Cacher`.
-func (kc *kodoCacher) Cache(
-	ctx context.Context,
-	name string,
-) (goproxy.Cache, error) {
-	fi, err := kc.bucketManager.Stat(kc.bucketName, name)
-	if err != nil {
-		if isKodoFileNotExist(err) {
-			return nil, goproxy.ErrCacheNotFound
-		}
-
-		return nil, err
-	}
-
-	deadline, ok := ctx.Deadline()
-	if !ok {
-		deadline = time.Now().Add(time.Hour)
-	}
-
-	url := storage.MakePrivateURL(
-		kc.bucketManager.Mac,
-		kc.bucketEndpoint,
-		name,
-		deadline.Unix(),
-	)
-
-	req, err := http.NewRequest(http.MethodHead, url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := http.DefaultClient.Do(req.WithContext(ctx))
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	checksum, err := hex.DecodeString(res.Header.Get("X-QN-Meta-Checksum"))
-	if err != nil {
-		return nil, err
-	}
-
-	return &kodoCache{
-		ctx:      ctx,
-		url:      url,
-		name:     name,
-		mimeType: fi.MimeType,
-		size:     fi.Fsize,
-		modTime:  storage.ParsePutTime(fi.PutTime),
-		checksum: checksum,
-	}, nil
-}
-
 // SetCache implements the `goproxy.Cacher`.
-func (kc *kodoCacher) SetCache(ctx context.Context, c goproxy.Cache) error {
-	localCache, err := ioutil.TempFile(kc.localCacheRoot, "")
+func (lc *localCacher) SetCache(ctx context.Context, c goproxy.Cache) error {
+	localCacheFile, err := ioutil.TempFile(lc.localCacheRoot, "")
 	if err != nil {
 		return err
 	}
@@ -202,21 +140,21 @@ func (kc *kodoCacher) SetCache(ctx context.Context, c goproxy.Cache) error {
 	hijackedLocalCacheRemoval := false
 	defer func() {
 		if !hijackedLocalCacheRemoval {
-			os.Remove(localCache.Name())
+			os.Remove(localCacheFile.Name())
 		}
 	}()
 
-	if _, err := io.Copy(localCache, c); err != nil {
+	if _, err := io.Copy(localCacheFile, c); err != nil {
 		return err
 	}
 
-	if err := localCache.Close(); err != nil {
+	if err := localCacheFile.Close(); err != nil {
 		return err
 	}
 
 	hijackedLocalCacheRemoval = true
 	go func() {
-		defer os.Remove(localCache.Name())
+		defer os.Remove(localCacheFile.Name())
 
 		ctx, cancel := context.WithTimeout(
 			context.Background(),
@@ -224,34 +162,30 @@ func (kc *kodoCacher) SetCache(ctx context.Context, c goproxy.Cache) error {
 		)
 		defer cancel()
 
-		kc.formUploader.PutFile(
-			ctx,
-			&storage.PutRet{},
-			(&storage.PutPolicy{
-				Scope: kc.bucketName,
-			}).UploadToken(kc.bucketManager.Mac),
-			c.Name(),
-			localCache.Name(),
-			&storage.PutExtra{
-				Params: map[string]string{
-					"x-qn-meta-checksum": hex.
-						EncodeToString(c.Checksum()),
-				},
-				MimeType: c.MIMEType(),
-			},
-		)
+		localCacheFile, err := os.Open(localCacheFile.Name())
+		if err != nil {
+			return
+		}
+		defer localCacheFile.Close()
+
+		lc.Cacher.SetCache(ctx, &localCache{
+			File:     localCacheFile,
+			name:     c.Name(),
+			mimeType: c.MIMEType(),
+			size:     c.Size(),
+			modTime:  c.ModTime(),
+			checksum: c.Checksum(),
+		})
 	}()
 
 	return nil
 }
 
-// kodoCache implements the `goproxy.Cache`. It is the cache unit of the
-// `kodoCacher`.
-type kodoCache struct {
-	ctx      context.Context
-	url      string
-	offset   int64
-	closed   bool
+// localCache implements the `goproxy.Cache`. It is the cache unit of the
+// `localCacher`.
+type localCache struct {
+	*os.File
+
 	name     string
 	mimeType string
 	size     int64
@@ -259,97 +193,29 @@ type kodoCache struct {
 	checksum []byte
 }
 
-// Read implements the `goproxy.Cache`.
-func (kc *kodoCache) Read(b []byte) (int, error) {
-	if kc.closed {
-		return 0, os.ErrClosed
-	} else if kc.offset >= kc.size {
-		return 0, io.EOF
-	}
-
-	req, err := http.NewRequest(http.MethodGet, kc.url, nil)
-	if err != nil {
-		return 0, err
-	}
-
-	rangeEnd := kc.offset + int64(len(b)) - 1
-	if rangeEnd >= kc.size {
-		rangeEnd = kc.size - 1
-	}
-
-	req.Header.Set("Range", fmt.Sprintf("bytes=%d-%d", kc.offset, rangeEnd))
-
-	res, err := http.DefaultClient.Do(req.WithContext(kc.ctx))
-	if err != nil {
-		return 0, err
-	}
-	defer res.Body.Close()
-
-	n, err := res.Body.Read(b)
-	kc.offset += int64(n)
-
-	return n, err
-}
-
-// Seek implements the `goproxy.Cache`.
-func (kc *kodoCache) Seek(offset int64, whence int) (int64, error) {
-	if kc.closed {
-		return 0, os.ErrClosed
-	}
-
-	switch whence {
-	case io.SeekStart:
-	case io.SeekCurrent:
-		offset += kc.offset
-	case io.SeekEnd:
-		offset += kc.size
-	default:
-		return 0, errors.New("invalid whence")
-	}
-
-	if offset < 0 {
-		return 0, errors.New("negative position")
-	}
-
-	kc.offset = offset
-
-	return kc.offset, nil
-}
-
-// Close implements the `goproxy.Cache`.
-func (kc *kodoCache) Close() error {
-	if kc.closed {
-		return os.ErrClosed
-	}
-
-	kc.closed = true
-
-	return nil
-}
-
 // Name implements the `goproxy.Cache`.
-func (kc *kodoCache) Name() string {
-	return kc.name
+func (lc *localCache) Name() string {
+	return lc.name
 }
 
 // MIMEType implements the `goproxy.Cache`.
-func (kc *kodoCache) MIMEType() string {
-	return kc.mimeType
+func (lc *localCache) MIMEType() string {
+	return lc.mimeType
 }
 
 // Size implements the `goproxy.Cache`.
-func (kc *kodoCache) Size() int64 {
-	return kc.size
+func (lc *localCache) Size() int64 {
+	return lc.size
 }
 
 // ModTime implements the `goproxy.Cache`.
-func (kc *kodoCache) ModTime() time.Time {
-	return kc.modTime
+func (lc *localCache) ModTime() time.Time {
+	return lc.modTime
 }
 
 // Checksum implements the `goproxy.Cache`.
-func (kc *kodoCache) Checksum() []byte {
-	return kc.checksum
+func (lc *localCache) Checksum() []byte {
+	return lc.checksum
 }
 
 // splitPathQuery splits the p of the form "path?query" into path and query.
