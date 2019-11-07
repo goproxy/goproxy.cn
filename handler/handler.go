@@ -272,7 +272,12 @@ func (kc *kodoCache) Read(b []byte) (int, error) {
 		return 0, err
 	}
 
-	req.Header.Set("Range", fmt.Sprintf("bytes=%d-", kc.offset))
+	rangeEnd := kc.offset + int64(len(b)) - 1
+	if rangeEnd >= kc.size {
+		rangeEnd = kc.size - 1
+	}
+
+	req.Header.Set("Range", fmt.Sprintf("bytes=%d-%d", kc.offset, rangeEnd))
 
 	res, err := http.DefaultClient.Do(req.WithContext(kc.ctx))
 	if err != nil {
