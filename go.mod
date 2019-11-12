@@ -11,7 +11,7 @@ require (
 	github.com/air-gases/logger v0.13.2
 	github.com/air-gases/redirector v0.13.2
 	github.com/aofei/air v0.13.2
-	github.com/goproxy/goproxy v0.0.0-20191107090114-d5a02f043d6b
+	github.com/goproxy/goproxy v0.0.0-20191112094713-b266aa5b797e
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/qiniu/api.v7/v7 v7.4.0
 	github.com/rs/zerolog v1.16.0
