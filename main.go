@@ -29,7 +29,9 @@ func main() {
 			IncludeClientAddress: true,
 		}),
 		defibrillator.Gas(defibrillator.GasConfig{}),
-		redirector.WWW2NonWWWGas(redirector.WWW2NonWWWGasConfig{}),
+		redirector.WWW2NonWWWGas(redirector.WWW2NonWWWGasConfig{
+			HTTPSEnforced: true,
+		}),
 		limiter.BodySizeGas(limiter.BodySizeGasConfig{
 			MaxBytes: 1 << 20,
 		}),

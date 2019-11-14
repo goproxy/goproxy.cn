@@ -15,8 +15,8 @@ github.com/air-gases/limiter v0.13.2 h1:yHI5RtASkyEqI+/Ab4ttSZgDQXarcKVghnaCFyBd
 github.com/air-gases/limiter v0.13.2/go.mod h1:EjLXyylvZmlxJaALHIe4rcQ+a7bITTK6GcdcN8XAGoo=
 github.com/air-gases/logger v0.13.2 h1:/lU0aBzW/Fo7KKSC0n0OyJf9LYgNudEDHWoMhdoaops=
 github.com/air-gases/logger v0.13.2/go.mod h1:8Z4bpA21ZnKnx3D3iw3eIo07PQ2G6xSoC3OQAa9whPw=
-github.com/air-gases/redirector v0.13.2 h1:c0A7XNVXI4I+GldsuNx9SFMLEV6fQkL9ATrycIcGgzA=
-github.com/air-gases/redirector v0.13.2/go.mod h1:UwVkXn7SRB5lw2I1junl0k/LaZ+7g5Vj0RSsCqP2I3c=
+github.com/air-gases/redirector v0.13.3-0.20191114183806-8e38cfaf8379 h1:6bZxC6OQfEB+angR52Un18ioyFajeXDR+iMZCk/LxdM=
+github.com/air-gases/redirector v0.13.3-0.20191114183806-8e38cfaf8379/go.mod h1:UwVkXn7SRB5lw2I1junl0k/LaZ+7g5Vj0RSsCqP2I3c=
 github.com/allegro/bigcache v1.2.1-0.20190218064605-e24eb225f156/go.mod h1:Cb/ax3seSYIx7SuZdm2G2xzfwmv3TPSk2ucNfQESPXM=
 github.com/allegro/bigcache v1.2.1 h1:hg1sY1raCwic3Vnsvje6TT7/pnZba83LeFck5NrFKSc=
 github.com/allegro/bigcache v1.2.1/go.mod h1:Cb/ax3seSYIx7SuZdm2G2xzfwmv3TPSk2ucNfQESPXM=
@@ -30,6 +30,8 @@ github.com/cespare/xxhash/v2 v2.0.1-0.20190104013014-3767db7a7e18 h1:pl4eWIqvFe/
 github.com/cespare/xxhash/v2 v2.0.1-0.20190104013014-3767db7a7e18/go.mod h1:HD5P3vAIAh+Y2GAxg0PrPN1P8WkepXGpjbUPDHJqqKM=
 github.com/cespare/xxhash/v2 v2.1.0 h1:yTUvW7Vhb89inJ+8irsUqiWjh8iT6sQPZiQzI6ReGkA=
 github.com/cespare/xxhash/v2 v2.1.0/go.mod h1:dgIUBU3pDso/gPgZ1osOZ0iQf77oPR28Tjxl5dIMyVM=
+github.com/cespare/xxhash/v2 v2.1.1 h1:6MnRN8NT7+YBpUIWxHtefFZOKTAPgGjpQSxqLNn0+qY=
+github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cheekybits/is v0.0.0-20150225183255-68e9c0620927/go.mod h1:h/aW8ynjgkuj+NQRlZcDbAbM1ORAbXjXX77sX7T289U=
 github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
