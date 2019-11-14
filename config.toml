@@ -18,11 +18,11 @@ access_key = "<ACCESS_KEY>"
 secret_key = "<SECRET_KEY>"
 kodo_endpoint = "<KODO_ENDPOINT>"
 kodo_bucket_name = "<KODO_BUCKET_NAME>"
-kodo_bucket_endpoint = "<KODO_BUCKET_ENDPOINT>"
 
 # Goproxy
 [goproxy]
 go_bin_name = "go"
 max_go_bin_workers = 8
 max_zip_cache_bytes = 104857600
+always_missing_caches = false
 local_cache_root = "/tmp"

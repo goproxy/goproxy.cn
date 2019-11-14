@@ -5,9 +5,11 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/air-gases/cacheman"
@@ -15,9 +17,11 @@ import (
 	"github.com/goproxy/goproxy"
 	"github.com/goproxy/goproxy.cn/cfg"
 	"github.com/goproxy/goproxy/cacher"
-	"github.com/qiniu/api.v7/v7/auth/qbox"
-	"github.com/qiniu/api.v7/v7/storage"
+	"github.com/minio/minio-go/v6"
+	"github.com/minio/minio-go/v6/pkg/credentials"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/mod/module"
+	"golang.org/x/mod/semver"
 )
 
 var (
@@ -34,39 +38,114 @@ var (
 		SMaxAge: -1,
 	})
 
-	// qiniuMac is the credentials of the Qiniu Cloud.
-	qiniuMac *qbox.Mac
+	// minioClient is the `minio.Client` for the Qiniu Cloud Kodo.
+	minioClient *minio.Client
 
-	// qiniuKodoBucketManager is the manager of the Qiniu Cloud Kodo.
-	qiniuKodoBucketManager *storage.BucketManager
+	// fileRemovals is a map of the files waiting to be removed.
+	fileRemovals sync.Map
 
 	// g is an instance of the `goproxy.Goproxy`.
 	g = goproxy.New()
 )
 
 func init() {
-	qiniuMac = qbox.NewMac(cfg.Qiniu.AccessKey, cfg.Qiniu.SecretKey)
-
-	qiniuKodoRegion, err := storage.GetRegion(
-		cfg.Qiniu.AccessKey,
-		cfg.Qiniu.KodoBucketName,
-	)
+	keu, err := url.Parse(cfg.Qiniu.KodoEndpoint)
 	if err != nil {
 		log.Fatal().Err(err).
 			Str("app_name", a.AppName).
-			Msg("failed to get qiniu cloud kodo region")
+			Msg("failed to parse qiniu cloud kodo endpoint")
 	}
 
-	qiniuKodoConfig := &storage.Config{
-		Region:        qiniuKodoRegion,
-		UseHTTPS:      true,
-		UseCdnDomains: true,
+	if minioClient, err = minio.NewWithOptions(
+		strings.TrimPrefix(keu.String(), keu.Scheme+"://"),
+		&minio.Options{
+			Creds: credentials.NewStatic(
+				cfg.Qiniu.AccessKey,
+				cfg.Qiniu.SecretKey,
+				"",
+				credentials.SignatureDefault,
+			),
+			Secure:       strings.ToLower(keu.Scheme) == "https",
+			BucketLookup: minio.BucketLookupPath,
+		},
+	); err != nil {
+		log.Fatal().Err(err).
+			Str("app_name", a.AppName).
+			Msg("failed to create minio client")
 	}
 
-	qiniuKodoBucketManager = storage.NewBucketManager(
-		qiniuMac,
-		qiniuKodoConfig,
-	)
+	if _, err := cfg.Cron.AddFunc("*/10 * * * * *", func() {
+		fileRemovals.Range(func(k, v interface{}) bool {
+			if time.Now().Sub(v.(time.Time)) < 30*time.Second {
+				return true
+			}
+
+			if err := minioClient.RemoveObject(
+				cfg.Qiniu.KodoBucketName,
+				k.(string),
+			); err == nil {
+				fileRemovals.Delete(k)
+			}
+
+			return true
+		})
+	}); err != nil {
+		log.Fatal().Err(err).
+			Str("app_name", a.AppName).
+			Msg("failed to add file removal cron job")
+	}
+
+	if eID, err := cfg.Cron.AddFunc("0 0 * * * *", func() {
+		minioCore := &minio.Core{
+			Client: minioClient,
+		}
+
+		var marker string
+		for {
+			lbr, err := minioCore.ListObjects(
+				cfg.Qiniu.KodoBucketName,
+				"",
+				marker,
+				"/@v/v",
+				1000,
+			)
+			if err != nil {
+				if err == io.EOF {
+					break
+				}
+
+				panic(err)
+			}
+
+			for _, content := range lbr.Contents {
+				if isFileMirrorable(content.Key) {
+					continue
+				}
+
+				if err := minioClient.RemoveObject(
+					cfg.Qiniu.KodoBucketName,
+					content.Key,
+				); err != nil {
+					fileRemovals.Store(
+						content.Key,
+						time.Now().Add(30*time.Second),
+					)
+				}
+			}
+
+			if !lbr.IsTruncated {
+				break
+			}
+
+			marker = lbr.NextMarker
+		}
+	}); err != nil {
+		log.Fatal().Err(err).
+			Str("app_name", a.AppName).
+			Msg("failed to add file corection cron job")
+	} else {
+		go cfg.Cron.Entry(eID).Job.Run() // Run once at the beginning
+	}
 
 	g.GoBinName = cfg.Goproxy.GoBinName
 	g.MaxGoBinWorkers = cfg.Goproxy.MaxGoBinWorkers
@@ -77,7 +156,8 @@ func init() {
 			SecretKey:  cfg.Qiniu.SecretKey,
 			BucketName: cfg.Qiniu.KodoBucketName,
 		},
-		localCacheRoot: cfg.Goproxy.LocalCacheRoot,
+		alwaysMissingCaches: cfg.Goproxy.AlwaysMissingCaches,
+		localCacheRoot:      cfg.Goproxy.LocalCacheRoot,
 	}
 
 	g.MaxZIPCacheBytes = cfg.Goproxy.MaxZIPCacheBytes
@@ -94,31 +174,31 @@ func init() {
 
 // indexPage handles requests to get index page.
 func indexPage(req *air.Request, res *air.Response) error {
-	const indexPageURLBase = "https://github.com/goproxy/goproxy.cn" +
-		"/blob/master/README.md"
-	return res.Redirect(req.LocalizedString(indexPageURLBase))
+	const indexHTML = "<meta http-equiv=refresh " +
+		"content=0;url=https://github.com/goproxy/goproxy.cn>"
+	return res.WriteHTML(indexHTML)
 }
 
 // proxy handles requests to play with Go module proxy.
 func proxy(req *air.Request, res *air.Response) error {
-	if p, _ := splitPathQuery(req.Path); path.Ext(p) == ".zip" {
-		fn := strings.TrimLeft(path.Clean(p), "/")
-		if _, err := qiniuKodoBucketManager.Stat(
-			cfg.Qiniu.KodoBucketName,
-			fn,
-		); err == nil {
-			return res.Redirect(storage.MakePrivateURL(
-				qiniuMac,
-				cfg.Qiniu.KodoBucketEndpoint,
-				fn,
-				time.Now().Add(time.Hour).Unix(),
-			))
-		} else if !isKodoFileNotExist(err) {
-			return err
-		}
+	g.ServeHTTP(res.HTTPResponseWriter(), req.HTTPRequest())
+	if res.Status >= http.StatusBadRequest {
+		return nil
 	}
 
-	g.ServeHTTP(res.HTTPResponseWriter(), req.HTTPRequest())
+	trimmedPath, _ := splitPathQuery(req.Path)
+	trimmedPath = path.Clean(trimmedPath)
+	trimmedPath = strings.TrimPrefix(trimmedPath, g.PathPrefix)
+	trimmedPath = strings.TrimLeft(trimmedPath, "/")
+
+	name, err := url.PathUnescape(trimmedPath)
+	if err != nil {
+		return err
+	}
+
+	if !isFileMirrorable(name) {
+		fileRemovals.Store(name, time.Now())
+	}
 
 	return nil
 }
@@ -126,8 +206,19 @@ func proxy(req *air.Request, res *air.Response) error {
 // localCacher implements the `goproxy.Cacher`.
 type localCacher struct {
 	goproxy.Cacher
+	alwaysMissingCaches bool
+	localCacheRoot      string
+}
 
-	localCacheRoot string
+func (lc *localCacher) Cache(
+	ctx context.Context,
+	name string,
+) (goproxy.Cache, error) {
+	if lc.alwaysMissingCaches {
+		return nil, goproxy.ErrCacheNotFound
+	}
+
+	return lc.Cacher.Cache(ctx, name)
 }
 
 // SetCache implements the `goproxy.Cacher`.
@@ -231,8 +322,29 @@ func splitPathQuery(p string) (path, query string) {
 	return p, ""
 }
 
-// isKodoFileNotExist reports whether the err means a Qiniu Cloud Kodo file is
-// not exist.
-func isKodoFileNotExist(err error) bool {
-	return err != nil && err.Error() == "no such file or directory"
+// isFileMirrorable reports whether the named file is mirrorable in the Qiniu
+// Cloud Kodo.
+func isFileMirrorable(name string) bool {
+	switch {
+	case strings.HasPrefix(name, "sumdb/"):
+		if strings.HasSuffix(name, "/supported") ||
+			strings.HasSuffix(name, "/latest") {
+			return false
+		}
+	case strings.HasSuffix(name, "/@latest"),
+		strings.HasSuffix(name, "/@v/list"):
+		return false
+	case strings.Contains(name, "/@"):
+		emv := strings.TrimSuffix(path.Base(name), path.Ext(name))
+		mv, err := module.UnescapeVersion(emv)
+		if err != nil {
+			return false
+		}
+
+		if !semver.IsValid(mv) {
+			return false
+		}
+	}
+
+	return true
 }
