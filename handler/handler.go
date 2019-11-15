@@ -114,7 +114,11 @@ func init() {
 					break
 				}
 
-				panic(err)
+				log.Error().Err(err).
+					Str("app_name", a.AppName).
+					Msg("failed to list files")
+
+				return
 			}
 
 			for _, content := range lbr.Contents {
