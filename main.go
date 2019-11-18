@@ -13,7 +13,6 @@ import (
 	"github.com/air-gases/logger"
 	"github.com/air-gases/redirector"
 	"github.com/aofei/air"
-	"github.com/goproxy/goproxy.cn/cfg"
 	_ "github.com/goproxy/goproxy.cn/handler"
 	"github.com/rs/zerolog/log"
 )
@@ -48,9 +47,7 @@ func main() {
 		}
 	}()
 
-	cfg.Cron.Start()
 	<-shutdownChan
-	<-cfg.Cron.Stop().Done()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()

@@ -6,12 +6,10 @@ import (
 	"fmt"
 	stdlog "log"
 	"strings"
-	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/aofei/air"
 	"github.com/mitchellh/mapstructure"
-	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -39,6 +37,10 @@ var (
 
 		// KodoBucketName is the bucket name of the Qiniu Cloud Kodo.
 		KodoBucketName string `mapstructure:"kodo_bucket_name"`
+
+		// KodoBucketEndpoint is the bucket endpint of the Qiniu Cloud
+		// Kodo.
+		KodoBucketEndpoint string `mapstructure:"kodo_bucket_endpoint"`
 	}
 
 	// Goproxy is the Goproxy configuration items.
@@ -55,17 +57,14 @@ var (
 		// cache that will be stored in the cacher of the Goproxy.
 		MaxZIPCacheBytes int `mapstructure:"max_zip_cache_bytes"`
 
-		// AlwaysMissingCaches indicates whether the cacher of the
-		// Goproxy is always missing caches.
-		AlwaysMissingCaches bool `mapstructure:"always_missing_caches"`
+		// AutoRedirection indicates whether to control automatic
+		// redirection of existing caches for the Goproxy.
+		AutoRedirection bool `mapstructure:"auto_redirection"`
 
 		// LocalCacheRoot is the root of the local caches of the
 		// Goproxy.
 		LocalCacheRoot string `mapstructure:"local_cache_root"`
 	}
-
-	// Cron is a global instance of the `cron.Cron`.
-	Cron *cron.Cron
 )
 
 func init() {
@@ -133,12 +132,6 @@ func init() {
 	if a.DebugMode {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
-
-	Cron = cron.New(
-		cron.WithSeconds(),
-		cron.WithLocation(time.UTC),
-		cron.WithLogger(cron.PrintfLogger(a.ErrorLogger)),
-	)
 }
 
 // errorLogWriter is an error log writer.
