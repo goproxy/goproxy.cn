@@ -12,7 +12,7 @@ require (
 	github.com/air-gases/redirector v0.13.3-0.20191114183806-8e38cfaf8379
 	github.com/aofei/air v0.13.2
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
-	github.com/goproxy/goproxy v0.0.0-20191114110005-5cb50b653c7e
+	github.com/goproxy/goproxy v0.0.0-20191118173933-384fb65960cd
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/qiniu/api.v7/v7 v7.4.0
 	github.com/rs/zerolog v1.16.0
