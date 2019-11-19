@@ -4,8 +4,6 @@
 
 The most trusted Go module proxy in China.
 
-![39C6C4A2-AF08-4B00-915D-2FCA96767E16](https://user-images.githubusercontent.com/5037285/62007948-66cdad00-b186-11e9-899e-01ccb76951d9.jpeg)
-
 Goproxy China has fully implemented the Go's
 [module proxy protocol](https://golang.org/cmd/go/#hdr-Module_proxy_protocol).
 And it's a non-profit project supported by China's well-trusted cloud service
@@ -21,12 +19,60 @@ based on.
 
 Happy coding, Gophers! ;-)
 
-## Credits
+## Usage
 
-* Author: [Aofei Sheng](https://aofeisheng.com)
-* Maintainer: [Aofei Sheng](https://aofeisheng.com)
-* Sponsor: [Qiniu Cloud](https://www.qiniu.com)
-* Promoters: [Shiwei Xu (Qiniu Cloud's founder-CEO)](https://baike.baidu.com/item/许式伟), [Asta Xie (Gopher China's organizer)](https://github.com/astaxie), Chuntang Tao and [Lifu Mao](https://github.com/forrest-mao)
+Although the following content only explains how to set `GOPROXY`, but we also
+recommend that you set `GO111MODULE` to `on` instead of `auto` when you are
+working with Go modules.
+
+### Go 1.13 and above (RECOMMENDED)
+
+Open your terminal and execute
+
+```bash
+$ go env -w GOPROXY=https://goproxy.cn,direct
+```
+
+done.
+
+### macOS or Linux
+
+Open your terminal and execute
+
+```bash
+$ export GOPROXY=https://goproxy.cn
+```
+
+or
+
+```bash
+$ echo "export GOPROXY=https://goproxy.cn" >> ~/.profile && source ~/.profile
+```
+
+done.
+
+### Windows
+
+Open your PowerShell and execute
+
+```poweshell
+C:\> $env:GOPROXY = "https://goproxy.cn"
+```
+
+or
+
+```md
+1. Open the Start Search, type in "env"
+2. Choose the "Edit the system environment variables"
+3. Click the "Environment Variables…" button
+4. Under the "User variables for <YOUR_USERNAME>" section (the upper half)
+5. Click the "New..." button
+6. Choose the "Variable name" input bar, type in "GOPROXY"
+7. Choose the "Variable value" input bar, type in "https://goproxy.cn"
+8. Click the "OK" button
+```
+
+done.
 
 ## FAQ
 
@@ -87,60 +133,12 @@ available at the origin. The same situation applies if you delete your entire
 repository. We suggest creating a new release and encouraging people to use that
 one instead.
 
-## Usage
+## Credits
 
-Although the following content only explains how to set `GOPROXY`, but we also
-recommend that you set `GO111MODULE` to `on` instead of `auto` when you are
-working with Go modules.
-
-### Go 1.13 and above (RECOMMENDED)
-
-Open your terminal and execute
-
-```bash
-$ go env -w GOPROXY=https://goproxy.cn,direct
-```
-
-done.
-
-### macOS or Linux
-
-Open your terminal and execute
-
-```bash
-$ export GOPROXY=https://goproxy.cn
-```
-
-or
-
-```bash
-$ echo "export GOPROXY=https://goproxy.cn" >> ~/.profile && source ~/.profile
-```
-
-done.
-
-### Windows
-
-Open your PowerShell and execute
-
-```poweshell
-C:\> $env:GOPROXY = "https://goproxy.cn"
-```
-
-or
-
-```md
-1. Open the Start Search, type in "env"
-2. Choose the "Edit the system environment variables"
-3. Click the "Environment Variables…" button
-4. Under the "User variables for <YOUR_USERNAME>" section (the upper half)
-5. Click the "New..." button
-6. Choose the "Variable name" input bar, type in "GOPROXY"
-7. Choose the "Variable value" input bar, type in "https://goproxy.cn"
-8. Click the "OK" button
-```
-
-done.
+* Author: [Aofei Sheng](https://aofeisheng.com)
+* Maintainer: [Aofei Sheng](https://aofeisheng.com)
+* Sponsor: [Qiniu Cloud](https://www.qiniu.com)
+* Promoters: [Shiwei Xu (Qiniu Cloud's founder-CEO)](https://baike.baidu.com/item/许式伟), [Asta Xie (Gopher China's organizer)](https://github.com/astaxie), Chuntang Tao and [Lifu Mao](https://github.com/forrest-mao)
 
 ## Community
 
