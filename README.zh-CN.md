@@ -4,6 +4,8 @@
 
 中国最可靠的 Go 模块代理。
 
+**注意：为了帮助 Gopher 们更好地去使用 Go modules，Goproxy 中国现在支持回答和 Go modules 相关的所有问题（不只是和 Go module proxy 相关的），你只需要遵循 Issue 模版将问题发表在[这里](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.zh-CN.md&title=Go+modules：)即可。**
+
 Goproxy 中国完全实现了 Go 的[模块代理协议](https://golang.org/cmd/go/#hdr-Module_proxy_protocol)。并且它是一个由中国备受信赖的云服务提供商[七牛云](https://www.qiniu.com)支持的非营利性项目。我们的目标是为中国和世界上其他地方的 Gopher 们提供一个免费的、可靠的、持续在线的且经过 CDN 加速的模块代理。
 
 请注意，Goproxy 中国只专注于服务在 [https://goproxy.cn](https://goproxy.cn) 的 Web 应用本身的开发。如果你正在寻找一种极其简单的方法来搭建你自己的 Go 模块代理，那么你应该看一下 [Goproxy](https://github.com/goproxy/goproxy)，Goproxy 中国就是基于它开发的。
@@ -98,7 +100,7 @@ C:\> $env:GOPROXY = "https://goproxy.cn"
 
 ## 社区
 
-如果你想要参与讨论 Goproxy 中国或者询问和它相关的问题，只需要在[这里](https://github.com/goproxy/goproxy.cn/issues)发表你的问题或看法即可。
+如果你想要参与讨论 Goproxy 中国或者询问和它相关的问题，只需要简单地在[这里](https://github.com/goproxy/goproxy.cn/issues)发表你的问题或看法即可。
 
 ## 贡献
 

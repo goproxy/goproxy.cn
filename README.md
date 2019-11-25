@@ -4,6 +4,11 @@
 
 The most trusted Go module proxy in China.
 
+**Note: In order to better help Gophers to use Go moduels, Goproxy China now
+supports answering all Go moduels related questions (not just Go module proxy),
+all you need to do is simply follow the issue template to post questions
+[here](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.md&title=Go+modules%3A+)**.
+
 Goproxy China has fully implemented the Go's
 [module proxy protocol](https://golang.org/cmd/go/#hdr-Module_proxy_protocol).
 And it's a non-profit project supported by China's well-trusted cloud service
