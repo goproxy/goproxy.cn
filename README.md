@@ -19,13 +19,13 @@ based on.
 
 Happy coding, Gophers! ;-)
 
-**Note: In order to better help Gophers to use Go moduels, Goproxy China now
+***Note: In order to better help Gophers to use Go moduels, Goproxy China now
 supports answering all Go moduels related questions (not just Go module proxy),
 all you need to do is simply follow the issue template to post questions
 [here](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.md&title=Go+modules%3A+).
 Don't forget to check if the
 [wiki page](https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-FAQ) already
-has the question you want to ask.**
+has the question you want to ask.***
 
 ## Usage
 
@@ -148,7 +148,7 @@ A: Members of Goproxy China and enthusiastic volunteers from our great Go
 community. Please keep in mind that in order to alleviate the workload of
 others, don't forget to check if the
 [wiki page](https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-FAQ) already
-has the question you want to ask.**
+has the question you want to ask.
 
 ## Credits
 
