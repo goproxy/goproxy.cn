@@ -9,6 +9,12 @@ assignees: ''
 
 <!-- 在提交你的问题之前，请先回答下述问题。非常感谢！ -->
 
+## 你确定 Wiki 页面没有你想要问的问题吗？
+
+<!-- Wiki 页面 URL：https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-FAQ -->
+<!-- 请在此行下面的空白行填写你的答案。 -->
+
+
 ## 当你执行 `go version` 命令后的输出结果是什么？
 
 <pre>
@@ -43,3 +49,4 @@ $ go env
 ## 你实际看到的结果是什么？
 
 <!-- 请在此行下面的空白行填写你的答案。 -->
+

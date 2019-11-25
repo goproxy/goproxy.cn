@@ -9,6 +9,12 @@ assignees: ''
 
 <!-- Please answer the following questions before submitting your issue. Thanks! -->
 
+## Are you sure that the wiki page doesn't have the question you want to ask?
+
+<!-- Wiki page URL: https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-FAQ -->
+<!-- Please fill in your answer in the blank line below this line. -->
+
+
 ## What is the output when you execute the `go version` command?
 
 <pre>
@@ -43,3 +49,4 @@ $ go env
 ## What did you see instead?
 
 <!-- Please fill in your answer in the blank line below this line. -->
+
