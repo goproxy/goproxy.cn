@@ -4,11 +4,6 @@
 
 The most trusted Go module proxy in China.
 
-**Note: In order to better help Gophers to use Go moduels, Goproxy China now
-supports answering all Go moduels related questions (not just Go module proxy),
-all you need to do is simply follow the issue template to post questions
-[here](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.md&title=Go+modules%3A+)**.
-
 Goproxy China has fully implemented the Go's
 [module proxy protocol](https://golang.org/cmd/go/#hdr-Module_proxy_protocol).
 And it's a non-profit project supported by China's well-trusted cloud service
@@ -23,6 +18,14 @@ look at [Goproxy](https://github.com/goproxy/goproxy) which is Goproxy China
 based on.
 
 Happy coding, Gophers! ;-)
+
+**Note: In order to better help Gophers to use Go moduels, Goproxy China now
+supports answering all Go moduels related questions (not just Go module proxy),
+all you need to do is simply follow the issue template to post questions
+[here](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.md&title=Go+modules%3A+).
+Don't forget to check if the
+[wiki page](https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-FAQ) already
+has the question you want to ask.**
 
 ## Usage
 
@@ -137,6 +140,15 @@ still be available in the [goproxy.cn](https://goproxy.cn) even if it is not
 available at the origin. The same situation applies if you delete your entire
 repository. We suggest creating a new release and encouraging people to use that
 one instead.
+
+**Q: Who will answer the questions related to Go modules that I have asked in
+[here](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.md&title=Go+modules%3A+)?**
+
+A: Members of Goproxy China and enthusiastic volunteers from our great Go
+community. Please keep in mind that in order to alleviate the workload of
+others, don't forget to check if the
+[wiki page](https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-FAQ) already
+has the question you want to ask.**
 
 ## Credits
 

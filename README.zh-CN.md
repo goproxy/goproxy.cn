@@ -4,13 +4,13 @@
 
 中国最可靠的 Go 模块代理。
 
-**注意：为了帮助 Gopher 们更好地去使用 Go modules，Goproxy 中国现在支持回答和 Go modules 相关的所有问题（不只是和 Go module proxy 相关的），你只需要遵循 Issue 模版将问题发表在[这里](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.zh-CN.md&title=Go+modules：)即可。**
-
 Goproxy 中国完全实现了 Go 的[模块代理协议](https://golang.org/cmd/go/#hdr-Module_proxy_protocol)。并且它是一个由中国备受信赖的云服务提供商[七牛云](https://www.qiniu.com)支持的非营利性项目。我们的目标是为中国和世界上其他地方的 Gopher 们提供一个免费的、可靠的、持续在线的且经过 CDN 加速的模块代理。
 
 请注意，Goproxy 中国只专注于服务在 [https://goproxy.cn](https://goproxy.cn) 的 Web 应用本身的开发。如果你正在寻找一种极其简单的方法来搭建你自己的 Go 模块代理，那么你应该看一下 [Goproxy](https://github.com/goproxy/goproxy)，Goproxy 中国就是基于它开发的。
 
 愉快地编码吧，Gopher 们！;-)
+
+**注意：为了帮助 Gopher 们更好地去使用 Go modules，Goproxy 中国现在支持回答和 Go modules 相关的所有问题（不只是和 Go module proxy 相关的），你只需要遵循 Issue 模版将问题发表在[这里](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.zh-CN.md&title=Go+modules%EF%BC%9A)即可。别忘了先去检查 [Wiki 页面](https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98)已经有了你想要问的问题。**
 
 ## 用法
 
@@ -90,6 +90,10 @@ C:\> $env:GOPROXY = "https://goproxy.cn"
 **问：我从我的库中移除了一个有问题的发行版，但它却仍然出现，我该怎么办？**
 
 答：为了避免依赖你的模块的人的构建被破坏，Goproxy 中国会尽可能地缓存内容。因此，即使一个发行版在源库中已经不存在了，但它在 [goproxy.cn](https://goproxy.cn) 中却仍然有可能继续存在。如果你删除了你的整个库，则情况相同。我们建议你创建一个新的发行版并鼓励人们使用它，而不是移除一个已发布的。
+
+**问：谁将回答我在[这里](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.zh-CN.md&title=Go+modules%EF%BC%9A)提问的和 Go modules 相关的问题？**
+
+答：Goproxy 中国的成员以及我们伟大的 Go 社区中热心肠的志愿者们。请牢记，为了减轻他人的工作量，别忘了先去检查 [Wiki 页面](https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98)已经有了你想要问的问题。
 
 ## 功劳
 
