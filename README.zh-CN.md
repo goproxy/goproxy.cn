@@ -10,7 +10,7 @@ Goproxy 中国完全实现了 Go 的[模块代理协议](https://golang.org/cmd/
 
 愉快地编码吧，Gopher 们！;-)
 
-***注意：为了帮助 Gopher 们更好地去使用 Go modules，Goproxy 中国现在支持回答和 Go modules 相关的所有问题（不只是和 Go module proxy 相关的），你只需要遵循 Issue 模版将问题发表在[这里](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.zh-CN.md&title=Go+modules%EF%BC%9A)即可。别忘了先去检查 [Wiki 页面](https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98)中是否已经有了你想要问的问题。***
+***注意：为了帮助 Gopher 们更好地去使用 Go 模块，Goproxy 中国现在支持回答和 Go 模块相关的所有问题（不再只是和 Go 模块代理相关的），你只需要遵循 Issue 模版将问题发表在[这里](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.zh-CN.md&title=Go+%E6%A8%A1%E5%9D%97%EF%BC%9A)即可。别忘了先去检查 [Wiki 页面](https://github.com/goproxy/goproxy.cn/wiki/Go-%E6%A8%A1%E5%9D%97%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98)中是否已经有了你想要问的问题。***
 
 ## 用法
 
@@ -91,9 +91,9 @@ C:\> $env:GOPROXY = "https://goproxy.cn"
 
 答：为了避免依赖你的模块的人的构建被破坏，Goproxy 中国会尽可能地缓存内容。因此，即使一个发行版在源库中已经不存在了，但它在 [goproxy.cn](https://goproxy.cn) 中却仍然有可能继续存在。如果你删除了你的整个库，则情况相同。我们建议你创建一个新的发行版并鼓励人们使用它，而不是移除一个已发布的。
 
-**问：谁将回答我在[这里](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.zh-CN.md&title=Go+modules%EF%BC%9A)提出的和 Go modules 相关的问题？**
+**问：谁将回答我在[这里](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.zh-CN.md&title=Go+%E6%A8%A1%E5%9D%97%EF%BC%9A)提出的和 Go 模块相关的问题？**
 
-答：Goproxy 中国的成员以及我们伟大的 Go 社区中热心肠的志愿者们。请牢记，为了减轻他人的工作量，别忘了先去检查 [Wiki 页面](https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98)中是否已经有了你想要问的问题。
+答：Goproxy 中国的成员以及我们伟大的 Go 社区中热心肠的志愿者们。请牢记，为了减轻他人的工作量，别忘了先去检查 [Wiki 页面](https://github.com/goproxy/goproxy.cn/wiki/Go-%E6%A8%A1%E5%9D%97%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98)中是否已经有了你想要问的问题。
 
 ## 功劳
 
