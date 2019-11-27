@@ -1,7 +1,7 @@
 ---
-name: 和 Go modules 相关的问题
-about: 用于方便 Gopher 们描述他们的和 Go modules 相关的所有问题。
-title: 'Go modules：'
+name: 和 Go 模块相关的问题
+about: 用于方便 Gopher 们描述他们的和 Go 模块相关的所有问题。
+title: 'Go 模块：'
 labels: ''
 assignees: ''
 
@@ -11,7 +11,7 @@ assignees: ''
 
 ## 你确定 Wiki 页面没有你想要问的问题吗？
 
-<!-- Wiki 页面 URL：https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98 -->
+<!-- Wiki 页面 URL：https://github.com/goproxy/goproxy.cn/wiki/Go-%E6%A8%A1%E5%9D%97%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98 -->
 <!-- 请在此行下面的空白行填写你的答案。 -->
 
 
