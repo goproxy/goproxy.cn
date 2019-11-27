@@ -25,7 +25,7 @@ Go module proxy), all you need to do is simply follow the issue template to post
 questions
 [here](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.md&title=Go+modules%3A+).
 Don't forget to check if the
-[wiki page](https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-FAQ) already
+[wiki page](https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-FAQs) already
 has the question you want to ask.***
 
 ## Usage
@@ -83,7 +83,7 @@ or
 
 done.
 
-## FAQ
+## FAQs
 
 **Q: Why create Goproxy China?**
 
@@ -148,7 +148,7 @@ one instead.
 A: Members of Goproxy China and enthusiastic volunteers from our great Go
 community. Please keep in mind that in order to alleviate the workload of
 others, don't forget to check if the
-[wiki page](https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-FAQ) already
+[wiki page](https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-FAQs) already
 has the question you want to ask.
 
 ## Credits

@@ -11,7 +11,7 @@ assignees: ''
 
 ## Are you sure that the wiki page doesn't have the question you want to ask?
 
-<!-- Wiki page URL: https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-FAQ -->
+<!-- Wiki page URL: https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-FAQs -->
 <!-- Please fill in your answer in the blank line below this line. -->
 
 
