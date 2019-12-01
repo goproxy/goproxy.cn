@@ -23,10 +23,9 @@ Happy coding, Gophers! ;-)
 supports answering all Go moduels related questions (no longer just related to
 Go module proxy), all you need to do is simply follow the issue template to post
 questions
-[here](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.md&title=Go+modules%3A+).
-Don't forget to check if the
-[wiki page](https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-FAQs) already
-has the question you want to ask.***
+[here](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=question-consultation.md&title=Question+%3A+).
+Don't forget to check if our
+[FAQ](https://goproxy.cn/faq) page already has the question you want to ask.***
 
 ## Usage
 
@@ -83,9 +82,9 @@ or
 
 done.
 
-## FAQs
+## FAQ
 
-**Q: Why create Goproxy China?**
+### Q: Why create Goproxy China?
 
 A: Due to the Chinese government's network supervision system, there're lot of
 modules in the Go ecosystem that Chinese Gophers cannot `go get`, such as the
@@ -95,7 +94,7 @@ in China better use Go modules. In fact, since the
 [goproxy.cn](https://goproxy.cn) has been CDNed, Gophers in other countries can
 also use it.
 
-**Q: Is it safe to use Goproxy China?**
+### Q: Is it safe to use Goproxy China?
 
 A: Of course, as with all other Go module proxies, we just cache the modules as
 they are, so we can assure you that they will never be tampered with on our
@@ -105,14 +104,14 @@ that the modules you get from us have not been tampered with, since Goproxy
 China has supported
 [proxying checksum databases](https://go.googlesource.com/proposal/+/master/design/25530-sumdb.md#proxying-a-checksum-database).
 
-**Q: Is Goproxy China legal in China?**
+### Q: Is Goproxy China legal in China?
 
 A: Goproxy China is a business-supported project rather than a personal project.
 And it has been ICP filed in the MIIT of China (ICP license:
 [沪ICP备11037377号-56](http://beian.miit.gov.cn)), which means it's **fully
 legal** in China.
 
-**Q: Why not use the [proxy.golang.org](https://proxy.golang.org)?**
+### Q: Why not use the [proxy.golang.org](https://proxy.golang.org)?
 
 A: The [proxy.golang.org](https://proxy.golang.org) has been blocked in the
 mainland of China. So, no. However, if you're not in the mainland of China, then
@@ -122,8 +121,7 @@ Once you enter the mainland of China, we hope that you'll think of the
 [goproxy.cn](https://goproxy.cn) in the first place, which is the main reason
 why we choose the `.cn` as the domain name extension.
 
-**Q: I committed a new revision to a repository, why isn't it showing up when I
-run `go get -u` or `go list -m -versions`?**
+### Q: I committed a new revision to a repository, why isn't it showing up when I run `go get -u` or `go list -m -versions`?
 
 A: In order to improve caching and serving latencies, new revisions may not show
 up right away. If you want new revision to be immediately available in the
@@ -132,8 +130,7 @@ versioned tag for this revision in the source repository. Then explicitly
 request that tagged version via `go get module@version`. After couple of minutes
 for caches to expire, the `go` command will see that tagged version.
 
-**Q: I removed a bad release from my repository but it still appears, what
-should I do?**
+### Q: I removed a bad release from my repository but it still appears, what should I do?
 
 A: Whenever possible, Goproxy China aims to cache content in order to avoid
 breaking builds for people that depend on your module, so this bad release may
@@ -142,14 +139,12 @@ available at the origin. The same situation applies if you delete your entire
 repository. We suggest creating a new release and encouraging people to use that
 one instead.
 
-**Q: Who will answer the questions related to Go modules that I have asked in
-[here](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.md&title=Go+modules%3A+)?**
+### Q: Who will answer the questions that I have asked in [here](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=question-consultation.md&title=Question+%3A+)?
 
 A: Members of Goproxy China and enthusiastic volunteers from our great Go
 community. Please keep in mind that in order to alleviate the workload of
-others, don't forget to check if the
-[wiki page](https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-FAQs) already
-has the question you want to ask.
+others, don't forget to check if our
+[FAQ](https://goproxy.cn/faq) page already has the question you want to ask.
 
 ## Credits
 
