@@ -23,7 +23,7 @@ Happy coding, Gophers! ;-)
 supports answering all Go moduels related questions (no longer just related to
 Go module proxy), all you need to do is simply follow the issue template to post
 questions
-[here](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=question-consultation.md&title=Question+%3A+).
+[here](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=question-consultation.md&title=Question%3A+).
 Don't forget to check if our
 [FAQ](https://goproxy.cn/faq) page already has the question you want to ask.***
 
@@ -139,7 +139,7 @@ available at the origin. The same situation applies if you delete your entire
 repository. We suggest creating a new release and encouraging people to use that
 one instead.
 
-### Q: Who will answer the questions that I have asked in [here](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=question-consultation.md&title=Question+%3A+)?
+### Q: Who will answer the questions that I have asked in [here](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=question-consultation.md&title=Question%3A+)?
 
 A: Members of Goproxy China and enthusiastic volunteers from our great Go
 community. Please keep in mind that in order to alleviate the workload of
