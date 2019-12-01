@@ -1,7 +1,7 @@
 ---
-name: Questions related to Go modules
-about: It's convenient for Gophers to describe all their questions related to Go modules.
-title: 'Go modules: '
+name: Question consultation
+about: Create a question to ask others for help.
+title: 'Question: '
 labels: ''
 assignees: ''
 
@@ -9,9 +9,10 @@ assignees: ''
 
 <!-- Please answer the following questions before submitting your issue. Thanks! -->
 
-## Are you sure that the wiki page doesn't have the question you want to ask?
+## Are you sure that our [FAQ](https://goproxy.cn/faq) page doesn't have the question you want to ask?
 
-<!-- Wiki page URL: https://github.com/goproxy/goproxy.cn/wiki/Go-Modules-FAQs -->
+<!-- To avoid abuse of this support, we will not repeat the answer and close --
+<!-- the issue directly. -->
 <!-- Please fill in your answer in the blank line below this line. -->
 
 

@@ -1,7 +1,7 @@
 ---
-name: 和 Go 模块相关的问题
-about: 用于方便 Gopher 们描述他们的和 Go 模块相关的所有问题。
-title: 'Go 模块：'
+name: 问题咨询
+about: 创建一个问题来向他人寻求帮助。
+title: '问题：'
 labels: ''
 assignees: ''
 
@@ -9,9 +9,9 @@ assignees: ''
 
 <!-- 在提交你的问题之前，请先回答下述问题。非常感谢！ -->
 
-## 你确定 Wiki 页面没有你想要问的问题吗？
+## 你确定我们的[常见问题](https://goproxy.cn/faq)页面中没有你想要咨询的问题吗？
 
-<!-- Wiki 页面 URL：https://github.com/goproxy/goproxy.cn/wiki/Go-%E6%A8%A1%E5%9D%97%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98 -->
+<!-- 为避免此支持被滥用，我们将不会重复作答并直接关闭 Issue。 -->
 <!-- 请在此行下面的空白行填写你的答案。 -->
 
 
