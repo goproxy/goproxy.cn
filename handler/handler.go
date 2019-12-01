@@ -69,15 +69,28 @@ func init() {
 	a.FILE("/favicon.ico", "favicon.ico", cachemanGas)
 	a.FILE("/apple-touch-icon.png", "apple-touch-icon.png", cachemanGas)
 	a.FILES("/assets", a.CofferAssetRoot, cachemanGas)
-	a.BATCH(getHeadMethods, "/", indexPage, cachemanGas)
+	a.BATCH(getHeadMethods, "/", indexPage)
+	a.BATCH(getHeadMethods, "/faq", faqPage)
 	a.BATCH(nil, "/*", proxy)
 }
 
 // indexPage handles requests to get index page.
 func indexPage(req *air.Request, res *air.Response) error {
-	const indexHTML = "<meta http-equiv=refresh " +
-		"content=0;url=https://github.com/goproxy/goproxy.cn>"
-	return res.WriteHTML(indexHTML)
+	const indexPageURLBase = "https://github.com/goproxy/goproxy.cn" +
+		"/blob/master/README.md"
+	return res.WriteHTML(fmt.Sprintf(
+		"<meta http-equiv=refresh content=0;url=%s>",
+		req.LocalizedString(indexPageURLBase),
+	))
+}
+
+// faqPage handles requests to get FAQ page.
+func faqPage(req *air.Request, res *air.Response) error {
+	const faqPageURLBase = "https://github.com/goproxy/goproxy.cn/wiki/FAQ"
+	return res.WriteHTML(fmt.Sprintf(
+		"<meta http-equiv=refresh content=0;url=%s>",
+		req.LocalizedString(faqPageURLBase),
+	))
 }
 
 // proxy handles requests to play with Go module proxy.
