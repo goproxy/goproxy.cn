@@ -9,7 +9,8 @@ Goproxy China has fully implemented the Go's
 And it's a non-profit project supported by China's well-trusted cloud service
 provider [Qiniu Cloud](https://www.qiniu.com). Our goal is to provide a free,
 trusted, always on, and CDNed Go module proxy for Gophers in China and the rest
-of the world.
+of the world. Please subscribe to our real-time and historical data on system
+performance at [status.goproxy.cn](https://status.goproxy.cn).
 
 Goproxy China only focuses on the development of the web application
 that serves at the [https://goproxy.cn](https://goproxy.cn). If you're looking
