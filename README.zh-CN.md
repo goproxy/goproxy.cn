@@ -83,14 +83,6 @@ Goproxy 中国是一个由商业支持的项目而不是一个个人项目。并
 
 因为 [proxy.golang.org](https://proxy.golang.org) 在中国大陆被屏蔽了，所以，不使用。但是，如果你不在中国大陆，那么我们建议你优先考虑使用 [proxy.golang.org](https://proxy.golang.org)，毕竟它看起来更加官方。一旦你进入了中国大陆，我们希望你能在第一时间想到 [goproxy.cn](https://goproxy.cn)，这也是我们选择 `.cn` 作为域名后缀的主要原因。
 
-### 我对一个库提交了新的修改，为什么在我运行 `go get -u` 或 `go list -m -versions` 时它却没有出现？
-
-为了改善缓存和服务等待时间，新修改可能不会立即出现。如果你希望新修改立即出现在 [goproxy.cn](https://goproxy.cn) 中，则首先确保在源库中有此修改的语义化版本的标签，接着通过 `go get module@version` 来显式地请求那个发行版。在几分钟过后缓存过期，`go` 命令就能看到那个发行版了。
-
-### 我从我的库中移除了一个有问题的发行版，但它却仍然出现，我该怎么办？
-
-为了避免依赖你的模块的人的构建被破坏，Goproxy 中国会尽可能地缓存内容。因此，即使一个发行版在源库中已经不存在了，但它在 [goproxy.cn](https://goproxy.cn) 中却仍然有可能继续存在。如果你删除了你的整个库，则情况相同。我们建议你创建一个新的发行版并鼓励人们使用它，而不是移除一个已发布的。
-
 ### 谁将回答我在[这里](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.zh-CN.md&title=Go+%E6%A8%A1%E5%9D%97%EF%BC%9A)咨询的问题？
 
 Goproxy 中国的成员以及我们伟大的 Go 社区中热心肠的志愿者们。请牢记，为了减轻他人的工作量，别忘了先去检查我们的[常见问题](https://goproxy.cn/faq)页面中是否已经有了你想要问的问题。

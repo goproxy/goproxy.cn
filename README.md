@@ -122,24 +122,6 @@ Once you enter the mainland of China, we hope that you'll think of the
 [goproxy.cn](https://goproxy.cn) in the first place, which is the main reason
 why we choose the `.cn` as the domain name extension.
 
-### I committed a new revision to a repository, why isn't it showing up when I run `go get -u` or `go list -m -versions`?
-
-In order to improve caching and serving latencies, new revisions may not show up
-right away. If you want new revision to be immediately available in the
-[goproxy.cn](https://goproxy.cn), then first make sure there is a semantically
-versioned tag for this revision in the source repository. Then explicitly
-request that tagged version via `go get module@version`. After couple of minutes
-for caches to expire, the `go` command will see that tagged version.
-
-### I removed a bad release from my repository but it still appears, what should I do?
-
-Whenever possible, Goproxy China aims to cache content in order to avoid
-breaking builds for people that depend on your module, so this bad release may
-still be available in the [goproxy.cn](https://goproxy.cn) even if it is not
-available at the origin. The same situation applies if you delete your entire
-repository. We suggest creating a new release and encouraging people to use that
-one instead.
-
 ### Who will answer the questions that I have asked in [here](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=question-consultation.md&title=Question%3A+)?
 
 Members of Goproxy China and enthusiastic volunteers from our great Go
