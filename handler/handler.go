@@ -2,7 +2,7 @@ package handler
 
 import (
 	"context"
-	"hash"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -16,23 +16,12 @@ import (
 	"github.com/goproxy/goproxy"
 	"github.com/goproxy/goproxy.cn/cfg"
 	"github.com/goproxy/goproxy/cacher"
-	"github.com/qiniu/api.v7/auth/qbox"
-	"github.com/qiniu/api.v7/storage"
-	"github.com/rs/zerolog/log"
+	"github.com/qiniu/api.v7/v7/auth"
 )
 
 var (
 	// a is the `air.Default`.
 	a = air.Default
-
-	// g is an instance of the `goproxy.Goproxy`.
-	g = goproxy.New()
-
-	// kodoMac is the credentials of the Qiniu Cloud Kodo.
-	kodoMac *qbox.Mac
-
-	// kodoBucketManager is the manager of the Qiniu Cloud Kodo.
-	kodoBucketManager *storage.BucketManager
 
 	// getHeadMethods is an array contains the GET and the HEAD methods.
 	getHeadMethods = []string{http.MethodGet, http.MethodHead}
@@ -43,70 +32,87 @@ var (
 		MaxAge:  3600,
 		SMaxAge: -1,
 	})
+
+	// qiniuCredentials is the `auth.Credentials` for the Qiniu Cloud.
+	qiniuCredentials *auth.Credentials
+
+	// kodoCacher is the implementation of the `goproxy.Cacher` for the
+	// Qiniu Cloud Kodo.
+	kodoCacher *cacher.Kodo
+
+	// g is an instance of the `goproxy.Goproxy`.
+	g = goproxy.New()
 )
 
 func init() {
+	qiniuCredentials = auth.New(cfg.Qiniu.AccessKey, cfg.Qiniu.SecretKey)
+
+	kodoCacher = &cacher.Kodo{
+		Endpoint:   cfg.Qiniu.KodoEndpoint,
+		AccessKey:  cfg.Qiniu.AccessKey,
+		SecretKey:  cfg.Qiniu.SecretKey,
+		BucketName: cfg.Qiniu.KodoBucketName,
+	}
+
 	g.GoBinName = cfg.Goproxy.GoBinName
 	g.MaxGoBinWorkers = cfg.Goproxy.MaxGoBinWorkers
-	g.Cacher = &kodoCacher{
-		kodoCacher: &cacher.Kodo{
-			Endpoint:   cfg.Kodo.Endpoint,
-			AccessKey:  cfg.Kodo.AccessKey,
-			SecretKey:  cfg.Kodo.SecretKey,
-			BucketName: cfg.Kodo.BucketName,
-		},
+	g.Cacher = &localCacher{
+		Cacher:         kodoCacher,
+		localCacheRoot: cfg.Goproxy.LocalCacheRoot,
 	}
 
 	g.MaxZIPCacheBytes = cfg.Goproxy.MaxZIPCacheBytes
 	g.ErrorLogger = a.ErrorLogger
 	g.DisableNotFoundLog = true
 
-	kodoMac = qbox.NewMac(cfg.Kodo.AccessKey, cfg.Kodo.SecretKey)
-
-	kodoRegion, err := storage.GetRegion(
-		cfg.Kodo.AccessKey,
-		cfg.Kodo.BucketName,
-	)
-	if err != nil {
-		log.Fatal().Err(err).
-			Str("app_name", a.AppName).
-			Msg("failed to get qiniu cloud kodo region")
-	}
-
-	kodoBucketManager = storage.NewBucketManager(kodoMac, &storage.Config{
-		Region: kodoRegion,
-	})
-
 	a.FILE("/robots.txt", "robots.txt")
 	a.FILE("/favicon.ico", "favicon.ico", cachemanGas)
 	a.FILE("/apple-touch-icon.png", "apple-touch-icon.png", cachemanGas)
 	a.FILES("/assets", a.CofferAssetRoot, cachemanGas)
-	a.BATCH(getHeadMethods, "/", indexPageHandler, cachemanGas)
-	a.BATCH(nil, "/*", goproxyHandler)
+	a.BATCH(getHeadMethods, "/", indexPage)
+	a.BATCH(getHeadMethods, "/faq", faqPage)
+	a.BATCH(nil, "/*", proxy)
 }
 
-// indexPageHandler handles requests to get index page.
-func indexPageHandler(req *air.Request, res *air.Response) error {
-	return res.Redirect("https://github.com/goproxy/goproxy.cn")
+// indexPage handles requests to get index page.
+func indexPage(req *air.Request, res *air.Response) error {
+	const indexPageURLBase = "https://github.com/goproxy/goproxy.cn" +
+		"/blob/master/README.md"
+	return res.WriteHTML(fmt.Sprintf(
+		"<meta http-equiv=refresh content=0;url=%s>",
+		req.LocalizedString(indexPageURLBase),
+	))
 }
 
-// goproxyHandler handles requests to play with Go module proxy.
-func goproxyHandler(req *air.Request, res *air.Response) error {
-	if p, _ := splitPathQuery(req.Path); path.Ext(p) == ".zip" {
-		fk := strings.TrimLeft(path.Clean(p), "/")
-		fi, err := kodoBucketManager.Stat(cfg.Kodo.BucketName, fk)
-		if err != nil {
-			if !isKodoFileNotExist(err) {
-				return err
-			}
-		} else if fi.Fsize > 10<<20 { // File size > 10 MB
-			fu := storage.MakePrivateURL(
-				kodoMac,
-				cfg.Kodo.BucketEndpoint,
-				fk,
+// faqPage handles requests to get FAQ page.
+func faqPage(req *air.Request, res *air.Response) error {
+	const faqPageURLBase = "https://github.com/goproxy/goproxy.cn/wiki/FAQ"
+	return res.WriteHTML(fmt.Sprintf(
+		"<meta http-equiv=refresh content=0;url=%s>",
+		req.LocalizedString(faqPageURLBase),
+	))
+}
+
+// proxy handles requests to play with Go module proxy.
+func proxy(req *air.Request, res *air.Response) error {
+	name, _ := splitPathQuery(req.Path)
+	name = path.Clean(name)
+	name = strings.TrimPrefix(name, g.PathPrefix)
+	name = strings.TrimLeft(name, "/")
+	if cfg.Goproxy.AutoRedirection && isModuleCacheFile(name) {
+		if _, err := kodoCacher.Cache(req.Context, name); err == nil {
+			u := fmt.Sprintf(
+				"%s/%s?e=%d",
+				cfg.Qiniu.KodoBucketEndpoint,
+				name,
 				time.Now().Add(time.Hour).Unix(),
 			)
-			return res.Redirect(fu)
+
+			token := qiniuCredentials.Sign([]byte(u))
+
+			return res.Redirect(fmt.Sprint(u, "&token=", token))
+		} else if err != goproxy.ErrCacheNotFound {
+			return err
 		}
 	}
 
@@ -115,28 +121,16 @@ func goproxyHandler(req *air.Request, res *air.Response) error {
 	return nil
 }
 
-// kodoCacher implements the `goproxy.Cacher`.
-type kodoCacher struct {
-	// kodoCacher is the underlying cacher.
-	kodoCacher *cacher.Kodo
-}
+// localCacher implements the `goproxy.Cacher`.
+type localCacher struct {
+	goproxy.Cacher
 
-// NewHash implements the `goproxy.Cacher`.
-func (kc *kodoCacher) NewHash() hash.Hash {
-	return kc.kodoCacher.NewHash()
-}
-
-// Cache implements the `goproxy.Cacher`.
-func (kc *kodoCacher) Cache(
-	ctx context.Context,
-	name string,
-) (goproxy.Cache, error) {
-	return kc.kodoCacher.Cache(ctx, name)
+	localCacheRoot string
 }
 
 // SetCache implements the `goproxy.Cacher`.
-func (kc *kodoCacher) SetCache(ctx context.Context, c goproxy.Cache) error {
-	localCache, err := ioutil.TempFile(cfg.Goproxy.LocalCacheRoot, "")
+func (lc *localCacher) SetCache(ctx context.Context, c goproxy.Cache) error {
+	localCacheFile, err := ioutil.TempFile(lc.localCacheRoot, "")
 	if err != nil {
 		return err
 	}
@@ -144,21 +138,21 @@ func (kc *kodoCacher) SetCache(ctx context.Context, c goproxy.Cache) error {
 	hijackedLocalCacheRemoval := false
 	defer func() {
 		if !hijackedLocalCacheRemoval {
-			os.Remove(localCache.Name())
+			os.Remove(localCacheFile.Name())
 		}
 	}()
 
-	if _, err := io.Copy(localCache, c); err != nil {
+	if _, err := io.Copy(localCacheFile, c); err != nil {
 		return err
 	}
 
-	if err := localCache.Close(); err != nil {
+	if err := localCacheFile.Close(); err != nil {
 		return err
 	}
 
 	hijackedLocalCacheRemoval = true
 	go func() {
-		defer os.Remove(localCache.Name())
+		defer os.Remove(localCacheFile.Name())
 
 		ctx, cancel := context.WithTimeout(
 			context.Background(),
@@ -166,30 +160,30 @@ func (kc *kodoCacher) SetCache(ctx context.Context, c goproxy.Cache) error {
 		)
 		defer cancel()
 
-		lc, err := os.Open(localCache.Name())
+		localCacheFile, err := os.Open(localCacheFile.Name())
 		if err != nil {
 			return
 		}
+		defer localCacheFile.Close()
 
-		dc := &diskCache{
-			file:     lc,
+		lc.Cacher.SetCache(ctx, &localCache{
+			File:     localCacheFile,
 			name:     c.Name(),
 			mimeType: c.MIMEType(),
 			size:     c.Size(),
 			modTime:  c.ModTime(),
 			checksum: c.Checksum(),
-		}
-		defer dc.Close()
-
-		kc.kodoCacher.SetCache(ctx, dc)
+		})
 	}()
 
 	return nil
 }
 
-// diskCache implements the `goproxy.Cache`.
-type diskCache struct {
-	file     *os.File
+// localCache implements the `goproxy.Cache`. It is the cache unit of the
+// `localCacher`.
+type localCache struct {
+	*os.File
+
 	name     string
 	mimeType string
 	size     int64
@@ -197,44 +191,29 @@ type diskCache struct {
 	checksum []byte
 }
 
-// Read implements the `goproxy.Cache`.
-func (dc *diskCache) Read(b []byte) (int, error) {
-	return dc.file.Read(b)
-}
-
-// Seek implements the `goproxy.Cache`.
-func (dc *diskCache) Seek(offset int64, whence int) (int64, error) {
-	return dc.file.Seek(offset, whence)
-}
-
-// Close implements the `goproxy.Cache`.
-func (dc *diskCache) Close() error {
-	return dc.file.Close()
-}
-
 // Name implements the `goproxy.Cache`.
-func (dc *diskCache) Name() string {
-	return dc.name
+func (lc *localCache) Name() string {
+	return lc.name
 }
 
 // MIMEType implements the `goproxy.Cache`.
-func (dc *diskCache) MIMEType() string {
-	return dc.mimeType
+func (lc *localCache) MIMEType() string {
+	return lc.mimeType
 }
 
 // Size implements the `goproxy.Cache`.
-func (dc *diskCache) Size() int64 {
-	return dc.size
+func (lc *localCache) Size() int64 {
+	return lc.size
 }
 
 // ModTime implements the `goproxy.Cache`.
-func (dc *diskCache) ModTime() time.Time {
-	return dc.modTime
+func (lc *localCache) ModTime() time.Time {
+	return lc.modTime
 }
 
 // Checksum implements the `goproxy.Cache`.
-func (dc *diskCache) Checksum() []byte {
-	return dc.checksum
+func (lc *localCache) Checksum() []byte {
+	return lc.checksum
 }
 
 // splitPathQuery splits the p of the form "path?query" into path and query.
@@ -250,7 +229,16 @@ func splitPathQuery(p string) (path, query string) {
 	return p, ""
 }
 
-// isKodoFileNotExist reports whether the err means a Kodo file is not exist.
-func isKodoFileNotExist(err error) bool {
-	return err != nil && err.Error() == "no such file or directory"
+// isModuleCacheFile reports whether the named file is a module cache.
+func isModuleCacheFile(name string) bool {
+	if !strings.Contains(name, "/@v/v") {
+		return false
+	}
+
+	switch path.Ext(name) {
+	case ".info", ".mod", ".zip":
+		return true
+	}
+
+	return false
 }

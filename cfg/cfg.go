@@ -24,22 +24,23 @@ var (
 		LoggerLevel string `mapstructure:"logger_level"`
 	}
 
-	// Kodo is the Qiniu Cloud Kodo configuration items.
-	Kodo struct {
-		// Endpoint is the endpoint of the Qiniu Cloud Kodo.
-		Endpoint string `mapstructure:"endpoint"`
-
-		// AccessKey is the access key of the Qiniu Cloud Kodo.
+	// Qiniu is the Qiniu Cloud configuration items.
+	Qiniu struct {
+		// AccessKey is the access key of the Qiniu Cloud.
 		AccessKey string `mapstructure:"access_key"`
 
-		// SecretKey is the secret key of the Qiniu Cloud Kodo.
+		// SecretKey is the secret key of the Qiniu Cloud.
 		SecretKey string `mapstructure:"secret_key"`
 
-		// BucketName is the bucket name of the Qiniu Cloud Kodo.
-		BucketName string `mapstructure:"bucket_name"`
+		// KodoEndpoint is the endpint of the Qiniu Cloud Kodo.
+		KodoEndpoint string `mapstructure:"kodo_endpoint"`
 
-		// BucketEndpoint is the bucket endpint of the Qiniu Cloud Kodo.
-		BucketEndpoint string `mapstructure:"bucket_endpoint"`
+		// KodoBucketName is the bucket name of the Qiniu Cloud Kodo.
+		KodoBucketName string `mapstructure:"kodo_bucket_name"`
+
+		// KodoBucketEndpoint is the bucket endpint of the Qiniu Cloud
+		// Kodo.
+		KodoBucketEndpoint string `mapstructure:"kodo_bucket_endpoint"`
 	}
 
 	// Goproxy is the Goproxy configuration items.
@@ -55,6 +56,10 @@ var (
 		// MaxZIPCacheBytes is the maximum number of bytes of the ZIP
 		// cache that will be stored in the cacher of the Goproxy.
 		MaxZIPCacheBytes int `mapstructure:"max_zip_cache_bytes"`
+
+		// AutoRedirection indicates whether to control automatic
+		// redirection of existing caches for the Goproxy.
+		AutoRedirection bool `mapstructure:"auto_redirection"`
 
 		// LocalCacheRoot is the root of the local caches of the
 		// Goproxy.
@@ -90,9 +95,9 @@ func init() {
 		))
 	}
 
-	if err := mapstructure.Decode(m["kodo"], &Kodo); err != nil {
+	if err := mapstructure.Decode(m["qiniu"], &Qiniu); err != nil {
 		panic(fmt.Errorf(
-			"failed to decode kodo configuration items: %v",
+			"failed to decode qiniu configuration items: %v",
 			err,
 		))
 	}

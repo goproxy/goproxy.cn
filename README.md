@@ -4,14 +4,13 @@
 
 The most trusted Go module proxy in China.
 
-![39C6C4A2-AF08-4B00-915D-2FCA96767E16](https://user-images.githubusercontent.com/5037285/62007948-66cdad00-b186-11e9-899e-01ccb76951d9.jpeg)
-
 Goproxy China has fully implemented the Go's
 [module proxy protocol](https://golang.org/cmd/go/#hdr-Module_proxy_protocol).
 And it's a non-profit project supported by China's well-trusted cloud service
 provider [Qiniu Cloud](https://www.qiniu.com). Our goal is to provide a free,
 trusted, always on, and CDNed Go module proxy for Gophers in China and the rest
-of the world.
+of the world. Please subscribe to our real-time and historical data on system
+performance at [status.goproxy.cn](https://status.goproxy.cn).
 
 Goproxy China only focuses on the development of the web application
 that serves at the [https://goproxy.cn](https://goproxy.cn). If you're looking
@@ -21,51 +20,13 @@ based on.
 
 Happy coding, Gophers! ;-)
 
-## Credits
-
-* Author: [Aofei Sheng](https://aofeisheng.com)
-* Maintainer: [Aofei Sheng](https://aofeisheng.com)
-* Sponsor: [Qiniu Cloud](https://www.qiniu.com)
-* Promoters: [Shiwei Xu (Qiniu Cloud's founder-CEO)](https://baike.baidu.com/item/许式伟), [Asta Xie (Gopher China's organizer)](https://github.com/astaxie), Chuntang Tao and [Lifu Mao](https://github.com/forrest-mao)
-
-## FAQ
-
-**Q: Why create Goproxy China?**
-
-A: Due to the Chinese government's network supervision system, there're lot of
-modules in the Go ecosystem that Chinese Gophers cannot `go get`, such as the
-most famous `golang.org/x/...`. And the speed of getting modules from GitHub in
-the mainland of China is a bit slow. So we created Goproxy China to make Gophers
-in China better use Go modules. In fact, since the
-[goproxy.cn](https://goproxy.cn) has been CDNed, Gophers in other countries can
-also use it.
-
-**Q: Is it safe to use Goproxy China?**
-
-A: Of course, as with all other Go module proxies, we just cache the modules as
-they are, so we can assure you that they will never be tampered with on our
-side. However, if you still can't fully trust us, then you can use the most
-trusted checksum database [sum.golang.org](https://sum.golang.org) to ensure
-that the modules you get from us have not been tampered with, since Goproxy
-China has supported
-[proxying checksum databases](https://go.googlesource.com/proposal/+/master/design/25530-sumdb.md#proxying-a-checksum-database).
-
-**Q: Is Goproxy China legal in China?**
-
-A: Goproxy China is a business-supported project rather than a personal project.
-And it has been ICP filed in the MIIT of China (ICP license:
-[沪ICP备11037377号-56](http://beian.miit.gov.cn)), which means it's **fully
-legal** in China.
-
-**Q: Why not use the [proxy.golang.org](https://proxy.golang.org)?**
-
-A: The [proxy.golang.org](https://proxy.golang.org) has been blocked in the
-mainland of China. So, no. However, if you're not in the mainland of China, then
-we recommend that you give priority to using the
-[proxy.golang.org](https://proxy.golang.org), after all, it looks more official.
-Once you enter the mainland of China, we hope that you'll think of the
-[goproxy.cn](https://goproxy.cn) in the first place, which is the main reason why
-we choose the `.cn` as the domain name extension.
+***Note: In order to better help Gophers to use Go moduels, Goproxy China now
+supports answering all Go moduels related questions (no longer just related to
+Go module proxy), all you need to do is simply follow the issue template to post
+questions
+[here](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=question-consultation.md&title=Question%3A+).
+Don't forget to check if our
+[FAQ](https://goproxy.cn/faq) page already has the question you want to ask.***
 
 ## Usage
 
@@ -121,6 +82,59 @@ or
 ```
 
 done.
+
+## FAQ
+
+### Why create Goproxy China?
+
+Due to the Chinese government's network supervision system, there're lot of
+modules in the Go ecosystem that Chinese Gophers cannot `go get`, such as the
+most famous `golang.org/x/...`. And the speed of getting modules from GitHub in
+the mainland of China is a bit slow. So we created Goproxy China to make Gophers
+in China better use Go modules. In fact, since the
+[goproxy.cn](https://goproxy.cn) has been CDNed, Gophers in other countries can
+also use it.
+
+### Is it safe to use Goproxy China?
+
+Of course, as with all other Go module proxies, we just cache the modules as
+they are, so we can assure you that they will never be tampered with on our
+side. However, if you still can't fully trust us, then you can use the most
+trusted checksum database [sum.golang.org](https://sum.golang.org) to ensure
+that the modules you get from us have not been tampered with, since Goproxy
+China has supported
+[proxying checksum databases](https://go.googlesource.com/proposal/+/master/design/25530-sumdb.md#proxying-a-checksum-database).
+
+### Is Goproxy China legal in China?
+
+Goproxy China is a business-supported project rather than a personal project.
+And it has been ICP filed in the MIIT of China (ICP license:
+[沪ICP备11037377号-56](http://beian.miit.gov.cn)), which means it's **fully
+legal** in China.
+
+### Why not use the [proxy.golang.org](https://proxy.golang.org)?
+
+The [proxy.golang.org](https://proxy.golang.org) has been blocked in the
+mainland of China. So, no. However, if you're not in the mainland of China, then
+we recommend that you give priority to using the
+[proxy.golang.org](https://proxy.golang.org), after all, it looks more official.
+Once you enter the mainland of China, we hope that you'll think of the
+[goproxy.cn](https://goproxy.cn) in the first place, which is the main reason
+why we choose the `.cn` as the domain name extension.
+
+### Who will answer the questions that I have asked in [here](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=question-consultation.md&title=Question%3A+)?
+
+Members of Goproxy China and enthusiastic volunteers from our great Go
+community. Please keep in mind that in order to alleviate the workload of
+others, don't forget to check if our
+[FAQ](https://goproxy.cn/faq) page already has the question you want to ask.
+
+## Credits
+
+* Author: [Aofei Sheng](https://aofeisheng.com)
+* Maintainer: [Aofei Sheng](https://aofeisheng.com)
+* Sponsor: [Qiniu Cloud](https://www.qiniu.com)
+* Promoters: [Shiwei Xu (Qiniu Cloud's founder-CEO)](https://baike.baidu.com/item/许式伟), [Asta Xie (Gopher China's organizer)](https://github.com/astaxie), Chuntang Tao and [Lifu Mao](https://github.com/forrest-mao)
 
 ## Community
 
