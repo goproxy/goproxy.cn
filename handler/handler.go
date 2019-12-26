@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"path"
@@ -14,14 +15,17 @@ import (
 	"github.com/air-gases/cacheman"
 	"github.com/aofei/air"
 	"github.com/goproxy/goproxy"
-	"github.com/goproxy/goproxy.cn/cfg"
+	"github.com/goproxy/goproxy.cn/base"
 	"github.com/goproxy/goproxy/cacher"
 	"github.com/qiniu/api.v7/v7/auth"
 )
 
 var (
-	// a is the `air.Default`.
-	a = air.Default
+	// qiniuViper is used to get the configuration items of the Qiniu Cloud.
+	qiniuViper = base.Viper.Sub("qiniu")
+
+	// goproxyViper is used to get the configuration items of the Goproxy.
+	goproxyViper = base.Viper.Sub("goproxy")
 
 	// getHeadMethods is an array contains the GET and the HEAD methods.
 	getHeadMethods = []string{http.MethodGet, http.MethodHead}
@@ -34,44 +38,62 @@ var (
 	})
 
 	// qiniuCredentials is the `auth.Credentials` for the Qiniu Cloud.
-	qiniuCredentials *auth.Credentials
+	qiniuCredentials = auth.New(
+		qiniuViper.GetString("access_key"),
+		qiniuViper.GetString("secret_key"),
+	)
 
-	// kodoCacher is the implementation of the `goproxy.Cacher` for the
-	// Qiniu Cloud Kodo.
-	kodoCacher *cacher.Kodo
+	// kodoCacher is the `cacher.Kodo` for the Qiniu Cloud Kodo.
+	kodoCacher = &cacher.Kodo{
+		Endpoint:   qiniuViper.GetString("kodo_endpoint"),
+		AccessKey:  qiniuViper.GetString("access_key"),
+		SecretKey:  qiniuViper.GetString("secret_key"),
+		BucketName: qiniuViper.GetString("kodo_bucket_name"),
+	}
 
 	// g is an instance of the `goproxy.Goproxy`.
 	g = goproxy.New()
 )
 
 func init() {
-	qiniuCredentials = auth.New(cfg.Qiniu.AccessKey, cfg.Qiniu.SecretKey)
-
-	kodoCacher = &cacher.Kodo{
-		Endpoint:   cfg.Qiniu.KodoEndpoint,
-		AccessKey:  cfg.Qiniu.AccessKey,
-		SecretKey:  cfg.Qiniu.SecretKey,
-		BucketName: cfg.Qiniu.KodoBucketName,
+	if err := goproxyViper.UnmarshalKey("goproxy", g); err != nil {
+		base.Logger.Fatal().Err(err).
+			Msg("failed to unmarshal goproxy configuration items")
 	}
 
-	g.GoBinName = cfg.Goproxy.GoBinName
-	g.MaxGoBinWorkers = cfg.Goproxy.MaxGoBinWorkers
 	g.Cacher = &localCacher{
 		Cacher:         kodoCacher,
-		localCacheRoot: cfg.Goproxy.LocalCacheRoot,
+		localCacheRoot: goproxyViper.GetString("local_cache_root"),
 	}
 
-	g.MaxZIPCacheBytes = cfg.Goproxy.MaxZIPCacheBytes
-	g.ErrorLogger = a.ErrorLogger
+	g.ErrorLogger = log.New(base.Logger, "", 0)
 	g.DisableNotFoundLog = true
 
-	a.FILE("/robots.txt", "robots.txt")
-	a.FILE("/favicon.ico", "favicon.ico", cachemanGas)
-	a.FILE("/apple-touch-icon.png", "apple-touch-icon.png", cachemanGas)
-	a.FILES("/assets", a.CofferAssetRoot, cachemanGas)
-	a.BATCH(getHeadMethods, "/", indexPage)
-	a.BATCH(getHeadMethods, "/faq", faqPage)
-	a.BATCH(nil, "/*", proxy)
+	base.Air.FILE("/robots.txt", "robots.txt")
+	base.Air.FILE("/favicon.ico", "favicon.ico", cachemanGas)
+	base.Air.FILE("/apple-touch-icon.png", "apple-touch-icon.png", cachemanGas)
+	base.Air.FILES("/assets", base.Air.CofferAssetRoot, cachemanGas)
+	base.Air.BATCH(getHeadMethods, "/", indexPage)
+	base.Air.BATCH(getHeadMethods, "/faq", faqPage)
+	base.Air.BATCH(nil, "/*", proxy)
+}
+
+// Error handles errors.
+func Error(err error, req *air.Request, res *air.Response) {
+	if res.Written {
+		return
+	}
+
+	m := ""
+	if !req.Air.DebugMode && res.Status == http.StatusInternalServerError {
+		m = http.StatusText(res.Status)
+	} else {
+		m = err.Error()
+	}
+
+	res.WriteJSON(map[string]interface{}{
+		"Error": m,
+	})
 }
 
 // indexPage handles requests to get index page.
@@ -99,11 +121,11 @@ func proxy(req *air.Request, res *air.Response) error {
 	name = path.Clean(name)
 	name = strings.TrimPrefix(name, g.PathPrefix)
 	name = strings.TrimLeft(name, "/")
-	if cfg.Goproxy.AutoRedirection && isModuleCacheFile(name) {
+	if isModuleCacheFile(name) && goproxyViper.GetBool("auto_redirect") {
 		if _, err := kodoCacher.Cache(req.Context, name); err == nil {
 			u := fmt.Sprintf(
 				"%s/%s?e=%d",
-				cfg.Qiniu.KodoBucketEndpoint,
+				qiniuViper.GetString("kodo_bucket_endpoint"),
 				name,
 				time.Now().Add(time.Hour).Unix(),
 			)

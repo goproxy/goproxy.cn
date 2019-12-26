@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"net/http"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,18 +13,17 @@ import (
 	"github.com/air-gases/logger"
 	"github.com/air-gases/redirector"
 	"github.com/aofei/air"
-	_ "github.com/goproxy/goproxy.cn/handler"
-	"github.com/rs/zerolog/log"
+	"github.com/goproxy/goproxy.cn/base"
+	"github.com/goproxy/goproxy.cn/handler"
 )
 
-// a is the `air.Default`.
-var a = air.Default
-
 func main() {
-	a.ErrorHandler = errorHandler
+	base.Air.ErrorHandler = handler.Error
+	base.Air.ErrorLogger = log.New(base.Logger, "", 0)
 
-	a.Pregases = []air.Gas{
+	base.Air.Pregases = []air.Gas{
 		logger.Gas(logger.GasConfig{
+			Logger:               &base.Logger,
 			IncludeClientAddress: true,
 		}),
 		defibrillator.Gas(defibrillator.GasConfig{}),
@@ -40,10 +39,9 @@ func main() {
 	signal.Notify(shutdownChan, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
-		if err := a.Serve(); err != nil {
-			log.Error().Err(err).
-				Str("app_name", a.AppName).
-				Msg("server error")
+		if err := base.Air.Serve(); err != nil {
+			base.Logger.Error().Err(err).
+				Msg("air server error")
 		}
 	}()
 
@@ -52,23 +50,5 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
-	a.Shutdown(ctx)
-}
-
-// errorHandler is the error handler.
-func errorHandler(err error, req *air.Request, res *air.Response) {
-	if res.Written {
-		return
-	}
-
-	m := ""
-	if !req.Air.DebugMode && res.Status == http.StatusInternalServerError {
-		m = http.StatusText(res.Status)
-	} else {
-		m = err.Error()
-	}
-
-	res.WriteJSON(map[string]interface{}{
-		"Error": m,
-	})
+	base.Air.Shutdown(ctx)
 }
