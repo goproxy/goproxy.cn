@@ -102,8 +102,8 @@ they are, so we can assure you that they will never be tampered with on our
 side. However, if you still can't fully trust us, then you can use the most
 trusted checksum database [sum.golang.org](https://sum.golang.org) to ensure
 that the modules you get from us have not been tampered with, since Goproxy
-China has supported
-[proxying checksum databases](https://go.googlesource.com/proposal/+/master/design/25530-sumdb.md#proxying-a-checksum-database).
+China already supports
+[proxying checksum databases](https://golang.org/design/25530-sumdb#proxying-a-checksum-database).
 
 ### Is Goproxy China legal in China?
 

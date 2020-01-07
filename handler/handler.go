@@ -66,6 +66,7 @@ func init() {
 		localCacheRoot: goproxyViper.GetString("local_cache_root"),
 	}
 
+	g.ProxiedSUMDBNames = []string{"sum.golang.org"}
 	g.ErrorLogger = log.New(base.Logger, "", 0)
 	g.DisableNotFoundLog = true
 

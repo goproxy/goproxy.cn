@@ -4,6 +4,8 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/VictoriaMetrics/fastcache v1.5.4 h1:0BaXbRH01RycJk79OOBwMCXlNryko9z4yEf6RqbP+Xo=
 github.com/VictoriaMetrics/fastcache v1.5.4/go.mod h1:ptDBkNMQI4RtmVo8VS/XwRY6RoTu1dAWCbrk+6WsEM8=
+github.com/VictoriaMetrics/fastcache v1.5.5 h1:HsBlzPgzKG0566YOl1mmfyz8SCU0zLKfbl9RDLsiLD8=
+github.com/VictoriaMetrics/fastcache v1.5.5/go.mod h1:ptDBkNMQI4RtmVo8VS/XwRY6RoTu1dAWCbrk+6WsEM8=
 github.com/air-gases/cacheman v0.9.1 h1:e/PV1mPbH7hZO/p7WkBiXvKab0aVtnnB/flXc0h+/6c=
 github.com/air-gases/cacheman v0.9.1/go.mod h1:hn+UVogaMW0T/68oZsvmBtNOOKgLBx97099Kl120ZIk=
 github.com/air-gases/defibrillator v0.14.1 h1:yTtyKU9ZvzhBU3T3oenPU0s/trAw7q6jcsPEhSW9ckY=
@@ -65,8 +67,8 @@ github.com/google/btree v1.0.0/go.mod h1:lNA+9X1NB3Zf8V7Ke586lFgjr2dZNuvo3lPJSGZ
 github.com/google/go-cmp v0.2.0/go.mod h1:oXzfMopK8JAjlY9xF4vHSVASa0yLyX7SntLO5aqRK0M=
 github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1 h1:EGx4pi6eqNxGaHF6qqu48+N2wcFQ5qg5FXgOdqsJ5d8=
 github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
-github.com/goproxy/goproxy v0.0.0-20191230065511-e5db0f793706 h1:H1GdcuuKi9zVMx4MxoCeWmd82K8V/NZ6eLgY9wckvY4=
-github.com/goproxy/goproxy v0.0.0-20191230065511-e5db0f793706/go.mod h1:v9SbTf+Ca4/C2RKSbdW6JQz3jje3Oftwd+muiK4y6b0=
+github.com/goproxy/goproxy v0.0.0-20200107124007-93d07b5deef8 h1:8K8PLmKA1QJBvSTSG7flvQMPWIlfI5I0vg6/JoUeihc=
+github.com/goproxy/goproxy v0.0.0-20200107124007-93d07b5deef8/go.mod h1:k8bGf4HX4TtzYllrWtaaOPcBR6N/TEAQ7spMjY3tBZo=
 github.com/gorilla/websocket v1.4.0/go.mod h1:E7qHFY5m1UJ88s3WnNqhKjPHQ0heANvMoAMk2YaljkQ=
 github.com/gorilla/websocket v1.4.1 h1:q7AeDBpnBk8AogcD4DSag/Ukw/KV+YhzLj2bP5HvKCM=
 github.com/gorilla/websocket v1.4.1/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
@@ -165,9 +167,13 @@ github.com/subosito/gotenv v1.2.0 h1:Slr1R9HxAlEKefgq5jn9U+DnETlIUa6HfgEzj0g5d7s
 github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69rRypqCw=
 github.com/tdewolff/minify/v2 v2.6.1 h1:UJLhbs2Q/iDrqA79EEyKE48uYHeAMPVdiUzdtKsatJ8=
 github.com/tdewolff/minify/v2 v2.6.1/go.mod h1:l9hbQnH096st77OkscoRUvKdd23oUM6pDZpYx381sPo=
+github.com/tdewolff/minify/v2 v2.7.0 h1:z1+mk91VJ5lyspFq9QVbgiPKqYP4r7rTz4CfGg0gLuU=
+github.com/tdewolff/minify/v2 v2.7.0/go.mod h1:BkDSm8aMMT0ALGmpt7j3Ra7nLUgZL0qhyrAHXwxcy5w=
 github.com/tdewolff/parse/v2 v2.3.14/go.mod h1:+V2lSZ93xpH2Csfs/vtNY1Fjr8kcFMsZKjyLoSkZbM0=
 github.com/tdewolff/parse/v2 v2.4.1 h1:ANb9ubvS28GT8zFE618BlvJbGopChGFExK5v1KEm2w0=
 github.com/tdewolff/parse/v2 v2.4.1/go.mod h1:WzaJpRSbwq++EIQHYIRTpbYKNA3gn9it1Ik++q4zyho=
+github.com/tdewolff/parse/v2 v2.4.2 h1:Bu2Qv6wepkc+Ou7iB/qHjAhEImlAP5vedzlQRUdj3BI=
+github.com/tdewolff/parse/v2 v2.4.2/go.mod h1:WzaJpRSbwq++EIQHYIRTpbYKNA3gn9it1Ik++q4zyho=
 github.com/tdewolff/test v1.0.4/go.mod h1:6DAvZliBAAnD7rhVgwaM7DE5/d9NMOAJ09SqYqeK4QE=
 github.com/tdewolff/test v1.0.6 h1:76mzYJQ83Op284kMT+63iCNCI7NEERsIN8dLM+RiKr4=
 github.com/tdewolff/test v1.0.6/go.mod h1:6DAvZliBAAnD7rhVgwaM7DE5/d9NMOAJ09SqYqeK4QE=
@@ -219,8 +225,8 @@ golang.org/x/sys v0.0.0-20190412213103-97732733099d/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20190422165155-953cdadca894/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20191224085550-c709ea063b76 h1:Dho5nD6R3PcW2SH1or8vS0dszDaXRxIw55lBX7XiE5g=
 golang.org/x/sys v0.0.0-20191224085550-c709ea063b76/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
-golang.org/x/sys v0.0.0-20191228213918-04cbcbbfeed8 h1:JA8d3MPx/IToSyXZG/RhwYEtfrKO1Fxrqe8KrkiLXKM=
-golang.org/x/sys v0.0.0-20191228213918-04cbcbbfeed8/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20200106162015-b016eb3dc98e h1:LwyF2AFISC9nVbS6MgzsaQNSUsRXI49GS+YQ5KX/QH0=
+golang.org/x/sys v0.0.0-20200106162015-b016eb3dc98e/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.2 h1:tW2bmiBqwgJj/UpqtC8EpXEZVYOwU0yG4iWbprSVAcs=
 golang.org/x/text v0.3.2/go.mod h1:bEr9sfX3Q8Zfm5fL9x+3itogRgK3+ptLWKqgva+5dAk=
