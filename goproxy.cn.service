@@ -5,8 +5,8 @@ After=network.target
 [Service]
 Environment=GOPROXY=direct
 Environment=GOSUMDB=off
-WorkingDirectory=/usr/local/lib/goproxy.cn
-ExecStart=/usr/local/bin/goproxy.cn --config=/usr/local/etc/goproxy.cn-config.toml
+WorkingDirectory=/srv/goproxy.cn
+ExecStart=/srv/goproxy.cn/goproxy.cn --config=/srv/goproxy.cn/config.toml
 KillSignal=SIGINT
 Restart=always
 
