@@ -30,7 +30,7 @@ func init() {
 	ext := filepath.Ext(*cf)
 	Viper.AddConfigPath(filepath.Dir(*cf))
 	Viper.SetConfigName(strings.TrimSuffix(filepath.Base(*cf), ext))
-	Viper.SetConfigType(strings.TrimLeft(ext, "."))
+	Viper.SetConfigType(strings.TrimPrefix(ext, "."))
 	if err := Viper.ReadInConfig(); err != nil {
 		panic(fmt.Errorf("failed to read configuration file: %v", err))
 	}
