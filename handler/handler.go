@@ -61,11 +61,14 @@ func init() {
 			Msg("failed to unmarshal goproxy configuration items")
 	}
 
+	g.GoBinName = goproxyViper.GetString("go_bin_name")
+	g.MaxGoBinWorkers = goproxyViper.GetInt("max_go_bin_workers")
 	g.Cacher = &localCacher{
 		Cacher:         kodoCacher,
 		localCacheRoot: goproxyViper.GetString("local_cache_root"),
 	}
 
+	g.MaxZIPCacheBytes = goproxyViper.GetInt("max_zip_cache_bytes")
 	g.ProxiedSUMDBNames = []string{"sum.golang.org"}
 	g.ErrorLogger = log.New(base.Logger, "", 0)
 	g.DisableNotFoundLog = true
@@ -118,8 +121,7 @@ func faqPage(req *air.Request, res *air.Response) error {
 
 // proxy handles requests to play with Go module proxy.
 func proxy(req *air.Request, res *air.Response) error {
-	name, _ := splitPathQuery(req.Path)
-	name = path.Clean(name)
+	name := path.Clean(req.RawPath())
 	name = strings.TrimPrefix(name, g.PathPrefix)
 	name = strings.TrimLeft(name, "/")
 	if isModuleCacheFile(name) && goproxyViper.GetBool("auto_redirect") {
@@ -237,19 +239,6 @@ func (lc *localCache) ModTime() time.Time {
 // Checksum implements the `goproxy.Cache`.
 func (lc *localCache) Checksum() []byte {
 	return lc.checksum
-}
-
-// splitPathQuery splits the p of the form "path?query" into path and query.
-func splitPathQuery(p string) (path, query string) {
-	i, l := 0, len(p)
-	for ; i < l && p[i] != '?'; i++ {
-	}
-
-	if i < l {
-		return p[:i], p[i+1:]
-	}
-
-	return p, ""
 }
 
 // isModuleCacheFile reports whether the named file is a module cache.
