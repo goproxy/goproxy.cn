@@ -137,7 +137,7 @@ content.***
 * Author: [Aofei Sheng](https://aofeisheng.com)
 * Maintainer: [Aofei Sheng](https://aofeisheng.com)
 * Sponsor: [Qiniu Cloud](https://www.qiniu.com)
-* Promoters: [Shiwei Xu (Qiniu Cloud's founder-CEO)](https://baike.baidu.com/item/许式伟), [Asta Xie (Gopher China's organizer)](https://github.com/astaxie), Chuntang Tao and [Lifu Mao](https://github.com/forrest-mao)
+* Promoters: [Shiwei Xu (Qiniu Cloud's founder-CEO)](https://baike.baidu.com/item/许式伟), Chuntang Tao and [Lifu Mao](https://github.com/forrest-mao)
 
 ## Community
 
