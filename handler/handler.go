@@ -2,6 +2,10 @@ package handler
 
 import (
 	"context"
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/base64"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -10,6 +14,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/air-gases/cacheman"
@@ -17,7 +22,6 @@ import (
 	"github.com/goproxy/goproxy"
 	"github.com/goproxy/goproxy.cn/base"
 	"github.com/goproxy/goproxy/cacher"
-	"github.com/qiniu/api.v7/v7/auth"
 )
 
 var (
@@ -37,12 +41,6 @@ var (
 		SMaxAge: -1,
 	})
 
-	// qiniuCredentials is the `auth.Credentials` for the Qiniu Cloud.
-	qiniuCredentials = auth.New(
-		qiniuViper.GetString("access_key"),
-		qiniuViper.GetString("secret_key"),
-	)
-
 	// kodoCacher is the `cacher.Kodo` for the Qiniu Cloud Kodo.
 	kodoCacher = &cacher.Kodo{
 		Endpoint:   qiniuViper.GetString("kodo_endpoint"),
@@ -56,6 +54,9 @@ var (
 )
 
 func init() {
+	ctx, cancel := context.WithCancel(context.Background())
+	base.Air.AddShutdownJob(cancel)
+
 	if err := goproxyViper.UnmarshalKey("goproxy", g); err != nil {
 		base.Logger.Fatal().Err(err).
 			Msg("failed to unmarshal goproxy configuration items")
@@ -66,6 +67,7 @@ func init() {
 	g.Cacher = &localCacher{
 		Cacher:         kodoCacher,
 		localCacheRoot: goproxyViper.GetString("local_cache_root"),
+		settingContext: ctx,
 	}
 
 	g.ProxiedSUMDBNames = []string{"sum.golang.org"}
@@ -120,9 +122,7 @@ func faqPage(req *air.Request, res *air.Response) error {
 
 // proxy handles requests to play with Go module proxy.
 func proxy(req *air.Request, res *air.Response) error {
-	name := path.Clean(req.RawPath())
-	name = strings.TrimPrefix(name, g.PathPrefix)
-	name = strings.TrimLeft(name, "/")
+	name := strings.TrimLeft(path.Clean(req.RawPath()), "/")
 	if isModuleCacheFile(name) && goproxyViper.GetBool("auto_redirect") {
 		if _, err := kodoCacher.Cache(req.Context, name); err == nil {
 			u := fmt.Sprintf(
@@ -131,11 +131,20 @@ func proxy(req *air.Request, res *air.Response) error {
 				name,
 				time.Now().Add(time.Hour).Unix(),
 			)
+			h := hmac.New(
+				sha1.New,
+				[]byte(qiniuViper.GetString("secret_key")),
+			)
+			h.Write([]byte(u))
+			u = fmt.Sprintf(
+				"%s&token=%s:%s",
+				u,
+				qiniuViper.GetString("access_key"),
+				base64.URLEncoding.EncodeToString(h.Sum(nil)),
+			)
 
-			token := qiniuCredentials.Sign([]byte(u))
-
-			return res.Redirect(fmt.Sprint(u, "&token=", token))
-		} else if err != goproxy.ErrCacheNotFound {
+			return res.Redirect(u)
+		} else if !errors.Is(err, goproxy.ErrCacheNotFound) {
 			return err
 		}
 	}
@@ -149,11 +158,61 @@ func proxy(req *air.Request, res *air.Response) error {
 type localCacher struct {
 	goproxy.Cacher
 
-	localCacheRoot string
+	localCacheRoot    string
+	settingContext    context.Context
+	settingCaches     sync.Map
+	startSetCacheOnce sync.Once
+}
+
+// startSetCache starts the cache setting of the lc.
+func (lc *localCacher) startSetCache() {
+	go func() {
+		for {
+			time.Sleep(time.Second)
+			if lc.settingContext.Err() != nil {
+				return
+			}
+
+			lc.settingCaches.Range(func(k, v interface{}) bool {
+				if lc.settingContext.Err() != nil {
+					return false
+				}
+
+				localCacheFile, err := os.Open(k.(string))
+				if err != nil {
+					if os.IsNotExist(err) {
+						lc.settingCaches.Delete(k)
+					}
+
+					return false
+				}
+				defer os.Remove(localCacheFile.Name())
+
+				lc.settingCaches.Delete(k)
+
+				cache := v.(goproxy.Cache)
+				lc.Cacher.SetCache(
+					lc.settingContext,
+					&localCache{
+						File:     localCacheFile,
+						name:     cache.Name(),
+						mimeType: cache.MIMEType(),
+						size:     cache.Size(),
+						modTime:  cache.ModTime(),
+						checksum: cache.Checksum(),
+					},
+				)
+
+				return true
+			})
+		}
+	}()
 }
 
 // SetCache implements the `goproxy.Cacher`.
 func (lc *localCacher) SetCache(ctx context.Context, c goproxy.Cache) error {
+	lc.startSetCacheOnce.Do(lc.startSetCache)
+
 	localCacheFile, err := ioutil.TempFile(lc.localCacheRoot, "")
 	if err != nil {
 		return err
@@ -175,30 +234,8 @@ func (lc *localCacher) SetCache(ctx context.Context, c goproxy.Cache) error {
 	}
 
 	hijackedLocalCacheRemoval = true
-	go func() {
-		defer os.Remove(localCacheFile.Name())
 
-		ctx, cancel := context.WithTimeout(
-			context.Background(),
-			10*time.Minute,
-		)
-		defer cancel()
-
-		localCacheFile, err := os.Open(localCacheFile.Name())
-		if err != nil {
-			return
-		}
-		defer localCacheFile.Close()
-
-		lc.Cacher.SetCache(ctx, &localCache{
-			File:     localCacheFile,
-			name:     c.Name(),
-			mimeType: c.MIMEType(),
-			size:     c.Size(),
-			modTime:  c.ModTime(),
-			checksum: c.Checksum(),
-		})
-	}()
+	lc.settingCaches.Store(localCacheFile.Name(), c)
 
 	return nil
 }
