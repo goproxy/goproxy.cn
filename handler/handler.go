@@ -64,9 +64,27 @@ func init() {
 
 	g.GoBinName = goproxyViper.GetString("go_bin_name")
 	g.MaxGoBinWorkers = goproxyViper.GetInt("max_go_bin_workers")
+
+	localCacheRoot, err := ioutil.TempDir(
+		goproxyViper.GetString("local_cache_root"),
+		"",
+	)
+	if err != nil {
+		base.Logger.Fatal().Err(err).
+			Msg("failed to create goproxy local cache root")
+	}
+	base.Air.AddShutdownJob(func() {
+		for i := 0; i < 60; i++ {
+			time.Sleep(time.Second)
+			if err := os.RemoveAll(localCacheRoot); err == nil {
+				break
+			}
+		}
+	})
+
 	g.Cacher = &localCacher{
 		Cacher:         kodoCacher,
-		localCacheRoot: goproxyViper.GetString("local_cache_root"),
+		localCacheRoot: localCacheRoot,
 		settingContext: ctx,
 	}
 
@@ -184,7 +202,7 @@ func (lc *localCacher) startSetCache() {
 						lc.settingCaches.Delete(k)
 					}
 
-					return false
+					return true
 				}
 				defer os.Remove(localCacheFile.Name())
 
