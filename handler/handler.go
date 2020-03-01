@@ -169,7 +169,7 @@ func proxy(req *air.Request, res *air.Response) error {
 
 	ctx, cancel := context.WithTimeout(
 		req.Context,
-		goproxyViper.GetDuration("timeout")*time.Second,
+		goproxyViper.GetDuration("timeout"),
 	)
 	defer cancel()
 
