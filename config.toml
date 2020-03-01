@@ -25,5 +25,5 @@ kodo_bucket_endpoint = "<KODO_BUCKET_ENDPOINT>"
 go_bin_name = "go"
 max_go_bin_workers = 8
 auto_redirect = false
-timeout = 60
+timeout = 60s
 local_cache_root = "/tmp"
