@@ -30,15 +30,12 @@ Don't forget to check if our
 
 ## Usage
 
-Although the following content only explains how to set `GOPROXY`, but we also
-recommend that you set `GO111MODULE` to `on` instead of `auto` when you are
-working with Go modules.
-
 ### Go 1.13 and above (RECOMMENDED)
 
 Open your terminal and execute
 
 ```bash
+$ go env -w GO111MODULE=on
 $ go env -w GOPROXY=https://goproxy.cn,direct
 ```
 
@@ -49,12 +46,14 @@ done.
 Open your terminal and execute
 
 ```bash
+$ export GO111MODULE=on
 $ export GOPROXY=https://goproxy.cn
 ```
 
 or
 
 ```bash
+$ echo "export GO111MODULE=on" >> ~/.profile && source ~/.profile
 $ echo "export GOPROXY=https://goproxy.cn" >> ~/.profile && source ~/.profile
 ```
 
@@ -65,6 +64,7 @@ done.
 Open your PowerShell and execute
 
 ```poweshell
+C:\> $env:GO111MODULE = "on"
 C:\> $env:GOPROXY = "https://goproxy.cn"
 ```
 
@@ -76,9 +76,13 @@ or
 3. Click the "Environment Variables…" button
 4. Under the "User variables for <YOUR_USERNAME>" section (the upper half)
 5. Click the "New..." button
-6. Choose the "Variable name" input bar, type in "GOPROXY"
-7. Choose the "Variable value" input bar, type in "https://goproxy.cn"
+6. Choose the "Variable name" input bar, type in "GO111MODULE"
+7. Choose the "Variable value" input bar, type in "on"
 8. Click the "OK" button
+9. Click the "New..." button
+10. Choose the "Variable name" input bar, type in "GOPROXY"
+11. Choose the "Variable value" input bar, type in "https://goproxy.cn"
+12. Click the "OK" button
 ```
 
 done.

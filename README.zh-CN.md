@@ -14,13 +14,12 @@ Goproxy 中国完全实现了 Go 的[模块代理协议](https://golang.org/cmd/
 
 ## 用法
 
-虽然下面的内容主要是讲解如何设置 `GOPROXY`，但是我们也推荐你在使用 Go 模块时将 `GO111MODULE` 设置为 `on` 而不是 `auto`。
-
 ### Go 1.13 及以上（推荐）
 
 打开你的终端并执行：
 
 ```bash
+$ go env -w GO111MODULE=on
 $ go env -w GOPROXY=https://goproxy.cn,direct
 ```
 
@@ -31,12 +30,14 @@ $ go env -w GOPROXY=https://goproxy.cn,direct
 打开你的终端并执行：
 
 ```bash
+$ export GO111MODULE=on
 $ export GOPROXY=https://goproxy.cn
 ```
 
 或者
 
 ```bash
+$ echo "export GO111MODULE=on" >> ~/.profile && source ~/.profile
 $ echo "export GOPROXY=https://goproxy.cn" >> ~/.profile && source ~/.profile
 ```
 
@@ -47,6 +48,7 @@ $ echo "export GOPROXY=https://goproxy.cn" >> ~/.profile && source ~/.profile
 打开你的 PowerShell 并执行：
 
 ```powershell
+C:\> $env:GO111MODULE = "on"
 C:\> $env:GOPROXY = "https://goproxy.cn"
 ```
 
@@ -58,9 +60,13 @@ C:\> $env:GOPROXY = "https://goproxy.cn"
 3. 点击“环境变量…”按钮
 4. 在“<你的用户名> 的用户变量”章节下（上半部分）
 5. 点击“新建…”按钮
-6. 选择“变量名”输入框并输入“GOPROXY”
-7. 选择“变量值”输入框并输入“https://goproxy.cn”
+6. 选择“变量名”输入框并输入“GO111MODULE”
+7. 选择“变量值”输入框并输入“on”
 8. 点击“确定”按钮
+9. 点击“新建…”按钮
+10. 选择“变量名”输入框并输入“GOPROXY”
+11. 选择“变量值”输入框并输入“https://goproxy.cn”
+12. 点击“确定”按钮
 ```
 
 完成。
