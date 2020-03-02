@@ -54,7 +54,7 @@ var (
 	// module proxy request.
 	goproxyTimeout = goproxyViper.GetDuration("timeout")
 
-	// goproxyAutoRedirect indicates whether automatic redirection is
+	// goproxyAutoRedirect indicates whether the automatic redirection is
 	// enabled for Go module proxy requests.
 	goproxyAutoRedirect = goproxyViper.GetBool("auto_redirect")
 )
@@ -110,7 +110,7 @@ func hGoproxy(req *air.Request, res *air.Response) error {
 	req.Context = ctx
 
 	name := strings.TrimLeft(path.Clean(req.RawPath()), "/")
-	if !goproxyAutoRedirect || !isGoModuleCache(name) {
+	if !goproxyAutoRedirect || !isAutoRedirectableGoproxyCache(name) {
 		goproxy.ServeHTTP(res.HTTPResponseWriter(), req.HTTPRequest())
 		return nil
 	}
@@ -128,7 +128,7 @@ func hGoproxy(req *air.Request, res *air.Response) error {
 
 	cache.Close() // Just check for existence, no need to read
 
-	e := time.Now().Add(48 * time.Hour).Unix()
+	e := time.Now().Add(24 * time.Hour).Unix()
 	u := fmt.Sprintf("%s/%s?e=%d", qiniuKodoBucketEndpoint, name, e)
 
 	h := hmac.New(sha1.New, []byte(qiniuSecretKey))
@@ -263,17 +263,10 @@ func (gc *goproxyCache) Checksum() []byte {
 	return gc.checksum
 }
 
-// isGoModuleCache reports whether the name refers to a Go module cache.
-func isGoModuleCache(name string) bool {
-	if strings.HasPrefix(name, "/sumdb/") ||
-		!strings.Contains(name, "/@v/") {
-		return false
-	}
-
-	switch path.Ext(name) {
-	case ".info", ".mod", ".zip":
-		return true
-	}
-
-	return false
+// isAutoRedirectableGoproxyCache reports whether the name refers to an
+// auto-redirectable Goproxy cache.
+func isAutoRedirectableGoproxyCache(name string) bool {
+	return !strings.HasPrefix(name, "sumdb/") &&
+		strings.Contains(name, "/@v/") &&
+		path.Ext(name) == ".zip"
 }
