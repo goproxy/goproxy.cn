@@ -3,6 +3,8 @@ Description=The most trusted Go module proxy in China.
 After=network.target
 
 [Service]
+Environment=GOPATH=/tmp/gopath
+Environment=GOCACHE=/tmp/gocache
 Environment=GOPROXY=direct
 Environment=GOSUMDB=off
 WorkingDirectory=/srv/goproxy.cn

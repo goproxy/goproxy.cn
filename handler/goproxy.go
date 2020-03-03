@@ -45,8 +45,8 @@ var (
 	// goproxyKodoCacher is the `cacher.Kodo` for the Qiniu Cloud Kodo.
 	goproxyKodoCacher = &cacher.Kodo{
 		Endpoint:   qiniuViper.GetString("kodo_endpoint"),
-		AccessKey:  qiniuViper.GetString("access_key"),
-		SecretKey:  qiniuViper.GetString("secret_key"),
+		AccessKey:  qiniuAccessKey,
+		SecretKey:  qiniuSecretKey,
 		BucketName: qiniuViper.GetString("kodo_bucket_name"),
 	}
 
