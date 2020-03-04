@@ -10,7 +10,7 @@ require (
 	github.com/air-gases/redirector v0.15.0
 	github.com/aofei/air v0.15.0
 	github.com/golang/protobuf v1.3.4 // indirect
-	github.com/goproxy/goproxy v0.0.0-20200303040113-ac1b4e9c51fe
+	github.com/goproxy/goproxy v0.0.0-20200304095319-45643959f59e
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/rs/zerolog v1.18.0
 	github.com/spf13/afero v1.2.2 // indirect
