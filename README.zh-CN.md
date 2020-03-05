@@ -37,8 +37,9 @@ $ export GOPROXY=https://goproxy.cn
 或者
 
 ```bash
-$ echo "export GO111MODULE=on" >> ~/.profile && source ~/.profile
-$ echo "export GOPROXY=https://goproxy.cn" >> ~/.profile && source ~/.profile
+$ echo "export GO111MODULE=on" >> ~/.profile
+$ echo "export GOPROXY=https://goproxy.cn" >> ~/.profile
+$ source ~/.profile
 ```
 
 完成。
