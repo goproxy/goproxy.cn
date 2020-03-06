@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"io"
@@ -129,9 +128,7 @@ func hGoproxy(req *air.Request, res *air.Response) error {
 
 	e := time.Now().Add(24 * time.Hour).Unix()
 	u := fmt.Sprintf("%s/%s?e=%d", qiniuKodoBucketEndpoint, name, e)
-	s := qiniuCredentials.Sign([]byte(u))
-	t := base64.URLEncoding.EncodeToString([]byte(s))
-	u = fmt.Sprintf("%s&token=%s:%s", u, qiniuCredentials.AccessKey, t)
+	u = fmt.Sprintf("%s&token=%s", u, qiniuCredentials.Sign([]byte(u)))
 
 	return res.Redirect(u)
 }
