@@ -1,0 +1,69 @@
+<div class="jumbotron">
+	<div class="container text-center">
+		<img class="logo" src="/assets/images/logo.png">
+		<h1 class="brand display-3">Goproxy China</h1>
+		<p>The most trusted Go module proxy in China.</p>
+		<p><span class="badge badge-success">{{.CachedModuleVersionCount}} module versions cached</span></p>
+		<a class="github-button" href="https://github.com/goproxy/goproxy.cn" data-size="large" data-show-count="true" aria-label="Star goproxy/goproxy.cn on GitHub">Star</a>
+	</div>
+</div>
+
+<div class="container">
+	<div class="row text-center">
+		<div class="col-md-4">
+			<h2 class="text-info"><i class="fas fa-rocket"></i>&nbsp;Blazing Fast</h2>
+			<p>We have used CDN to accelerate our service globally without placing any bandwidth limits. With thousands of CDN nodes and <b>40Gbps+ single-node bandwidth</b>, you will be given the ability to download module versions at a blazing fast speed.</p>
+		</div>
+
+		<div class="col-md-4">
+			<h2 class="text-info"><i class="fas fa-infinity"></i>&nbsp;No Limit</h2>
+			<p>We do not just place no bandwidth limits. Furthermore, we <b>have not placed any rate limits</b>. This means that you can use our service in any scenario, like CI/CD. You can even use our service as an upstream proxy, just like <a class="text-secondary" href="https://goproxy.baidu.com" target="_blank">goproxy.baidu.com</a> does.</p>
+		</div>
+
+		<div class="col-md-4">
+			<h2 class="text-info"><i class="fas fa-th-large"></i>&nbsp;Full Featured</h2>
+			<p>We are always using the latest Go version, even the unstable version. Because we provide <b>cutting-edge feature support</b>. In particular, we support <a class="text-secondary" href="https://golang.org/design/25530-sumdb#proxying-a-checksum-database" target="_blank">proxying</a> the default checksum database <a class="text-secondary" href="https://sum.golang.org" target="_blank">sum.golang.org</a>. You don't need to do anything extra, it just works.</p>
+		</div>
+	</div>
+
+	<hr>
+
+	<div class="row">
+		<div class="col-md">
+			<p id="Go 1.13 and above (RECOMMENDED)"><b><a class="text-info" href="#Go 1.13 and above (RECOMMENDED)">Go 1.13 and above (RECOMMENDED)</a></b></p>
+			<p>Open your terminal and execute</p>
+			<pre><code class="language-bash">$ go env -w GO111MODULE=on
+$ go env -w GOPROXY=https://goproxy.cn,direct</code></pre>
+			<p>done.</p>
+
+			<p id="macOS or Linux"><b><a class="text-info" href="#macOS or Linux">macOS or Linux</a></b></p>
+			<p>Open your terminal and execute</p>
+			<pre><code class="language-bash">$ export GO111MODULE=on
+$ export GOPROXY=https://goproxy.cn</code></pre>
+			<p>or</p>
+			<pre><code class="language-bash">$ echo "export GO111MODULE=on" >> ~/.profile
+$ echo "export GOPROXY=https://goproxy.cn" >> ~/.profile
+$ source ~/.profile</code></pre>
+			<p>done.</p>
+
+			<p id="Windows"><b><a class="text-info" href="#Windows">Windows</a></b></p>
+			<p>Open your terminal and execute</p>
+			<pre><code class="language-bash">C:\> $env:GO111MODULE = "on"
+C:\> $env:GOPROXY = "https://goproxy.cn"</code></pre>
+			<p>or</p>
+			<pre><code class="language-md">1. Open the Start Search, type in "env"
+2. Choose the "Edit the system environment variables"
+3. Click the "Environment Variables…" button
+4. Under the "User variables for &lt;YOUR_USERNAME&gt;" section (the upper half)
+5. Click the "New..." button
+6. Choose the "Variable name" input bar, type in "GO111MODULE"
+7. Choose the "Variable value" input bar, type in "on"
+8. Click the "OK" button
+9. Click the "New..." button
+10. Choose the "Variable name" input bar, type in "GOPROXY"
+11. Choose the "Variable value" input bar, type in "https://goproxy.cn"
+12. Click the "OK" button</code></pre>
+			<p>done.</p>
+		</div>
+	</div>
+</div>

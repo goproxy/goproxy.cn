@@ -16,7 +16,7 @@ Goproxy 中国完全实现了 Go 的[模块代理协议](https://golang.org/cmd/
 
 ### Go 1.13 及以上（推荐）
 
-打开你的终端并执行：
+打开你的终端并执行
 
 ```bash
 $ go env -w GO111MODULE=on
@@ -27,7 +27,7 @@ $ go env -w GOPROXY=https://goproxy.cn,direct
 
 ### macOS 或 Linux
 
-打开你的终端并执行：
+打开你的终端并执行
 
 ```bash
 $ export GO111MODULE=on
@@ -46,7 +46,7 @@ $ source ~/.profile
 
 ### Windows
 
-打开你的 PowerShell 并执行：
+打开你的 PowerShell 并执行
 
 ```powershell
 C:\> $env:GO111MODULE = "on"

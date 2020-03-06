@@ -3,11 +3,14 @@ package base
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/aofei/air"
+	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog"
 	"github.com/spf13/viper"
 )
@@ -21,6 +24,13 @@ var (
 
 	// Air is the global instace of the `air.Air`.
 	Air = air.New()
+
+	// Cron is the global instance of the `cron.Cron`.
+	Cron = cron.New(
+		cron.WithLocation(time.UTC),
+		cron.WithSeconds(),
+		cron.WithLogger(cron.PrintfLogger(log.New(Logger, "", 0))),
+	)
 )
 
 func init() {
@@ -52,4 +62,9 @@ func init() {
 		Logger.Fatal().Err(err).
 			Msg("failed to unmarshal air configuration items")
 	}
+
+	Cron.Start()
+	Air.AddShutdownJob(func() {
+		<-Cron.Stop().Done()
+	})
 }

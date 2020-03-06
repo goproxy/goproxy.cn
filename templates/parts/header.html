@@ -1,0 +1,27 @@
+<header>
+	<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-primary">
+		<a class="navbar-brand" href="/">{{locstr "Goproxy China"}}</a>
+
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+		<div id="navbarCollapse" class="collapse navbar-collapse">
+			<div class="mr-auto"></div>
+
+			<ul class="navbar-nav mt-md-0">
+				<li class="nav-item active">
+					<a class="nav-link" href="/">{{locstr "Index"}}{{if .IsIndexPage}}<span class="sr-only">(current)</span>{{end}}</a>
+				</li>
+
+				<li class="nav-item">
+					<a class="nav-link" href="{{locstr "https://github.com/goproxy/goproxy.cn/wiki/FAQ"}}" target="_blank">{{locstr "FAQ"}}</a>
+				</li>
+
+				<li class="nav-item">
+					<a class="nav-link" href="https://status.goproxy.cn" target="_blank">{{locstr "Status"}}</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+</header>

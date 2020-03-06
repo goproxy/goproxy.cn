@@ -1,0 +1,69 @@
+<div class="jumbotron">
+	<div class="container text-center">
+		<img class="logo" src="/assets/images/logo.png">
+		<h1 class="brand display-3">Goproxy 中国</h1>
+		<p>中国最可靠的 Go 模块代理。</p>
+		<p><span class="badge badge-success">已缓存 {{.CachedModuleVersionCount}} 个模块版本</span></p>
+		<a class="github-button" href="https://github.com/goproxy/goproxy.cn" data-size="large" data-show-count="true" aria-label="Star goproxy/goproxy.cn on GitHub">Star</a>
+	</div>
+</div>
+
+<div class="container">
+	<div class="row text-center">
+		<div class="col-md-4">
+			<h2 class="text-info"><i class="fas fa-rocket"></i>&nbsp;极速下载</h2>
+			<p>我们使用 CDN 在全球范围内加速了我们的服务，并且没有设置任何带宽限制。凭借着数以千计的 CDN 节点和 <b>40Gbps+ 的单节点带宽</b>，您将被赋予一个以极快的速度下载模块版本的能力。</p>
+		</div>
+
+		<div class="col-md-4">
+			<h2 class="text-info"><i class="fas fa-infinity"></i>&nbsp;没有限制</h2>
+			<p>我们不但没有设置带宽限制。更进一步地，我们还<b>没有设置任何速率限制</b>。这意味着您可以在任何场景下使用我们的服务，例如 CI/CD。您甚至可以像 <a class="text-secondary" href="https://goproxy.baidu.com" target="_blank">goproxy.baidu.com</a> 一样将我们的服务用作上游代理。</p>
+		</div>
+
+		<div class="col-md-4">
+			<h2 class="text-info"><i class="fas fa-th-large"></i>&nbsp;功能齐全</h2>
+			<p>我们一直在使用最新的 Go 版本，甚至是不稳定版本。因为我们提供了<b>最前沿的功能支持</b>。特别地，我们支持<a class="text-secondary" href="https://golang.org/design/25530-sumdb#proxying-a-checksum-database" target="_blank">代理</a>默认的校验和数据库 <a class="text-secondary" href="https://sum.golang.org" target="_blank">sum.golang.org</a>。您不需要做任何额外的事情，它就可以工作。</p>
+		</div>
+	</div>
+
+	<hr>
+
+	<div class="row">
+		<div class="col-md">
+			<p id="Go 1.13 及以上（推荐）"><b><a class="text-info" href="#Go 1.13 及以上（推荐）">Go 1.13 及以上（推荐）</a></b></p>
+			<p>打开你的终端并执行</p>
+			<pre><code class="language-bash">$ go env -w GO111MODULE=on
+$ go env -w GOPROXY=https://goproxy.cn,direct</code></pre>
+			<p>完成。</p>
+
+			<p id="macOS 或 Linux"><b><a class="text-info" href="#macOS 或 Linux">macOS 或 Linux</a></b></p>
+			<p>打开你的终端并执行</p>
+			<pre><code class="language-bash">$ export GO111MODULE=on
+$ export GOPROXY=https://goproxy.cn</code></pre>
+			<p>或者</p>
+			<pre><code class="language-bash">$ echo "export GO111MODULE=on" >> ~/.profile
+$ echo "export GOPROXY=https://goproxy.cn" >> ~/.profile
+$ source ~/.profile</code></pre>
+			<p>完成。</p>
+
+			<p id="Windows"><b><a class="text-info" href="#Windows">Windows</a></b></p>
+			<p>打开你的 PowerShell 并执行</p>
+			<pre><code class="language-bash">C:\> $env:GO111MODULE = "on"
+C:\> $env:GOPROXY = "https://goproxy.cn"</code></pre>
+			<p>或者</p>
+			<pre><code class="language-md">1. 打开“开始”并搜索“env”
+2. 选择“编辑系统环境变量”
+3. 点击“环境变量…”按钮
+4. 在“&lt;你的用户名&gt; 的用户变量”章节下（上半部分）
+5. 点击“新建…”按钮
+6. 选择“变量名”输入框并输入“GO111MODULE”
+7. 选择“变量值”输入框并输入“on”
+8. 点击“确定”按钮
+9. 点击“新建…”按钮
+10. 选择“变量名”输入框并输入“GOPROXY”
+11. 选择“变量值”输入框并输入“https://goproxy.cn”
+12. 点击“确定”按钮</code></pre>
+			<p>完成。</p>
+		</div>
+	</div>
+</div>

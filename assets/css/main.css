@@ -1,0 +1,31 @@
+body {
+	color: #5a5a5a;
+	padding-bottom: 3rem;
+	padding-top: 3rem;
+}
+
+hr {
+	margin: 4rem 0;
+}
+
+pre code {
+	word-wrap: normal;
+}
+
+.jumbotron {
+	margin-bottom: 5rem;
+}
+
+.jumbotron .logo {
+	width: 15rem;
+}
+
+@media screen and (max-width: 600px) {
+	.jumbotron .logo {
+		width: 12rem;
+	}
+
+	.jumbotron .brand {
+		font-size: 2.5rem;
+	}
+}

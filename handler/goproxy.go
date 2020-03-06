@@ -2,8 +2,6 @@ package handler
 
 import (
 	"context"
-	"crypto/hmac"
-	"crypto/sha1"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -20,6 +18,7 @@ import (
 	pgoproxy "github.com/goproxy/goproxy"
 	"github.com/goproxy/goproxy.cn/base"
 	"github.com/goproxy/goproxy/cacher"
+	"github.com/qiniu/api.v7/v7/auth"
 )
 
 var (
@@ -29,15 +28,15 @@ var (
 	// goproxyViper is used to get the configuration items of the Goproxy.
 	goproxyViper = base.Viper.Sub("goproxy")
 
+	// qiniuCredentials is the credentials for the Qiniu Cloud.
+	qiniuCredentials = auth.New(
+		qiniuViper.GetString("access_key"),
+		qiniuViper.GetString("secret_key"),
+	)
+
 	// qiniuKodoBucketEndpoint is the bucket endpoint for the Qiniu Cloud
 	// Kodo.
 	qiniuKodoBucketEndpoint = qiniuViper.GetString("kodo_bucket_endpoint")
-
-	// qiniuAccessKey is the access key for the Qiniu Cloud.
-	qiniuAccessKey = qiniuViper.GetString("access_key")
-
-	// qiniuSecretKey is the secret key for the Qiniu Cloud.
-	qiniuSecretKey = qiniuViper.GetString("secret_key")
 
 	// goproxy is an instance of the `pgoproxy.Goproxy`.
 	goproxy = pgoproxy.New()
@@ -45,8 +44,8 @@ var (
 	// goproxyKodoCacher is the `cacher.Kodo` for the Qiniu Cloud Kodo.
 	goproxyKodoCacher = &cacher.Kodo{
 		Endpoint:   qiniuViper.GetString("kodo_endpoint"),
-		AccessKey:  qiniuAccessKey,
-		SecretKey:  qiniuSecretKey,
+		AccessKey:  qiniuCredentials.AccessKey,
+		SecretKey:  string(qiniuCredentials.SecretKey),
 		BucketName: qiniuViper.GetString("kodo_bucket_name"),
 	}
 
@@ -130,12 +129,9 @@ func hGoproxy(req *air.Request, res *air.Response) error {
 
 	e := time.Now().Add(24 * time.Hour).Unix()
 	u := fmt.Sprintf("%s/%s?e=%d", qiniuKodoBucketEndpoint, name, e)
-
-	h := hmac.New(sha1.New, []byte(qiniuSecretKey))
-	h.Write([]byte(u))
-	sign := base64.URLEncoding.EncodeToString(h.Sum(nil))
-
-	u = fmt.Sprintf("%s&token=%s:%s", u, qiniuAccessKey, sign)
+	s := qiniuCredentials.Sign([]byte(u))
+	t := base64.URLEncoding.EncodeToString([]byte(s))
+	u = fmt.Sprintf("%s&token=%s:%s", u, qiniuCredentials.AccessKey, t)
 
 	return res.Redirect(u)
 }

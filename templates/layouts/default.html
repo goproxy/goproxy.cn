@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+	{{template "parts/head.html" .}}
+
+	<body>
+		{{template "parts/header.html" .}}
+		<main>{{.InheritedHTML}}</main>
+		<hr>
+		{{template "parts/footer.html" .}}
+		{{template "parts/scripts.html" .}}
+	</body>
+</html>
