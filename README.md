@@ -2,7 +2,7 @@
 
 # Goproxy China
 
-The most trusted Go module proxy in China.
+A trustworthy Go module proxy in China.
 
 Goproxy China has fully implemented the Go's
 [module proxy protocol](https://golang.org/cmd/go/#hdr-Module_proxy_protocol).
