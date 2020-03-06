@@ -10,12 +10,12 @@
 			<div class="mr-auto"></div>
 
 			<ul class="navbar-nav mt-md-0">
-				<li class="nav-item active">
+				<li class="nav-item{{if .IsIndexPage}} active{{end}}">
 					<a class="nav-link" href="/">{{locstr "Index"}}{{if .IsIndexPage}}<span class="sr-only">(current)</span>{{end}}</a>
 				</li>
 
-				<li class="nav-item">
-					<a class="nav-link" href="{{locstr "https://github.com/goproxy/goproxy.cn/wiki/FAQ"}}" target="_blank">{{locstr "FAQ"}}</a>
+				<li class="nav-item{{if .IsFAQPage}} active{{end}}">
+					<a class="nav-link" href="/faq">{{locstr "FAQ"}}{{if .IsFAQPage}}<span class="sr-only">(current)</span>{{end}}</a>
 				</li>
 
 				<li class="nav-item">
