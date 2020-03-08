@@ -10,7 +10,7 @@ require (
 	github.com/air-gases/redirector v0.15.0
 	github.com/aofei/air v0.15.0
 	github.com/golang/protobuf v1.3.4 // indirect
-	github.com/goproxy/goproxy v0.0.0-20200304095319-45643959f59e
+	github.com/goproxy/goproxy v0.0.0-20200308233018-d38aa6956193
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/qiniu/api.v7/v7 v7.4.1
 	github.com/robfig/cron/v3 v3.0.1
@@ -21,4 +21,5 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.6.2
 	github.com/tidwall/gjson v1.6.0
+	github.com/tidwall/pretty v1.0.1 // indirect
 )
