@@ -108,7 +108,7 @@ func hGoproxy(req *air.Request, res *air.Response) error {
 	req.Context = ctx
 
 	name := strings.TrimLeft(path.Clean(req.RawPath()), "/")
-	if !goproxyAutoRedirect || !isGoproxyCache(name) {
+	if !goproxyAutoRedirect || !isAutoRedirectableGoproxyCache(name) {
 		goproxy.ServeHTTP(res.HTTPResponseWriter(), req.HTTPRequest())
 		return nil
 	}
@@ -256,17 +256,10 @@ func (gc *goproxyCache) Checksum() []byte {
 	return gc.checksum
 }
 
-// isGoproxyCache reports whether the name refers to a Goproxy cache.
-func isGoproxyCache(name string) bool {
-	if strings.HasPrefix(name, "sumdb/") ||
-		!strings.Contains(name, "/@v/") {
-		return false
-	}
-
-	switch path.Ext(name) {
-	case ".info", ".mod", ".zip":
-		return true
-	}
-
-	return false
+// isAutoRedirectableGoproxyCache reports whether the name refers to an
+// auto-redirectable Goproxy cache.
+func isAutoRedirectableGoproxyCache(name string) bool {
+	return !strings.HasPrefix(name, "sumdb/") &&
+		strings.Contains(name, "/@v/") &&
+		path.Ext(name) == ".zip"
 }
