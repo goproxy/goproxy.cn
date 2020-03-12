@@ -2,6 +2,9 @@ package handler
 
 import (
 	"context"
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"io"
@@ -17,25 +20,11 @@ import (
 	pgoproxy "github.com/goproxy/goproxy"
 	"github.com/goproxy/goproxy.cn/base"
 	"github.com/goproxy/goproxy/cacher"
-	"github.com/qiniu/api.v7/v7/auth"
 )
 
 var (
-	// qiniuViper is used to get the configuration items of the Qiniu Cloud.
-	qiniuViper = base.Viper.Sub("qiniu")
-
 	// goproxyViper is used to get the configuration items of the Goproxy.
 	goproxyViper = base.Viper.Sub("goproxy")
-
-	// qiniuCredentials is the credentials for the Qiniu Cloud.
-	qiniuCredentials = auth.New(
-		qiniuViper.GetString("access_key"),
-		qiniuViper.GetString("secret_key"),
-	)
-
-	// qiniuKodoBucketEndpoint is the bucket endpoint for the Qiniu Cloud
-	// Kodo.
-	qiniuKodoBucketEndpoint = qiniuViper.GetString("kodo_bucket_endpoint")
 
 	// goproxy is an instance of the `pgoproxy.Goproxy`.
 	goproxy = pgoproxy.New()
@@ -43,8 +32,8 @@ var (
 	// goproxyKodoCacher is the `cacher.Kodo` for the Qiniu Cloud Kodo.
 	goproxyKodoCacher = &cacher.Kodo{
 		Endpoint:   qiniuViper.GetString("kodo_endpoint"),
-		AccessKey:  qiniuCredentials.AccessKey,
-		SecretKey:  string(qiniuCredentials.SecretKey),
+		AccessKey:  qiniuAccessKey,
+		SecretKey:  qiniuSecretKey,
 		BucketName: qiniuViper.GetString("kodo_bucket_name"),
 	}
 
@@ -55,47 +44,48 @@ var (
 	// goproxyAutoRedirect indicates whether the automatic redirection is
 	// enabled for Go module proxy requests.
 	goproxyAutoRedirect = goproxyViper.GetBool("auto_redirect")
+
+	// qiniuKodoBucketEndpoint is the bucket endpoint for the Qiniu Cloud
+	// Kodo.
+	qiniuKodoBucketEndpoint = qiniuViper.GetString("kodo_bucket_endpoint")
 )
 
 func init() {
 	ctx, cancel := context.WithCancel(context.Background())
 	base.Air.AddShutdownJob(cancel)
 
-	if err := goproxyViper.UnmarshalKey("goproxy", goproxy); err != nil {
+	if err := goproxyViper.Unmarshal(goproxy); err != nil {
 		base.Logger.Fatal().Err(err).
 			Msg("failed to unmarshal goproxy configuration items")
 	}
 
-	goproxy.GoBinName = goproxyViper.GetString("go_bin_name")
-	goproxy.MaxGoBinWorkers = goproxyViper.GetInt("max_go_bin_workers")
-
-	goproxyLocalCacheRoot, err := ioutil.TempDir(
-		goproxyViper.GetString("local_cache_root"),
-		"",
-	)
-	if err != nil {
-		base.Logger.Fatal().Err(err).
-			Msg("failed to create goproxy local cache root")
-	}
-	base.Air.AddShutdownJob(func() {
-		for i := 0; i < 60; i++ {
-			time.Sleep(time.Second)
-			err := os.RemoveAll(goproxyLocalCacheRoot)
-			if err == nil {
-				break
-			}
+	if !goproxyViper.GetBool("disable_cacher") {
+		goproxyLocalCacheRoot, err := ioutil.TempDir(
+			goproxyViper.GetString("local_cache_root"),
+			"",
+		)
+		if err != nil {
+			base.Logger.Fatal().Err(err).
+				Msg("failed to create goproxy local cache root")
 		}
-	})
+		base.Air.AddShutdownJob(func() {
+			for i := 0; i < 60; i++ {
+				time.Sleep(time.Second)
+				err := os.RemoveAll(goproxyLocalCacheRoot)
+				if err == nil {
+					break
+				}
+			}
+		})
 
-	goproxy.Cacher = &goproxyCacher{
-		Cacher:         goproxyKodoCacher,
-		localCacheRoot: goproxyLocalCacheRoot,
-		settingContext: ctx,
+		goproxy.Cacher = &goproxyCacher{
+			Cacher:         goproxyKodoCacher,
+			localCacheRoot: goproxyLocalCacheRoot,
+			settingContext: ctx,
+		}
 	}
 
-	goproxy.ProxiedSUMDBNames = []string{"sum.golang.org"}
 	goproxy.ErrorLogger = log.New(base.Logger, "", 0)
-	goproxy.DisableNotFoundLog = true
 
 	base.Air.BATCH(nil, "/*", hGoproxy)
 }
@@ -128,7 +118,10 @@ func hGoproxy(req *air.Request, res *air.Response) error {
 
 	e := time.Now().Add(24 * time.Hour).Unix()
 	u := fmt.Sprintf("%s/%s?e=%d", qiniuKodoBucketEndpoint, name, e)
-	u = fmt.Sprintf("%s&token=%s", u, qiniuCredentials.Sign([]byte(u)))
+	h := hmac.New(sha1.New, []byte(qiniuSecretKey))
+	h.Write([]byte(u))
+	s := base64.URLEncoding.EncodeToString(h.Sum(nil))
+	u = fmt.Sprintf("%s&token=%s:%s", u, qiniuAccessKey, s)
 
 	return res.Redirect(u)
 }

@@ -1,6 +1,10 @@
 package handler
 
 import (
+	"bytes"
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -15,6 +19,15 @@ import (
 )
 
 var (
+	// qiniuViper is used to get the configuration items of the Qiniu Cloud.
+	qiniuViper = base.Viper.Sub("qiniu")
+
+	// qiniuAccessKey is the access key for the Qiniu Cloud.
+	qiniuAccessKey = qiniuViper.GetString("access_key")
+
+	// qiniuSecretKey is the secret key for the Qiniu Cloud.
+	qiniuSecretKey = qiniuViper.GetString("secret_key")
+
 	// getHeadMethods is an array contains the GET and the HEAD methods.
 	getHeadMethods = []string{http.MethodGet, http.MethodHead}
 
@@ -125,12 +138,29 @@ func requestQiniuAPI(
 		return nil, err
 	}
 
-	accessToken, err := qiniuCredentials.SignRequest(req)
-	if err != nil {
-		return nil, err
+	path := req.URL.Path
+	if req.URL.RawQuery != "" {
+		path = fmt.Sprint(path, "?", req.URL.RawQuery)
 	}
 
-	req.Header.Set("Authorization", fmt.Sprint("QBox ", accessToken))
+	data := []byte(fmt.Sprint(path, "\n"))
+	if contentType == "application/x-www-form-urlencoded" && body != nil {
+		b, err := ioutil.ReadAll(body)
+		if err != nil {
+			return nil, err
+		}
+
+		data = append(data, b...)
+
+		req.Body = ioutil.NopCloser(bytes.NewReader(b))
+	}
+
+	h := hmac.New(sha1.New, []byte(qiniuSecretKey))
+	h.Write(data)
+	sign := base64.URLEncoding.EncodeToString(h.Sum(nil))
+	token := fmt.Sprint(qiniuAccessKey, ":", sign)
+
+	req.Header.Set("Authorization", fmt.Sprint("QBox ", token))
 	if contentType != "" {
 		req.Header.Set("Content-Type", contentType)
 	}
@@ -138,11 +168,14 @@ func requestQiniuAPI(
 	nots := 0
 
 Do:
+	if err := req.Context().Err(); err != nil {
+		return nil, err
+	}
+
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		if nots < 5 {
 			nots++
-			time.Sleep(time.Second)
 			goto Do
 		}
 
