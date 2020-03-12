@@ -28,6 +28,12 @@
 
 	<hr>
 
+	<div class="row text-center">
+		<div class="col-md">
+			<h2 id="用法"><a class="font-weight-bold text-info" href="#用法">用法</a></h2>
+		</div>
+	</div>
+
 	<div class="row">
 		<div class="col-md">
 			<p id="Go 1.13 及以上（推荐）"><a class="font-weight-bold text-info" href="#Go 1.13 及以上（推荐）">Go 1.13 及以上（推荐）</a></p>
@@ -64,6 +70,43 @@ C:\> $env:GOPROXY = "https://goproxy.cn"</code></pre>
 11. 选择“变量值”输入框并输入“https://goproxy.cn”
 12. 点击“确定”按钮</code></pre>
 			<p>完成。</p>
+		</div>
+	</div>
+
+	<hr>
+
+	<div class="row text-center">
+		<div class="col-md">
+			<h2 id="自托管 Go 模块代理"><a class="font-weight-bold text-info" href="#自托管 Go 模块代理">自托管 Go 模块代理</a></h2>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md">
+			<p>我们还提供了目前世界上最炫酷的自托管 Go 模块代理搭建方案。通过使用 <a href="https://github.com/goproxy/goproxy" target="_blank">Goproxy</a> 这个极简主义项目（<a href="https://goproxy.cn" target="_blank">goproxy.cn</a> 就是基于它搭建的），你可以在现有的任意 Web 服务中轻松地加入 Go 模块代理支持。</p>
+			<p>创建一个名为 <code>goproxy.go</code> 的文件</p>
+			<pre><code class="language-go">package main
+
+import (
+	"net/http"
+	"os"
+
+	"github.com/goproxy/goproxy"
+)
+
+func main() {
+	g := goproxy.New()
+	g.GoBinEnv = append(
+		os.Environ(),
+		"GOPROXY=https://goproxy.cn,direct", // 使用 goproxy.cn 作为上游代理
+		"GOPRIVATE=git.example.com",         // 解决私有模块的拉取问题（比如可以配置成公司内部的代码源）
+	)
+	http.ListenAndServe("localhost:8080", g)
+}</code></pre>
+			<p>并且运行它</p>
+			<pre><code class="language-bash">$ go run goproxy.go</code></pre>
+			<p>然后通过把 <code>GOPROXY</code> 设置为 <code>http://localhost:8080</code> 来试用它。另外，我们也建议你把 <code>GO111MODULE</code> 设置为 <code>on</code>。</p>
+			<p>就这么简单，一个功能完备的 Go 模块代理就搭建成功了。更高级的用法请查看<a href="https://pkg.go.dev/github.com/goproxy/goproxy" target="_blank">文档</a>。</p>
 		</div>
 	</div>
 </div>

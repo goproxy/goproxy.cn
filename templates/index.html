@@ -28,6 +28,12 @@
 
 	<hr>
 
+	<div class="row text-center">
+		<div class="col-md">
+			<h2 id="Usage"><a class="font-weight-bold text-info" href="#Usage">Usage</a></h2>
+		</div>
+	</div>
+
 	<div class="row">
 		<div class="col-md">
 			<p id="Go 1.13 and above (RECOMMENDED)"><a class="font-weight-bold text-info" href="#Go 1.13 and above (RECOMMENDED)">Go 1.13 and above (RECOMMENDED)</a></p>
@@ -64,6 +70,43 @@ C:\> $env:GOPROXY = "https://goproxy.cn"</code></pre>
 11. Choose the "Variable value" input bar, type in "https://goproxy.cn"
 12. Click the "OK" button</code></pre>
 			<p>done.</p>
+		</div>
+	</div>
+
+	<hr>
+
+	<div class="row text-center">
+		<div class="col-md">
+			<h2 id="Self-hosted Go module proxy"><a class="font-weight-bold text-info" href="#Self-hosted Go module proxy">Self-hosted Go module proxy</a></h2>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md">
+			<p>We also provide the coolest self-hosted Go module proxy building solution in the world. By using <a href="https://github.com/goproxy/goproxy" target="_blank">Goproxy</a>, a minimalist project (<a href="https://goproxy.cn" target="_blank">goproxy.cn</a> is built on it), you can easily add Go module proxy support to any existing web service.</p>
+			<p>Create a file named <code>goproxy.go</code></p>
+			<pre><code class="language-go">package main
+
+import (
+	"net/http"
+	"os"
+
+	"github.com/goproxy/goproxy"
+)
+
+func main() {
+	g := goproxy.New()
+	g.GoBinEnv = append(
+		os.Environ(),
+		"GOPROXY=https://goproxy.cn,direct", // Use goproxy.cn as the upstream proxy
+		"GOPRIVATE=git.example.com",         // Solve the problem of pulling private modules
+	)
+	http.ListenAndServe("localhost:8080", g)
+}</code></pre>
+			<p>and run it</p>
+			<pre><code class="language-bash">$ go run goproxy.go</code></pre>
+			<p>then try it by setting <code>GOPROXY</code> to <code>http://localhost:8080</code>. In addition, we also recommend that you set <code>GO111MODULE</code> to <code>on</code>.</p>
+			<p>That's it, a fully functional Go module proxy is successfully built. For more advanced usage please check the <a href="https://pkg.go.dev/github.com/goproxy/goproxy" target="_blank">documentation</a>.</p>
 		</div>
 	</div>
 </div>
