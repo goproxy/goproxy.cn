@@ -1,14 +1,20 @@
 <div class="jumbotron">
 	<div class="container text-center">
-		<h1 class="brand display-3">FAQ</h1>
+		<h1 class="brand display-3">{{locstr "FAQ"}}</h1>
 	</div>
 </div>
 
 <div class="container">
 	<div class="row">
 		<div class="col-md">
-			<p>Goproxy China is now trying to collect as many questions as possible about the problems Gophers have when working with Go moduels and try to give the best answers. By doing this, we believe we can better help everyone use Go moduels.</p>
-			<p>If you can't find the answer to the question you want to ask below, feel free to post your question <a href="https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=question-consultation.md&title=Question%3A+" target="_blank">here</a>. Please pay attention to follow the issue template we have prepared for you, that will help us better answer your question.</p>
+			<p>{{locstr "Goproxy China is now trying to collect as many questions as possible about the problems Gophers have when working with Go moduels and try to give the best answers. By doing this, we believe we can better help everyone use Go moduels."}}</p>
+			<p>{{locstr "If you can't find the answer to the question you want to ask below, you can always post your question by clicking the \"New Question\" button below. Please pay attention to follow the issue template we have prepared for you, that will help us better answer your question."}}</p>
+		</div>
+	</div>
+
+	<div class="row text-center">
+		<div class="col-md">
+			<a class="btn btn-outline-warning btn-lg" href="{{locstr "https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=question-consultation.md&title=Question%3A+"}}" role="button">{{locstr "New Question"}}</a>
 		</div>
 	</div>
 
@@ -16,43 +22,35 @@
 
 	<div class="row">
 		<div class="col-md">
-			<h2>Table of Contents</h2>
-			<h2 id="Table of Contents"><a class="font-weight-bold text-info" href="#Table of Contents">Table of Contents</a></h2>
+			<h2 id="{{locstr "Table of Contents"}}"><a class="font-weight-bold text-info" href="#{{locstr "Table of Contents"}}">{{locstr "Table of Contents"}}</a></h2>
 		</div>
 	</div>
 
 	<div class="row">
 		<div class="col-md">
 			<ul>
-				<li><a href="#I committed a new revision to a repository, why isn't it showing up when I run go get -u or go list -m -versions?">I committed a new revision to a repository, why isn't it showing up when I run go get -u or go list -m -versions?</a></li>
-				<li><a href="#I removed a bad release from my repository but it still appears, what should I do?">I removed a bad release from my repository but it still appears, what should I do?</a></li>
+				{{range .QAs}}
+				<li><a href="#{{.Question}}">{{.Question}}</a></li>
+				{{end}}
 			</ul>
 		</div>
 	</div>
 
 	<hr>
 
+	{{range .QAs}}
+
 	<div class="row">
 		<div class="col-md">
-			<p id="I committed a new revision to a repository, why isn't it showing up when I run go get -u or go list -m -versions?"><a class="font-weight-bold text-info" href="#I committed a new revision to a repository, why isn't it showing up when I run go get -u or go list -m -versions?">I committed a new revision to a repository, why isn't it showing up when I run go get -u or go list -m -versions?</a></p>
+			<p id="{{.Question}}"><a class="font-weight-bold text-info" href="#{{.Question}}">{{.Question}}</a></p>
 		</div>
 	</div>
 
 	<div class="row">
 		<div class="col-md">
-			<p>If you're using the <a href="https://goproxy.cn">goproxy.cn</a> as your Go module proxy. Then you need to know in order to improve caching and serving latencies, new revisions may not show up right away. If you want new revision to be immediately available in the <a href="https://goproxy.cn">goproxy.cn</a>, then first make sure there is a semantically versioned tag for this revision in the source repository. Then explicitly request that tagged version via <code>go get module@version</code>. After couple of minutes for caches to expire, the <code>go</code> command will see that tagged version.</p>
+			<p>{{.Answer}}</p>
 		</div>
 	</div>
 
-	<div class="row">
-		<div class="col-md">
-			<p id="I removed a bad release from my repository but it still appears, what should I do?"><a class="font-weight-bold text-info" href="#I removed a bad release from my repository but it still appears, what should I do?">I removed a bad release from my repository but it still appears, what should I do?</a></p>
-		</div>
-	</div>
-
-	<div class="row">
-		<div class="col-md">
-			<p>If you're using the <a href="https://goproxy.cn">goproxy.cn</a> as your Go module proxy. Then you need to know whenever possible, Goproxy China aims to cache content in order to avoid breaking builds for people that depend on your module, so this bad release may still be available in the <a href="https://goproxy.cn">goproxy.cn</a> even if it is not available at the origin. The same situation applies if you delete your entire repository. We suggest creating a new release and encouraging people to use that one instead.</p>
-		</div>
-	</div>
+	{{end}}
 </div>

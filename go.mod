@@ -9,7 +9,7 @@ require (
 	github.com/air-gases/logger v0.15.2
 	github.com/air-gases/redirector v0.15.2
 	github.com/aofei/air v0.15.2
-	github.com/fsnotify/fsnotify v1.4.9 // indirect
+	github.com/fsnotify/fsnotify v1.4.9
 	github.com/goproxy/goproxy v0.0.0-20200313105010-b21e3112b7d3
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1
@@ -22,4 +22,5 @@ require (
 	github.com/tdewolff/minify/v2 v2.7.3 // indirect
 	github.com/tidwall/gjson v1.6.0
 	github.com/tidwall/pretty v1.0.1 // indirect
+	github.com/yuin/goldmark v1.1.25
 )
