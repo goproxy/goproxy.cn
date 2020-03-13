@@ -59,30 +59,28 @@ func init() {
 			Msg("failed to unmarshal goproxy configuration items")
 	}
 
-	if !goproxyViper.GetBool("disable_cacher") {
-		goproxyLocalCacheRoot, err := ioutil.TempDir(
-			goproxyViper.GetString("local_cache_root"),
-			"",
-		)
-		if err != nil {
-			base.Logger.Fatal().Err(err).
-				Msg("failed to create goproxy local cache root")
-		}
-		base.Air.AddShutdownJob(func() {
-			for i := 0; i < 60; i++ {
-				time.Sleep(time.Second)
-				err := os.RemoveAll(goproxyLocalCacheRoot)
-				if err == nil {
-					break
-				}
+	goproxyLocalCacheRoot, err := ioutil.TempDir(
+		goproxyViper.GetString("local_cache_root"),
+		"",
+	)
+	if err != nil {
+		base.Logger.Fatal().Err(err).
+			Msg("failed to create goproxy local cache root")
+	}
+	base.Air.AddShutdownJob(func() {
+		for i := 0; i < 60; i++ {
+			time.Sleep(time.Second)
+			err := os.RemoveAll(goproxyLocalCacheRoot)
+			if err == nil {
+				break
 			}
-		})
-
-		goproxy.Cacher = &goproxyCacher{
-			Cacher:         goproxyKodoCacher,
-			localCacheRoot: goproxyLocalCacheRoot,
-			settingContext: ctx,
 		}
+	})
+
+	goproxy.Cacher = &goproxyCacher{
+		Cacher:         goproxyKodoCacher,
+		localCacheRoot: goproxyLocalCacheRoot,
+		settingContext: ctx,
 	}
 
 	goproxy.ErrorLogger = log.New(base.Logger, "", 0)
