@@ -83,7 +83,7 @@ C:\> $env:GOPROXY = "https://goproxy.cn"</code></pre>
 
 	<div class="row">
 		<div class="col-md">
-			<p>We also provide the coolest self-hosted Go module proxy building solution in the world. By using <a href="https://github.com/goproxy/goproxy" target="_blank">Goproxy</a>, a minimalist project (<a href="https://goproxy.cn" target="_blank">goproxy.cn</a> is built on it), you can easily add Go module proxy support to any existing web service. Your code is always yours.</p>
+			<p>Your code is always yours, so we also provide the coolest self-hosted Go module proxy building solution in the world. By using <a href="https://github.com/goproxy/goproxy" target="_blank">Goproxy</a>, a minimalist project, you can easily add Go module proxy support to any existing web service, you know that <a href="https://goproxy.cn" target="_blank">goproxy.cn</a> is built on it.</p>
 			<p>Create a file named <code>goproxy.go</code></p>
 			<pre><code class="language-go">package main
 
@@ -106,7 +106,7 @@ func main() {
 			<p>and run it</p>
 			<pre><code class="language-bash">$ go run goproxy.go</code></pre>
 			<p>then try it by setting <code>GOPROXY</code> to <code>http://localhost:8080</code>. In addition, we also recommend that you set <code>GO111MODULE</code> to <code>on</code>.</p>
-			<p>That's it, a fully functional Go module proxy is successfully built. For more advanced usage please check the <a href="https://pkg.go.dev/github.com/goproxy/goproxy" target="_blank">documentation</a>.</p>
+			<p>That's it, a fully functional Go module proxy is successfully built. In fact, you can use <a href="https://github.com/goproxy/goproxy" target="_blank">Goproxy</a> with your favorite web frameworks, such as <a href="https://pkg.go.dev/github.com/gin-gonic/gin#WrapH" target="_blank">Gin</a> and <a href="https://pkg.go.dev/github.com/labstack/echo/v4#WrapHandler" target="_blank">Echo</a>, all you need to do is add one more route. For more advanced usage please check the <a href="https://pkg.go.dev/github.com/goproxy/goproxy" target="_blank">documentation</a>.</p>
 		</div>
 	</div>
 </div>
