@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"context"
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
@@ -101,7 +102,12 @@ func hIndexPage(req *air.Request, res *air.Response) error {
 
 // updateCachedModuleVersionsCount updates the `cachedModuleVersionCount`.
 func updateCachedModuleVersionsCount() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	defer base.Air.RemoveShutdownJob(base.Air.AddShutdownJob(cancel))
+
 	b, err := requestQiniuAPI(
+		ctx,
 		http.MethodGet,
 		fmt.Sprintf(
 			"https://api.qiniu.com"+
@@ -128,12 +134,13 @@ func updateCachedModuleVersionsCount() {
 
 // requestQiniuAPI requests Qiniu API.
 func requestQiniuAPI(
+	ctx context.Context,
 	method string,
 	url string,
 	contentType string,
 	body io.Reader,
 ) ([]byte, error) {
-	req, err := http.NewRequest(method, url, body)
+	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
 		return nil, err
 	}
@@ -165,20 +172,8 @@ func requestQiniuAPI(
 		req.Header.Set("Content-Type", contentType)
 	}
 
-	nots := 0
-
-Do:
-	if err := req.Context().Err(); err != nil {
-		return nil, err
-	}
-
-	res, err := http.DefaultClient.Do(req)
+	res, err := base.HTTPDo(nil, req)
 	if err != nil {
-		if nots < 5 {
-			nots++
-			goto Do
-		}
-
 		return nil, err
 	}
 	defer res.Body.Close()
