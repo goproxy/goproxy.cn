@@ -1,5 +1,5 @@
 [Unit]
-Description=The most trusted Go module proxy in China.
+Description=Goproxy China
 After=network.target
 
 [Service]
