@@ -1,5 +1,5 @@
 ---
-name: Question consultation
+name: New question
 about: Create a question to ask others for help.
 title: 'Question: '
 labels: ''

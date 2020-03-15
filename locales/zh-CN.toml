@@ -11,5 +11,5 @@
 "Status" = "状态页"
 "Table of Contents" = "目录"
 "The most trusted Go module proxy in China." = "中国最可靠的 Go 模块代理。"
-"https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=question-consultation.md&title=Question%3A+" = "https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=question-consultation.zh-CN.md&title=问题："
+"https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=new-question.md&title=Question%3A+" = "https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=new-question.zh-CN.md&title=问题："
 "index.html" = "index.zh-CN.html"

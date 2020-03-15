@@ -10,7 +10,7 @@ Goproxy 中国完全实现了 Go 的[模块代理协议](https://golang.org/cmd/
 
 愉快地编码吧，Gopher 们！;-)
 
-***注意，为了帮助 Gopher 们更好地去使用 Go 模块，Goproxy 中国现在支持回答和 Go 模块相关的所有问题（不再只是和 Go 模块代理相关的），你只需要遵循 Issue 模版将问题发表在[这里](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=question-consultation.zh-CN.md&title=%E9%97%AE%E9%A2%98%EF%BC%9A)即可。别忘了先去检查我们的[常见问题](https://goproxy.cn/faq)页面中是否已经有了你想要咨询的问题。***
+***注意，为了帮助 Gopher 们更好地去使用 Go 模块，Goproxy 中国现在支持回答和 Go 模块相关的所有问题（不再只是和 Go 模块代理相关的），你只需要遵循 Issue 模版将问题发表在[这里](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=new-question.zh-CN.md&title=%E9%97%AE%E9%A2%98%EF%BC%9A)即可。别忘了先去检查我们的[常见问题](https://goproxy.cn/faq)页面中是否已经有了你想要询问的问题。***
 
 ## 用法
 
@@ -90,7 +90,7 @@ Goproxy 中国是一个由商业支持的项目而不是一个个人项目。并
 
 因为 [proxy.golang.org](https://proxy.golang.org) 在中国大陆被屏蔽了，所以，不使用。但是，如果你不在中国大陆，那么我们建议你优先考虑使用 [proxy.golang.org](https://proxy.golang.org)，毕竟它看起来更加官方。一旦你进入了中国大陆，我们希望你能在第一时间想到 [goproxy.cn](https://goproxy.cn)，这也是我们选择 `.cn` 作为域名后缀的主要原因。
 
-### 谁将回答我在[这里](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.zh-CN.md&title=Go+%E6%A8%A1%E5%9D%97%EF%BC%9A)咨询的问题？
+### 谁将回答我在[这里](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.zh-CN.md&title=Go+%E6%A8%A1%E5%9D%97%EF%BC%9A)询问的问题？
 
 Goproxy 中国的成员以及我们伟大的 Go 社区中热心肠的志愿者们。请牢记，为了减轻他人的工作量，别忘了先去检查我们的[常见问题](https://goproxy.cn/faq)页面中是否已经有了你想要问的问题。
 
