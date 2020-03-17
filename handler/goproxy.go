@@ -17,7 +17,7 @@ import (
 	"time"
 
 	"github.com/aofei/air"
-	pgoproxy "github.com/goproxy/goproxy"
+	"github.com/goproxy/goproxy"
 	"github.com/goproxy/goproxy.cn/base"
 	"github.com/goproxy/goproxy/cacher"
 )
@@ -26,16 +26,8 @@ var (
 	// goproxyViper is used to get the configuration items of the Goproxy.
 	goproxyViper = base.Viper.Sub("goproxy")
 
-	// goproxy is an instance of the `pgoproxy.Goproxy`.
-	goproxy = pgoproxy.New()
-
-	// goproxyKodoCacher is the `cacher.Kodo` for the Qiniu Cloud Kodo.
-	goproxyKodoCacher = &cacher.Kodo{
-		Endpoint:   qiniuViper.GetString("kodo_endpoint"),
-		AccessKey:  qiniuAccessKey,
-		SecretKey:  qiniuSecretKey,
-		BucketName: qiniuViper.GetString("kodo_bucket_name"),
-	}
+	// hhGoproxy is an instance of the `goproxy.Goproxy`.
+	hhGoproxy = goproxy.New()
 
 	// goproxyTimeout is the the maximum execution duration allowed for a Go
 	// module proxy request.
@@ -54,7 +46,7 @@ func init() {
 	ctx, cancel := context.WithCancel(context.Background())
 	base.Air.AddShutdownJob(cancel)
 
-	if err := goproxyViper.Unmarshal(goproxy); err != nil {
+	if err := goproxyViper.Unmarshal(hhGoproxy); err != nil {
 		base.Logger.Fatal().Err(err).
 			Msg("failed to unmarshal goproxy configuration items")
 	}
@@ -77,13 +69,18 @@ func init() {
 		}
 	})
 
-	goproxy.Cacher = &goproxyCacher{
-		Cacher:         goproxyKodoCacher,
+	hhGoproxy.Cacher = &goproxyCacher{
+		Cacher: &cacher.Kodo{
+			Endpoint:   qiniuViper.GetString("kodo_endpoint"),
+			AccessKey:  qiniuAccessKey,
+			SecretKey:  qiniuSecretKey,
+			BucketName: qiniuViper.GetString("kodo_bucket_name"),
+		},
 		localCacheRoot: goproxyLocalCacheRoot,
 		settingContext: ctx,
 	}
 
-	goproxy.ErrorLogger = log.New(base.Logger, "", 0)
+	hhGoproxy.ErrorLogger = log.New(base.Logger, "", 0)
 
 	base.Air.BATCH(nil, "/*", hGoproxy)
 }
@@ -97,17 +94,17 @@ func hGoproxy(req *air.Request, res *air.Response) error {
 
 	name := strings.TrimLeft(path.Clean(req.RawPath()), "/")
 	if !goproxyAutoRedirect || !isAutoRedirectableGoproxyCache(name) {
-		goproxy.ServeHTTP(res.HTTPResponseWriter(), req.HTTPRequest())
+		hhGoproxy.ServeHTTP(res.HTTPResponseWriter(), req.HTTPRequest())
 		return nil
 	}
 
-	cache, err := goproxyKodoCacher.Cache(req.Context, name)
+	cache, err := hhGoproxy.Cacher.Cache(req.Context, name)
 	if err != nil {
-		if !errors.Is(err, pgoproxy.ErrCacheNotFound) {
+		if !errors.Is(err, goproxy.ErrCacheNotFound) {
 			return err
 		}
 
-		goproxy.ServeHTTP(res.HTTPResponseWriter(), req.HTTPRequest())
+		hhGoproxy.ServeHTTP(res.HTTPResponseWriter(), req.HTTPRequest())
 
 		return nil
 	}
@@ -126,7 +123,7 @@ func hGoproxy(req *air.Request, res *air.Response) error {
 
 // goproxyCacher implements the `goproxy.Cacher`.
 type goproxyCacher struct {
-	pgoproxy.Cacher
+	goproxy.Cacher
 
 	localCacheRoot    string
 	settingContext    context.Context
@@ -160,7 +157,7 @@ func (gc *goproxyCacher) startSetCache() {
 
 				gc.settingCaches.Delete(k)
 
-				cache := v.(pgoproxy.Cache)
+				cache := v.(goproxy.Cache)
 				gc.Cacher.SetCache(
 					gc.settingContext,
 					&goproxyCache{
@@ -180,7 +177,7 @@ func (gc *goproxyCacher) startSetCache() {
 }
 
 // SetCache implements the `goproxy.Cacher`.
-func (gc *goproxyCacher) SetCache(ctx context.Context, c pgoproxy.Cache) error {
+func (gc *goproxyCacher) SetCache(ctx context.Context, c goproxy.Cache) error {
 	gc.startSetCacheOnce.Do(gc.startSetCache)
 
 	localCacheFile, err := ioutil.TempFile(gc.localCacheRoot, "")

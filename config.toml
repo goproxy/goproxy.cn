@@ -27,7 +27,6 @@ go_bin_max_workers = 8
 cacher_max_cache_bytes = 0
 proxied_sumdb_names = ["sum.golang.org"]
 insecure_mode = false
-disable_not_found_log = false
 timeout = "60s"
 auto_redirect = false
 local_cache_root = "/tmp"
