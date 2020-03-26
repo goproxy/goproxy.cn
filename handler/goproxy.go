@@ -19,7 +19,6 @@ import (
 	"github.com/aofei/air"
 	"github.com/goproxy/goproxy"
 	"github.com/goproxy/goproxy.cn/base"
-	"github.com/goproxy/goproxy/cacher"
 )
 
 var (
@@ -70,12 +69,7 @@ func init() {
 	})
 
 	hhGoproxy.Cacher = &goproxyCacher{
-		Cacher: &cacher.Kodo{
-			Endpoint:   qiniuViper.GetString("kodo_endpoint"),
-			AccessKey:  qiniuAccessKey,
-			SecretKey:  qiniuSecretKey,
-			BucketName: qiniuViper.GetString("kodo_bucket_name"),
-		},
+		Cacher:         qiniuKodoCacher,
 		localCacheRoot: goproxyLocalCacheRoot,
 		settingContext: ctx,
 	}

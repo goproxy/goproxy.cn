@@ -3,26 +3,31 @@
 		<img class="logo" src="/assets/images/logo.png">
 		<h1 class="brand display-3">Goproxy 中国</h1>
 		<p>中国最可靠的 Go 模块代理。</p>
-		<p><span class="badge badge-success">已缓存 {{.CachedModuleVersionCount}} 个模块版本</span></p>
+		<p><span class="badge badge-success">已缓存 {{.ModuleVersionCount}} 个模块版本</span></p>
 		<a class="github-button" href="https://github.com/goproxy/goproxy.cn" data-size="large" data-show-count="true" aria-label="Star goproxy/goproxy.cn on GitHub">Star</a>
 	</div>
 </div>
 
 <div class="container">
 	<div class="row text-center">
-		<div class="col-md-4">
-			<h2 class="text-info"><i class="fas fa-rocket"></i>&nbsp;极速下载</h2>
-			<p>我们正在使用<a class="text-secondary" href="https://www.qiniu.com/products/qcdn" target="_blank">七牛云 CDN</a> 在全球范围内加速我们的服务，并且我们没有设置任何带宽限制。凭借着数以千计的 CDN 节点和 <b>40Gbps+ 的单节点带宽</b>，你将被赋予一个以极快的速度下载模块版本的能力。</p>
+		<div class="col-md-3">
+			<h3 class="text-info"><i class="fas fa-rocket"></i>&nbsp;极速下载</h3>
+			<p>我们正在使用<a href="https://www.qiniu.com/products/qcdn" target="_blank">七牛云 CDN</a> 在全球范围内加速我们的服务，并且我们没有设置任何带宽限制。凭借着数以千计的 CDN 节点和 <b>40Gbps+ 的单节点带宽</b>，你将被赋予一个以极快的速度下载模块版本的能力。</p>
 		</div>
 
-		<div class="col-md-4">
-			<h2 class="text-info"><i class="fas fa-infinity"></i>&nbsp;没有限制</h2>
-			<p>我们不但没有设置带宽限制。更进一步地，我们还<b>没有设置任何速率限制</b>。这意味着你可以在任何场景下使用我们的服务，例如 CI/CD。你甚至可以像 <a class="text-secondary" href="https://goproxy.baidu.com" target="_blank">goproxy.baidu.com</a> 一样将我们的服务用作上游代理。</p>
+		<div class="col-md-3">
+			<h3 class="text-info"><i class="fas fa-infinity"></i>&nbsp;没有限制</h3>
+			<p>我们不但没有设置带宽限制。更进一步地，我们还<b>没有设置任何速率限制</b>。这意味着你可以在任何场景下使用我们的服务，例如 CI/CD。你甚至可以像 <a href="https://goproxy.baidu.com" target="_blank">goproxy.baidu.com</a> 一样将我们的服务用作上游代理。</p>
 		</div>
 
-		<div class="col-md-4">
-			<h2 class="text-info"><i class="fas fa-th-large"></i>&nbsp;功能齐全</h2>
-			<p>我们一直在使用最新的 Go 版本，甚至是不稳定版本。因为我们提供了<b>最前沿的功能支持</b>。特别地，我们支持<a class="text-secondary" href="https://golang.org/design/25530-sumdb#proxying-a-checksum-database" target="_blank">代理</a>默认的校验和数据库 <a class="text-secondary" href="https://sum.golang.org" target="_blank">sum.golang.org</a>。你不需要做任何额外的事情，它就可以工作。</p>
+		<div class="col-md-3">
+			<h3 class="text-info"><i class="fas fa-th-large"></i>&nbsp;功能齐全</h3>
+			<p>我们一直在使用最新的 Go 版本，甚至是不稳定版本。因为我们提供了<b>最前沿的功能支持</b>。特别地，我们支持<a href="https://golang.org/design/25530-sumdb#proxying-a-checksum-database" target="_blank">代理</a>默认的校验和数据库 <a href="https://sum.golang.org" target="_blank">sum.golang.org</a>。你不需要做任何额外的事情，它就可以工作。</p>
+		</div>
+
+		<div class="col-md-3">
+			<h3 class="text-info"><i class="fas fa-eye"></i>&nbsp;数据可视</h3>
+			<p>为了使大家可以更好地了解我们的服务中所有模块的活跃度，我们推出了 Go 模块代理世界中的首个<a href="/stats">统计数据 API</a>。通过得体的 RESTful API 设计，你将能够轻松地查询我们服务中所有模块版本的统计数据。</p>
 		</div>
 	</div>
 
@@ -30,7 +35,7 @@
 
 	<div class="row text-center">
 		<div class="col-md">
-			<h2 id="用法"><a class="font-weight-bold text-info" href="#用法">用法</a></h2>
+			<h3 id="用法"><a class="font-weight-bold text-info" href="#用法">用法</a></h3>
 		</div>
 	</div>
 
@@ -77,7 +82,7 @@ C:\> $env:GOPROXY = "https://goproxy.cn"</code></pre>
 
 	<div class="row text-center">
 		<div class="col-md">
-			<h2 id="自托管 Go 模块代理"><a class="font-weight-bold text-info" href="#自托管 Go 模块代理">自托管 Go 模块代理</a></h2>
+			<h3 id="自托管 Go 模块代理"><a class="font-weight-bold text-info" href="#自托管 Go 模块代理">自托管 Go 模块代理</a></h3>
 		</div>
 	</div>
 

@@ -5,6 +5,12 @@ body {
 	padding: 3.5rem 0;
 }
 
+@media screen and (max-width: 600px) {
+	body {
+		font-size: 0.875rem;
+	}
+}
+
 hr {
 	margin: 4rem 0;
 }

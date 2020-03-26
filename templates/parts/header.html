@@ -14,6 +14,10 @@
 					<a class="nav-link" href="/">{{locstr "Index"}}{{if .IsIndexPage}}<span class="sr-only">(current)</span>{{end}}</a>
 				</li>
 
+				<li class="nav-item{{if .IsStatsPage}} active{{end}}">
+					<a class="nav-link" href="/stats">{{locstr "Statistics"}}{{if .IsStatsPage}}<span class="sr-only">(current)</span>{{end}}</a>
+				</li>
+
 				<li class="nav-item{{if .IsFAQPage}} active{{end}}">
 					<a class="nav-link" href="/faq">{{locstr "FAQ"}}{{if .IsFAQPage}}<span class="sr-only">(current)</span>{{end}}</a>
 				</li>

@@ -1,21 +1,17 @@
 package handler
 
 import (
-	"bytes"
 	"context"
-	"crypto/hmac"
-	"crypto/sha1"
-	"encoding/base64"
-	"fmt"
-	"io"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"time"
+	"strings"
 
 	"github.com/air-gases/cacheman"
 	"github.com/aofei/air"
 	"github.com/goproxy/goproxy.cn/base"
+	"github.com/goproxy/goproxy/cacher"
 	"github.com/tidwall/gjson"
 )
 
@@ -29,6 +25,14 @@ var (
 	// qiniuSecretKey is the secret key for the Qiniu Cloud.
 	qiniuSecretKey = qiniuViper.GetString("secret_key")
 
+	// qiniuKodoCacher is the kodo cacher for the Qiniu Cloud.
+	qiniuKodoCacher = &cacher.Kodo{
+		Endpoint:   qiniuViper.GetString("kodo_endpoint"),
+		AccessKey:  qiniuAccessKey,
+		SecretKey:  qiniuSecretKey,
+		BucketName: qiniuViper.GetString("kodo_bucket_name"),
+	}
+
 	// getHeadMethods is an array contains the GET and the HEAD methods.
 	getHeadMethods = []string{http.MethodGet, http.MethodHead}
 
@@ -39,24 +43,24 @@ var (
 		SMaxAge: -1,
 	})
 
-	// cachedModuleVersionCount is the cached module version count.
-	cachedModuleVersionCount int64
+	// moduleVersionCount is the module version count.
+	moduleVersionCount int64
 )
 
 func init() {
-	updateCachedModuleVersionsCount()
-	if cachedModuleVersionCount == 0 {
+	updateModuleVersionsCount()
+	if moduleVersionCount == 0 {
 		base.Logger.Fatal().
-			Msg("failed to initialize cached module version count")
+			Msg("failed to initialize module version count")
 	}
 
 	if _, err := base.Cron.AddFunc(
-		"0 0 * * * *", // every 1 hour
-		updateCachedModuleVersionsCount,
+		"0 */10 * * * *", // every 10 minutes
+		updateModuleVersionsCount,
 	); err != nil {
 		base.Logger.Fatal().Err(err).
-			Msg("failed to add cached module version count " +
-				"update cron job")
+			Msg("failed to add module version count update cron " +
+				"job")
 	}
 
 	base.Air.FILE("/robots.txt", "robots.txt")
@@ -72,122 +76,63 @@ func init() {
 	base.Air.BATCH(getHeadMethods, "/", hIndexPage)
 }
 
+// NotFoundHandler handles not found.
+func NotFoundHandler(req *air.Request, res *air.Response) error {
+	res.Status = http.StatusNotFound
+	return errors.New(strings.ToLower(http.StatusText(res.Status)))
+}
+
+// MethodNotAllowedHandler handles method not allowed.
+func MethodNotAllowedHandler(req *air.Request, res *air.Response) error {
+	res.Status = http.StatusMethodNotAllowed
+	return errors.New(strings.ToLower(http.StatusText(res.Status)))
+}
+
 // Error handles errors.
 func Error(err error, req *air.Request, res *air.Response) {
 	if res.Written {
 		return
 	}
 
-	m := ""
 	if !req.Air.DebugMode && res.Status == http.StatusInternalServerError {
-		m = http.StatusText(res.Status)
+		res.WriteString(strings.ToLower(http.StatusText(res.Status)))
 	} else {
-		m = err.Error()
+		res.WriteString(err.Error())
 	}
-
-	res.WriteJSON(map[string]interface{}{
-		"Error": m,
-	})
 }
 
 // hIndexPage handles requests to get index page.
 func hIndexPage(req *air.Request, res *air.Response) error {
 	return res.Render(map[string]interface{}{
 		"IsIndexPage": true,
-		"CachedModuleVersionCount": thousandsCommaSeperated(
-			cachedModuleVersionCount,
+		"ModuleVersionCount": thousandsCommaSeperated(
+			moduleVersionCount,
 		),
 	}, req.LocalizedString("index.html"), "layouts/default.html")
 }
 
-// updateCachedModuleVersionsCount updates the `cachedModuleVersionCount`.
-func updateCachedModuleVersionsCount() {
+// updateModuleVersionsCount updates the `moduleVersionCount`.
+func updateModuleVersionsCount() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	defer base.Air.RemoveShutdownJob(base.Air.AddShutdownJob(cancel))
 
-	b, err := requestQiniuAPI(
-		ctx,
-		http.MethodGet,
-		fmt.Sprintf(
-			"https://api.qiniu.com"+
-				"/v6/count?bucket=%s&begin=%s&end=%s&g=day",
-			qiniuViper.GetString("kodo_bucket_name"),
-			time.Now().Add(-time.Hour).In(base.TZAsiaShanghai).
-				Format("20060102150405"),
-			time.Now().In(base.TZAsiaShanghai).
-				Format("20060102150405"),
-		),
-		"",
-		nil,
-	)
+	cache, err := qiniuKodoCacher.Cache(ctx, "stats/summary")
 	if err != nil {
 		base.Logger.Error().Err(err).
-			Msg("failed to update cached module version count")
+			Msg("failed to update module version count")
+		return
 	}
+	defer cache.Close()
 
-	count := gjson.GetBytes(b, "datas.0").Int()
-	if count > 0 {
-		cachedModuleVersionCount = count / 3
-	}
-}
-
-// requestQiniuAPI requests Qiniu API.
-func requestQiniuAPI(
-	ctx context.Context,
-	method string,
-	url string,
-	contentType string,
-	body io.Reader,
-) ([]byte, error) {
-	req, err := http.NewRequestWithContext(ctx, method, url, body)
+	b, err := ioutil.ReadAll(cache)
 	if err != nil {
-		return nil, err
+		base.Logger.Error().Err(err).
+			Msg("failed to update module version count")
+		return
 	}
 
-	path := req.URL.Path
-	if req.URL.RawQuery != "" {
-		path = fmt.Sprint(path, "?", req.URL.RawQuery)
-	}
-
-	data := []byte(fmt.Sprint(path, "\n"))
-	if contentType == "application/x-www-form-urlencoded" && body != nil {
-		b, err := ioutil.ReadAll(body)
-		if err != nil {
-			return nil, err
-		}
-
-		data = append(data, b...)
-
-		req.Body = ioutil.NopCloser(bytes.NewReader(b))
-	}
-
-	h := hmac.New(sha1.New, []byte(qiniuSecretKey))
-	h.Write(data)
-	sign := base64.URLEncoding.EncodeToString(h.Sum(nil))
-	token := fmt.Sprint(qiniuAccessKey, ":", sign)
-
-	req.Header.Set("Authorization", fmt.Sprint("QBox ", token))
-	if contentType != "" {
-		req.Header.Set("Content-Type", contentType)
-	}
-
-	res, err := base.HTTPDo(nil, req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	b, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	if res.StatusCode == http.StatusOK {
-		return b, nil
-	}
-
-	return nil, fmt.Errorf("GET %s: %s: %s", url, res.Status, b)
+	moduleVersionCount = gjson.GetBytes(b, "module_version_count").Int()
 }
 
 // thousandsCommaSeperated returns a thousands comma seperated string for the n.

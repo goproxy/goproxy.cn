@@ -3,26 +3,31 @@
 		<img class="logo" src="/assets/images/logo.png">
 		<h1 class="brand display-3">Goproxy China</h1>
 		<p>The most trusted Go module proxy in China.</p>
-		<p><span class="badge badge-success">{{.CachedModuleVersionCount}} module versions cached</span></p>
+		<p><span class="badge badge-success">{{.ModuleVersionCount}} module versions cached</span></p>
 		<a class="github-button" href="https://github.com/goproxy/goproxy.cn" data-size="large" data-show-count="true" aria-label="Star goproxy/goproxy.cn on GitHub">Star</a>
 	</div>
 </div>
 
 <div class="container">
 	<div class="row text-center">
-		<div class="col-md-4">
-			<h2 class="text-info"><i class="fas fa-rocket"></i>&nbsp;Blazing Fast</h2>
-			<p>We are using <a class="text-secondary" href="https://www.qiniu.com/en/products/qcdn" target="_blank">Qiniu Cloud CDN</a> to accelerate our service globally without placing any bandwidth limits. With thousands of CDN nodes and <b>40Gbps+ single-node bandwidth</b>, you will be given the ability to download module versions at a blazing fast speed.</p>
+		<div class="col-md-3">
+			<h3 class="text-info"><i class="fas fa-rocket"></i>&nbsp;Blazing Fast</h3>
+			<p>We are using <a href="https://www.qiniu.com/en/products/qcdn" target="_blank">Qiniu Cloud CDN</a> to accelerate our service globally without placing any bandwidth limits. With thousands of CDN nodes and <b>40Gbps+ single-node bandwidth</b>, you will be given the ability to download module versions at a blazing fast speed.</p>
 		</div>
 
-		<div class="col-md-4">
-			<h2 class="text-info"><i class="fas fa-infinity"></i>&nbsp;No Limit</h2>
-			<p>We do not just place no bandwidth limits. Furthermore, we <b>have not placed any rate limits</b>. This means that you can use our service in any scenario, like CI/CD. You can even use our service as an upstream proxy, just like <a class="text-secondary" href="https://goproxy.baidu.com" target="_blank">goproxy.baidu.com</a> does.</p>
+		<div class="col-md-3">
+			<h3 class="text-info"><i class="fas fa-infinity"></i>&nbsp;No Limit</h3>
+			<p>We do not just place no bandwidth limits. Furthermore, we <b>have not placed any rate limits</b>. This means that you can use our service in any scenario, like CI/CD. You can even use our service as an upstream proxy, just like <a href="https://goproxy.baidu.com" target="_blank">goproxy.baidu.com</a> does.</p>
 		</div>
 
-		<div class="col-md-4">
-			<h2 class="text-info"><i class="fas fa-th-large"></i>&nbsp;Full Featured</h2>
-			<p>We are always using the latest Go version, even the unstable version. Because we provide <b>cutting-edge feature support</b>. In particular, we support <a class="text-secondary" href="https://golang.org/design/25530-sumdb#proxying-a-checksum-database" target="_blank">proxying</a> the default checksum database <a class="text-secondary" href="https://sum.golang.org" target="_blank">sum.golang.org</a>. You don't need to do anything extra, it just works.</p>
+		<div class="col-md-3">
+			<h3 class="text-info"><i class="fas fa-th-large"></i>&nbsp;Full Featured</h3>
+			<p>We are always using the latest Go version, even the unstable version. Because we provide <b>cutting-edge feature support</b>. In particular, we support <a href="https://golang.org/design/25530-sumdb#proxying-a-checksum-database" target="_blank">proxying</a> the default checksum database <a href="https://sum.golang.org" target="_blank">sum.golang.org</a>. You don't need to do anything extra, it just works.</p>
+		</div>
+
+		<div class="col-md-3">
+			<h3 class="text-info"><i class="fas fa-eye"></i>&nbsp;Data Visualized</h3>
+			<p>For everyone to better understand the activity of all modules in our service, we have launched the very first <a href="/stats">Statistics API</a> of the Go module proxy world. With the decent RESTful API design, you will be able to easily query statistics for all module versions in our service.</p>
 		</div>
 	</div>
 
@@ -30,7 +35,7 @@
 
 	<div class="row text-center">
 		<div class="col-md">
-			<h2 id="Usage"><a class="font-weight-bold text-info" href="#Usage">Usage</a></h2>
+			<h3 id="Usage"><a class="font-weight-bold text-info" href="#Usage">Usage</a></h3>
 		</div>
 	</div>
 
@@ -77,7 +82,7 @@ C:\> $env:GOPROXY = "https://goproxy.cn"</code></pre>
 
 	<div class="row text-center">
 		<div class="col-md">
-			<h2 id="Self-hosted Go module proxy"><a class="font-weight-bold text-info" href="#Self-hosted Go module proxy">Self-hosted Go module proxy</a></h2>
+			<h3 id="Self-hosted Go module proxy"><a class="font-weight-bold text-info" href="#Self-hosted Go module proxy">Self-hosted Go module proxy</a></h3>
 		</div>
 	</div>
 

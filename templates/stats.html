@@ -1,0 +1,198 @@
+<div class="jumbotron">
+	<div class="container text-center">
+		<h1 class="brand display-3">Statistics</h1>
+	</div>
+</div>
+
+<div class="container">
+	<div class="row">
+		<div class="col-md">
+			<p>*Note: All the related APIs listed below are still in Beta. Although we will try our best not to make any changes, anything can happen before the official release.</p>
+		</div>
+	</div>
+
+	<hr>
+
+	<div id="statsAPI" class="accordion">
+		<div class="card">
+			<div id="statSummaryAPI" class="card-header">
+				<h2 class="mb-0">
+					<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#statSummaryAPICollapse" aria-expanded="false" aria-controls="statSummaryAPICollapse">API: Get Service Summary</button>
+				</h2>
+			</div>
+
+			<div id="statSummaryAPICollapse" class="collapse" aria-labelledby="statSummaryAPI" data-parent="#statsAPI">
+				<div class="card-body">
+					<p>Get the summary information of the service, such as the total size and total number of all module versions in the service.</p>
+					<pre><code class="language-http">GET /stats/summary</code></pre>
+					<p>Example request URL: <a href="https://goproxy.cn/stats/summary" target="_blank">goproxy.cn/stats/summary</a></p>
+					<p>Example response body:</p>
+					<pre><code class="language-json">{
+	"cacher_size": 2663405247231,
+	"module_version_count": 1035421,
+	"module_host_count": 1120,
+	"top_10_module_hosts": [
+		{"module_host": "github.com", "module_version_count": 921606},
+		{"module_host": "k8s.io", "module_version_count": 24982},
+		{"module_host": "gitlab.com", "module_version_count": 13172},
+		{"module_host": "gopkg.in", "module_version_count": 10479},
+		{"module_host": "golang.org", "module_version_count": 8000},
+		{"module_host": "gitee.com", "module_version_count": 4650},
+		{"module_host": "bitbucket.org", "module_version_count": 4177},
+		{"module_host": "sigs.k8s.io", "module_version_count": 3280},
+		{"module_host": "google.golang.org", "module_version_count": 2703},
+		{"module_host": "istio.io", "module_version_count": 2487}
+	]
+}</code></pre>
+				</div>
+			</div>
+		</div>
+
+		<div class="card">
+			<div id="statTrendAPI" class="card-header">
+				<h2 class="mb-0">
+					<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#statTrendAPICollapse" aria-expanded="false" aria-controls="statTrendAPICollapse">API: Get Module Trends</button>
+				</h2>
+			</div>
+
+			<div id="statTrendAPICollapse" class="collapse" aria-labelledby="statTrendAPI" data-parent="#statsAPI">
+				<div class="card-body">
+					<p>Get module trends in service, such as the most active top 1000 module in the most recent period.</p>
+					<pre><code class="language-http">GET /stats/trends/&lt;trend&gt;</code></pre>
+					<p>The path parameter <code>&lt;trend&gt;</code> is <span class="text-danger">REQUIRED</span> and has three optional values: <code>latest</code> (latest trend), <code>last-7-days</code> (trend in the last 7 days), and <code>last-30-days</code> (trend in the last 30 days).</p>
+					<p>Example request URL: <a href="https://goproxy.cn/stats/trends/latest" target="_blank">goproxy.cn/stats/trends/latest</a></p>
+					<p>Example response body:</p>
+					<pre><code class="language-json">[
+	{"module_path": "golang.org/x/sys", "download_count": 1822180},
+	{"module_path": "golang.org/x/net", "download_count": 1713080},
+	{"module_path": "golang.org/x/tools", "download_count": 1503522},
+	{"module_path": "golang.org/x/crypto", "download_count": 1032270},
+	{"module_path": "gopkg.in/yaml.v2", "download_count": 578120}
+]</code></pre>
+				</div>
+			</div>
+		</div>
+
+		<div class="card">
+			<div id="statModuleVersionAPI" class="card-header">
+				<h2 class="mb-0">
+					<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#statModuleVersionAPICollapse" aria-expanded="false" aria-controls="statModuleVersionAPICollapse">API: Get Module (Version) Statistics</button>
+				</h2>
+			</div>
+
+			<div id="statModuleVersionAPICollapse" class="collapse" aria-labelledby="statModuleVersionAPI" data-parent="#statsAPI">
+				<div class="card-body">
+					<p>Get the statistics of the specified module (version) in the service, such as the total number of downloads of the specified module (version) and its single-day downloads in the last 30 days.</p>
+					<pre><code class="language-http">GET /stats/&lt;module-path&gt;[@&lt;module-version&gt;]</code></pre>
+					<p>The path parameter <code>&lt;module-path&gt;</code> is <span class="text-danger">REQUIRED</span>, for example: <code>golang.org/x/text</code>.<p>
+					<p>The path parameter <code>&lt;module-version&gt;</code> is <span class="text-danger">OPTIONAL</span>, and note that it can only appear with the leading symbol <code>@</code>, for example: <code>@v0.3.2</code>.<p>
+					<p>Example request URL: <a href="https://goproxy.cn/stats/golang.org/x/text" target="_blank">goproxy.cn/stats/golang.org/x/text</a></p>
+					<p>Example response body:</p>
+					<pre><code class="language-json">{
+	"download_count": 476705,
+	"last_30_days": [
+		{"date": "2020-03-25T00:00:00Z", "download_count": 8778},
+		{"date": "2020-03-24T00:00:00Z", "download_count": 16884},
+		{"date": "2020-03-23T00:00:00Z", "download_count": 15842},
+		{"date": "2020-03-22T00:00:00Z", "download_count": 11232},
+		{"date": "2020-03-21T00:00:00Z", "download_count": 11894},
+		{"date": "2020-03-20T00:00:00Z", "download_count": 14968},
+		{"date": "2020-03-19T00:00:00Z", "download_count": 11017},
+		{"date": "2020-03-18T00:00:00Z", "download_count": 5209},
+		{"date": "2020-03-17T00:00:00Z", "download_count": 5759},
+		{"date": "2020-03-16T00:00:00Z", "download_count": 4166},
+		{"date": "2020-03-15T00:00:00Z", "download_count": 2145},
+		{"date": "2020-03-14T00:00:00Z", "download_count": 2218},
+		{"date": "2020-03-13T00:00:00Z", "download_count": 4609},
+		{"date": "2020-03-12T00:00:00Z", "download_count": 5503},
+		{"date": "2020-03-11T00:00:00Z", "download_count": 5412},
+		{"date": "2020-03-10T00:00:00Z", "download_count": 6453},
+		{"date": "2020-03-09T00:00:00Z", "download_count": 4798},
+		{"date": "2020-03-08T00:00:00Z", "download_count": 2323},
+		{"date": "2020-03-07T00:00:00Z", "download_count": 2332},
+		{"date": "2020-03-06T00:00:00Z", "download_count": 4806},
+		{"date": "2020-03-05T00:00:00Z", "download_count": 6339},
+		{"date": "2020-03-04T00:00:00Z", "download_count": 5858},
+		{"date": "2020-03-03T00:00:00Z", "download_count": 5579},
+		{"date": "2020-03-02T00:00:00Z", "download_count": 8862},
+		{"date": "2020-03-01T00:00:00Z", "download_count": 2119},
+		{"date": "2020-02-29T00:00:00Z", "download_count": 2053},
+		{"date": "2020-02-28T00:00:00Z", "download_count": 4735},
+		{"date": "2020-02-27T00:00:00Z", "download_count": 6578},
+		{"date": "2020-02-26T00:00:00Z", "download_count": 4954}
+	],
+	"top_10_module_versions": [
+		{"module_version": "v0.3.2", "download_count": 232795},
+		{"module_version": "v0.3.0", "download_count": 146009},
+		{"module_version": "v0.3.1-0.20180807135948-17ff2d5776d2", "download_count": 67096},
+		{"module_version": "v0.3.1-0.20181227161524-e6919f6577db", "download_count": 11494},
+		{"module_version": "v0.0.0-20160726164857-2910a502d2bf", "download_count": 11223},
+		{"module_version": "v0.0.0-20170915032832-14c0d48ead0c", "download_count": 3991},
+		{"module_version": "v0.3.1-0.20171227012246-e19ae1496984", "download_count": 1128},
+		{"module_version": "v0.0.0-20170915090833-1cbadb444a80", "download_count": 937},
+		{"module_version": "v0.3.1-0.20181030141323-6f44c5a2ea40", "download_count": 480},
+		{"module_version": "v0.3.1", "download_count": 353}
+	]
+}</code></pre>
+					<p>Example request URL: <a href="https://goproxy.cn/stats/golang.org/x/text@v0.3.2" target="_blank">goproxy.cn/stats/golang.org/x/text@v0.3.2</a></p>
+					<p>Example response body:</p>
+					<pre><code class="language-json">{
+	"download_count": 232795,
+	"last_30_days": [
+		{"date": "2020-03-25T00:00:00Z", "download_count": 6232},
+		{"date": "2020-03-24T00:00:00Z", "download_count": 12708},
+		{"date": "2020-03-23T00:00:00Z", "download_count": 12602},
+		{"date": "2020-03-22T00:00:00Z", "download_count": 10371},
+		{"date": "2020-03-21T00:00:00Z", "download_count": 10673},
+		{"date": "2020-03-20T00:00:00Z", "download_count": 11882},
+		{"date": "2020-03-19T00:00:00Z", "download_count": 8379},
+		{"date": "2020-03-18T00:00:00Z", "download_count": 2244},
+		{"date": "2020-03-17T00:00:00Z", "download_count": 2407},
+		{"date": "2020-03-16T00:00:00Z", "download_count": 1696},
+		{"date": "2020-03-15T00:00:00Z", "download_count": 981},
+		{"date": "2020-03-14T00:00:00Z", "download_count": 897},
+		{"date": "2020-03-13T00:00:00Z", "download_count": 1898},
+		{"date": "2020-03-12T00:00:00Z", "download_count": 2498},
+		{"date": "2020-03-11T00:00:00Z", "download_count": 2374},
+		{"date": "2020-03-10T00:00:00Z", "download_count": 2491},
+		{"date": "2020-03-09T00:00:00Z", "download_count": 1854},
+		{"date": "2020-03-08T00:00:00Z", "download_count": 800},
+		{"date": "2020-03-07T00:00:00Z", "download_count": 981},
+		{"date": "2020-03-06T00:00:00Z", "download_count": 2085},
+		{"date": "2020-03-05T00:00:00Z", "download_count": 2642},
+		{"date": "2020-03-04T00:00:00Z", "download_count": 2212},
+		{"date": "2020-03-03T00:00:00Z", "download_count": 2515},
+		{"date": "2020-03-02T00:00:00Z", "download_count": 2832},
+		{"date": "2020-03-01T00:00:00Z", "download_count": 785},
+		{"date": "2020-02-29T00:00:00Z", "download_count": 871},
+		{"date": "2020-02-28T00:00:00Z", "download_count": 2019},
+		{"date": "2020-02-27T00:00:00Z", "download_count": 2480},
+		{"date": "2020-02-26T00:00:00Z", "download_count": 2163}
+	]
+}</code></pre>
+				</div>
+			</div>
+		</div>
+
+		<div class="card">
+			<div id="statModuleDownloadCountBadgeAPI" class="card-header">
+				<h2 class="mb-0">
+					<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#statModuleDownloadCountBadgeAPICollapse" aria-expanded="false" aria-controls="statModuleDownloadCountBadgeAPICollapse">API: Get Module Total Download Badge</button>
+				</h2>
+			</div>
+
+			<div id="statModuleDownloadCountBadgeAPICollapse" class="collapse" aria-labelledby="statModuleDownloadCountBadgeAPI" data-parent="#statsAPI">
+				<div class="card-body">
+					<p>Get the badge for the total download of the specified module in the service.</p>
+					<pre><code class="language-http">GET /stats/&lt;module-path&gt;/badges/download-count.svg</code></pre>
+					<p>The path parameter <code>&lt;trend&gt;</code> is <span class="text-danger">REQUIRED</span> and has three optional values: <code>latest</code> (latest trend), <code>last-7-days</code> (trend in the last 7 days), and <code>last-30-days</code> (trend in the last 30 days).</p>
+					<p>Example request URL: <a href="https://goproxy.cn/stats/golang.org/x/text/badges/download-count.svg" target="_blank">goproxy.cn/stats/golang.org/x/text/badges/download-count.svg</a></p>
+					<p>Example response body:</p>
+					<p><img src="https://goproxy.cn/stats/golang.org/x/text/badges/download-count.svg"></p>
+					<p>The total download badge for a specified module can be placed in the project's <code>README.md</code> using the following Markdown syntax:</p>
+					<pre><code class="language-md">[![goproxy.cn](https://goproxy.cn/stats/&lt;module-path&gt;/badges/download-count.svg)](https://goproxy.cn)</code></pre>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
