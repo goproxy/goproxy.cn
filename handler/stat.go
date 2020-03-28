@@ -1,10 +1,13 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/aofei/air"
 	"github.com/goproxy/goproxy"
@@ -103,17 +106,64 @@ func hStat(req *air.Request, res *air.Response) error {
 		return res.WriteFile("unknown-badge.svg")
 	}
 
-	res.Header.Set("Content-Type", "application/json; charset=utf-8")
-	res.Header.Set("ETag", `"x9cdZUcPsO7jFB3h3qLvGwEMkStZGvg6vPd9PSQ8Hms="`)
-	res.Header.Set("Last-Modified", "Thu, 26 Mar 2020 12:34:56 GMT")
+	date := time.Now().In(base.TZAsiaShanghai)
+	if date.Hour() < 8 {
+		date = time.Date(
+			date.Year(),
+			date.Month(),
+			date.Day()-2,
+			0,
+			0,
+			0,
+			0,
+			time.UTC,
+		)
+	} else {
+		date = time.Date(
+			date.Year(),
+			date.Month(),
+			date.Day()-1,
+			0,
+			0,
+			0,
+			0,
+			time.UTC,
+		)
+	}
 
-	return res.Write(strings.NewReader(
-		`{` +
-			`"download_count":0,` +
-			`"last_30_days":[],` +
-			`"top_10_module_versions":[]` +
-			`}`),
-	)
+	mvs := struct {
+		DownloadCount       int           `json:"download_count"`
+		Last30Days          []interface{} `json:"last_30_days"`
+		Top10ModuleVersions interface{}   `json:"top_10_module_versions,omitempty"`
+	}{
+		0,
+		make([]interface{}, 30),
+		nil,
+	}
+
+	for i := 0; i < len(mvs.Last30Days); i++ {
+		date := date.AddDate(0, 0, -i)
+		mvs.Last30Days[i] = struct {
+			Date          string `json:"date"`
+			DownloadCount int    `json:"download_count"`
+		}{
+			date.UTC().Format(time.RFC3339),
+			0,
+		}
+	}
+
+	if !strings.Contains(name, "@") {
+		mvs.Top10ModuleVersions = make([]interface{}, 0)
+	}
+
+	statJSON, err := json.Marshal(&mvs)
+	if err != nil {
+		return err
+	}
+
+	res.Header.Set("Content-Type", "application/json; charset=utf-8")
+
+	return res.Write(bytes.NewReader(statJSON))
 }
 
 // hStatsPage handles requests to get statistics page.
