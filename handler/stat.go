@@ -5,6 +5,8 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"path"
 	"strings"
 	"time"
@@ -12,6 +14,7 @@ import (
 	"github.com/aofei/air"
 	"github.com/goproxy/goproxy"
 	"github.com/goproxy/goproxy.cn/base"
+	"github.com/tidwall/gjson"
 )
 
 func init() {
@@ -47,6 +50,10 @@ func hStatSummary(req *air.Request, res *air.Response) error {
 		"%q",
 		base64.StdEncoding.EncodeToString(cache.Checksum()),
 	))
+	res.Header.Set(
+		"Last-Modified",
+		cache.ModTime().UTC().Format(http.TimeFormat),
+	)
 
 	return res.Write(cache)
 }
@@ -74,13 +81,31 @@ func hStatTrend(req *air.Request, res *air.Response) error {
 		"%q",
 		base64.StdEncoding.EncodeToString(cache.Checksum()),
 	))
+	res.Header.Set(
+		"Last-Modified",
+		cache.ModTime().UTC().Format(http.TimeFormat),
+	)
 
 	return res.Write(cache)
 }
 
 // hStat handles requests to query stat.
 func hStat(req *air.Request, res *air.Response) error {
+	const downloadCountBadgeSuffix = "/badges/download-count.svg"
+
 	name := path.Clean(req.Param("*").Value().String())
+
+	date := time.Now().UTC()
+	date = time.Date(
+		date.Year(),
+		date.Month(),
+		date.Day()-1,
+		0,
+		0,
+		0,
+		0,
+		time.UTC,
+	)
 
 	cache, err := qiniuKodoCacher.Cache(
 		req.Context,
@@ -89,50 +114,79 @@ func hStat(req *air.Request, res *air.Response) error {
 	if err == nil {
 		defer cache.Close()
 
-		res.Header.Set("Content-Type", cache.MIMEType())
-		res.Header.Set("ETag", fmt.Sprintf(
-			"%q",
-			base64.StdEncoding.EncodeToString(cache.Checksum()),
-		))
+		if strings.HasSuffix(name, downloadCountBadgeSuffix) {
+			res.Header.Set("Content-Type", cache.MIMEType())
+			res.Header.Set("ETag", fmt.Sprintf(
+				"%q",
+				base64.StdEncoding.
+					EncodeToString(cache.Checksum()),
+			))
+			res.Header.Set(
+				"Last-Modified",
+				cache.ModTime().UTC().Format(http.TimeFormat),
+			)
 
-		return res.Write(cache)
+			return res.Write(cache)
+		}
+
+		b, err := ioutil.ReadAll(cache)
+		if err != nil {
+			return err
+		}
+
+		gjr := gjson.ParseBytes(b)
+
+		mvs := struct {
+			DownloadCount       int64         `json:"download_count"`
+			Last30Days          []interface{} `json:"last_30_days"`
+			Top10ModuleVersions interface{}   `json:"top_10_module_versions,omitempty"`
+		}{
+			gjr.Get("download_count").Int(),
+			make([]interface{}, 30),
+			gjr.Get("top_10_module_versions").Value(),
+		}
+
+		gjrL30DsArray := gjr.Get("last_30_days").Array()
+		for i := 0; i < len(mvs.Last30Days); i++ {
+			date := date.AddDate(0, 0, -i).Format(time.RFC3339)
+			var downloadCount int64
+			for _, gjr := range gjrL30DsArray {
+				if gjr.Get("date").String() != date {
+					continue
+				}
+
+				downloadCount = gjr.Get("download_count").Int()
+			}
+
+			mvs.Last30Days[i] = struct {
+				Date          string `json:"date"`
+				DownloadCount int64  `json:"download_count"`
+			}{
+				date,
+				downloadCount,
+			}
+		}
+
+		statJSON, err := json.Marshal(&mvs)
+		if err != nil {
+			return err
+		}
+
+		res.Header.Set("Content-Type", cache.MIMEType())
+
+		return res.Write(bytes.NewReader(statJSON))
 	} else if err != goproxy.ErrCacheNotFound {
 		return err
 	}
 
 	switch {
-	case strings.HasSuffix(name, "/badges/download-count.svg"):
+	case strings.HasSuffix(name, downloadCountBadgeSuffix):
 		res.Header.Set("Content-Type", "image/svg+xml")
 		return res.WriteFile("unknown-badge.svg")
 	}
 
-	date := time.Now().In(base.TZAsiaShanghai)
-	if date.Hour() < 8 {
-		date = time.Date(
-			date.Year(),
-			date.Month(),
-			date.Day()-2,
-			0,
-			0,
-			0,
-			0,
-			time.UTC,
-		)
-	} else {
-		date = time.Date(
-			date.Year(),
-			date.Month(),
-			date.Day()-1,
-			0,
-			0,
-			0,
-			0,
-			time.UTC,
-		)
-	}
-
 	mvs := struct {
-		DownloadCount       int           `json:"download_count"`
+		DownloadCount       int64         `json:"download_count"`
 		Last30Days          []interface{} `json:"last_30_days"`
 		Top10ModuleVersions interface{}   `json:"top_10_module_versions,omitempty"`
 	}{
@@ -142,12 +196,11 @@ func hStat(req *air.Request, res *air.Response) error {
 	}
 
 	for i := 0; i < len(mvs.Last30Days); i++ {
-		date := date.AddDate(0, 0, -i)
 		mvs.Last30Days[i] = struct {
 			Date          string `json:"date"`
-			DownloadCount int    `json:"download_count"`
+			DownloadCount int64  `json:"download_count"`
 		}{
-			date.UTC().Format(time.RFC3339),
+			date.AddDate(0, 0, -i).Format(time.RFC3339),
 			0,
 		}
 	}

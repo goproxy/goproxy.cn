@@ -25,5 +25,4 @@ require (
 	github.com/tidwall/gjson v1.6.0
 	github.com/tidwall/pretty v1.0.1 // indirect
 	github.com/yuin/goldmark v1.1.26
-	golang.org/x/mod v0.2.0
 )
