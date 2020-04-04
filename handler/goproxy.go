@@ -4,7 +4,9 @@ import (
 	"context"
 	"crypto/hmac"
 	"crypto/sha1"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -12,6 +14,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -121,6 +124,7 @@ type goproxyCacher struct {
 
 	localCacheRoot    string
 	settingContext    context.Context
+	settingMutex      sync.Mutex
 	settingCaches     sync.Map
 	startSetCacheOnce sync.Once
 }
@@ -147,7 +151,11 @@ func (gc *goproxyCacher) startSetCache() {
 
 					return true
 				}
-				defer os.Remove(localCacheFile.Name())
+				defer func() {
+					gc.settingMutex.Lock()
+					os.Remove(localCacheFile.Name())
+					gc.settingMutex.Unlock()
+				}()
 
 				gc.settingCaches.Delete(k)
 
@@ -174,27 +182,40 @@ func (gc *goproxyCacher) startSetCache() {
 func (gc *goproxyCacher) SetCache(ctx context.Context, c goproxy.Cache) error {
 	gc.startSetCacheOnce.Do(gc.startSetCache)
 
-	localCacheFile, err := ioutil.TempFile(gc.localCacheRoot, "")
-	if err != nil {
+	cacheNameChecksum := sha256.Sum256([]byte(c.Name()))
+
+	localCacheFileName := filepath.Join(
+		gc.localCacheRoot,
+		hex.EncodeToString(cacheNameChecksum[:]),
+	)
+
+	gc.settingMutex.Lock()
+
+	if _, err := os.Stat(localCacheFileName); err == nil {
+		gc.settingMutex.Unlock()
+		return nil
+	} else if !os.IsNotExist(err) {
+		gc.settingMutex.Unlock()
 		return err
 	}
 
-	hijackedLocalCacheRemoval := false
-	defer func() {
-		if !hijackedLocalCacheRemoval {
-			os.Remove(localCacheFile.Name())
-		}
-	}()
+	localCacheFile, err := os.Create(localCacheFileName)
+	if err != nil {
+		gc.settingMutex.Unlock()
+		return err
+	}
+
+	gc.settingMutex.Unlock()
 
 	if _, err := io.Copy(localCacheFile, c); err != nil {
+		os.Remove(localCacheFile.Name())
 		return err
 	}
 
 	if err := localCacheFile.Close(); err != nil {
+		os.Remove(localCacheFile.Name())
 		return err
 	}
-
-	hijackedLocalCacheRemoval = true
 
 	gc.settingCaches.Store(localCacheFile.Name(), c)
 
