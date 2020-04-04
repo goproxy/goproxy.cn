@@ -10,10 +10,10 @@ require (
 	github.com/air-gases/redirector v0.15.2
 	github.com/aofei/air v0.15.2
 	github.com/fsnotify/fsnotify v1.4.9
-	github.com/goproxy/goproxy v0.0.0-20200326092349-8b22ef89a531
+	github.com/goproxy/goproxy v0.0.0-20200404184308-f3bb12b279d4
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
-	github.com/pelletier/go-toml v1.6.0 // indirect
+	github.com/pelletier/go-toml v1.7.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.18.0
 	github.com/spf13/afero v1.2.2 // indirect
@@ -24,5 +24,5 @@ require (
 	github.com/tdewolff/minify/v2 v2.7.3 // indirect
 	github.com/tidwall/gjson v1.6.0
 	github.com/tidwall/pretty v1.0.1 // indirect
-	github.com/yuin/goldmark v1.1.26
+	github.com/yuin/goldmark v1.1.27
 )
