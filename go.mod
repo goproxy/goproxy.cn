@@ -18,9 +18,9 @@ require (
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/spf13/viper v1.6.2
+	github.com/spf13/viper v1.6.3
 	github.com/tidwall/gjson v1.6.0
 	github.com/tidwall/pretty v1.0.1 // indirect
 	github.com/yuin/goldmark v1.1.27
-	golang.org/x/sys v0.0.0-20200408040146-ea54a3c99b9b // indirect
+	golang.org/x/sys v0.0.0-20200409092240-59c9f1ba88fa // indirect
 )

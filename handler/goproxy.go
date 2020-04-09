@@ -55,7 +55,7 @@ func init() {
 
 	goproxyLocalCacheRoot, err := ioutil.TempDir(
 		goproxyViper.GetString("local_cache_root"),
-		"",
+		"goproxy-china-local-caches",
 	)
 	if err != nil {
 		base.Logger.Fatal().Err(err).
