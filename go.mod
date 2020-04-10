@@ -3,12 +3,12 @@ module github.com/goproxy/goproxy.cn
 go 1.14
 
 require (
-	github.com/air-gases/cacheman v0.10.3
-	github.com/air-gases/defibrillator v0.15.3
-	github.com/air-gases/limiter v0.15.3
-	github.com/air-gases/logger v0.15.3
-	github.com/air-gases/redirector v0.15.3
-	github.com/aofei/air v0.15.3
+	github.com/air-gases/cacheman v0.10.4
+	github.com/air-gases/defibrillator v0.15.4
+	github.com/air-gases/limiter v0.15.4
+	github.com/air-gases/logger v0.15.4
+	github.com/air-gases/redirector v0.15.4
+	github.com/aofei/air v0.15.4
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/goproxy/goproxy v0.0.0-20200404184308-f3bb12b279d4
 	github.com/pelletier/go-toml v1.7.0 // indirect
@@ -22,5 +22,4 @@ require (
 	github.com/tidwall/gjson v1.6.0
 	github.com/tidwall/pretty v1.0.1 // indirect
 	github.com/yuin/goldmark v1.1.27
-	golang.org/x/sys v0.0.0-20200409092240-59c9f1ba88fa // indirect
 )
