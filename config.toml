@@ -23,10 +23,7 @@ kodo_bucket_endpoint = "<KODO_BUCKET_ENDPOINT>"
 # Goproxy
 [goproxy]
 go_bin_name = "go"
-go_bin_max_workers = 8
-cacher_max_cache_bytes = 0
 proxied_sumdbs = ["sum.golang.org"]
-insecure_mode = false
 timeout = "60s"
 auto_redirect = false
 local_cache_root = "/tmp"
