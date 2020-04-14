@@ -187,7 +187,7 @@
 				<div class="card-body">
 					<p>Get the badge for the total download of the specified module in the service.</p>
 					<pre><code class="language-http">GET /stats/&lt;module-path&gt;/badges/download-count.svg</code></pre>
-					<p>The path parameter <code>&lt;trend&gt;</code> is <span class="text-danger">REQUIRED</span> and has three optional values: <code>latest</code> (latest trend), <code>last-7-days</code> (trend in the last 7 days), and <code>last-30-days</code> (trend in the last 30 days).</p>
+					<p>The path parameter <code>&lt;module-path&gt;</code> is <span class="text-danger">REQUIRED</span>, for example: <code>golang.org/x/text</code>.<p>
 					<p>Example request URL: <a href="https://goproxy.cn/stats/golang.org/x/text/badges/download-count.svg" target="_blank">goproxy.cn/stats/golang.org/x/text/badges/download-count.svg</a></p>
 					<p>Example response body:</p>
 					<p><img src="https://goproxy.cn/stats/golang.org/x/text/badges/download-count.svg"></p>
