@@ -33,7 +33,7 @@ var (
 		BucketName: qiniuViper.GetString("kodo_bucket_name"),
 	}
 
-	// getHeadMethods is an array contains the GET and the HEAD methods.
+	// getHeadMethods is an array contains the GET and HEAD methods.
 	getHeadMethods = []string{http.MethodGet, http.MethodHead}
 
 	// hourlyCachemanGas is used to manage the Cache-Control header.
