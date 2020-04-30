@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"log"
 	"os"
 	"os/signal"
@@ -18,6 +19,10 @@ import (
 )
 
 func main() {
+	base.Air.TLSConfig = &tls.Config{
+		MinVersion: tls.VersionTLS12,
+	}
+
 	base.Air.NotFoundHandler = handler.NotFoundHandler
 	base.Air.MethodNotAllowedHandler = handler.MethodNotAllowedHandler
 	base.Air.ErrorHandler = handler.Error
