@@ -19,8 +19,10 @@ import (
 )
 
 func main() {
-	base.Air.TLSConfig = &tls.Config{
-		MinVersion: tls.VersionTLS12,
+	if !base.Air.DebugMode {
+		base.Air.TLSConfig = &tls.Config{
+			MinVersion: tls.VersionTLS12,
+		}
 	}
 
 	base.Air.NotFoundHandler = handler.NotFoundHandler
