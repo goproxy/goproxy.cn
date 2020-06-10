@@ -89,7 +89,7 @@ func hGoproxy(req *air.Request, res *air.Response) error {
 
 	req.Context = ctx
 
-	name := strings.TrimLeft(path.Clean(req.RawPath()), "/")
+	name := strings.TrimPrefix(path.Clean(req.RawPath()), "/")
 	if !goproxyAutoRedirect || !isAutoRedirectableGoproxyCache(name) {
 		hhGoproxy.ServeHTTP(res.HTTPResponseWriter(), req.HTTPRequest())
 		return nil
