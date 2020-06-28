@@ -10,7 +10,7 @@ require (
 	github.com/air-gases/redirector v0.17.1
 	github.com/aofei/air v0.17.1
 	github.com/fsnotify/fsnotify v1.4.9
-	github.com/goproxy/goproxy v0.1.0
+	github.com/goproxy/goproxy v0.1.1
 	github.com/pelletier/go-toml v1.8.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.19.0
@@ -22,4 +22,5 @@ require (
 	github.com/tidwall/gjson v1.6.0
 	github.com/tidwall/pretty v1.0.1 // indirect
 	github.com/yuin/goldmark v1.1.32
+	google.golang.org/protobuf v1.25.0 // indirect
 )
