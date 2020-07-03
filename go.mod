@@ -10,7 +10,7 @@ require (
 	github.com/air-gases/redirector v0.18.0
 	github.com/aofei/air v0.18.0
 	github.com/fsnotify/fsnotify v1.4.9
-	github.com/goproxy/goproxy v0.1.2
+	github.com/goproxy/goproxy v0.1.3
 	github.com/pelletier/go-toml v1.8.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.19.0
