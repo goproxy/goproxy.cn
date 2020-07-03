@@ -31,13 +31,13 @@ var (
 	// hhGoproxy is an instance of the `goproxy.Goproxy`.
 	hhGoproxy = goproxy.New()
 
-	// goproxyTimeout is the the maximum execution duration allowed for a Go
-	// module proxy request.
-	goproxyTimeout = goproxyViper.GetDuration("timeout")
-
-	// goproxyAutoRedirect indicates whether the automatic redirection is
-	// enabled for Go module proxy requests.
+	// goproxyAutoRedirect indicates whether the automatic redirection
+	// feature is enabled for Goproxy.
 	goproxyAutoRedirect = goproxyViper.GetBool("auto_redirect")
+
+	// goproxyAutoRedirectMinSize is the minimum size of the Goproxy used to
+	// limit at least how big Goproxy cache can be automatically redirected.
+	goproxyAutoRedirectMinSize = goproxyViper.GetInt64("auto_redirect_min_size")
 
 	// qiniuKodoBucketEndpoint is the bucket endpoint for the Qiniu Cloud
 	// Kodo.
@@ -84,11 +84,6 @@ func init() {
 
 // hGoproxy handles requests to play with Go module proxy.
 func hGoproxy(req *air.Request, res *air.Response) error {
-	ctx, cancel := context.WithTimeout(req.Context, goproxyTimeout)
-	defer cancel()
-
-	req.Context = ctx
-
 	name := strings.TrimPrefix(path.Clean(req.RawPath()), "/")
 	if !goproxyAutoRedirect || !isAutoRedirectableGoproxyCache(name) {
 		hhGoproxy.ServeHTTP(res.HTTPResponseWriter(), req.HTTPRequest())
@@ -105,8 +100,12 @@ func hGoproxy(req *air.Request, res *air.Response) error {
 
 		return nil
 	}
+	defer cache.Close()
 
-	cache.Close() // Just check for existence, no need to read
+	if cache.Size() < goproxyAutoRedirectMinSize {
+		hhGoproxy.ServeHTTP(res.HTTPResponseWriter(), req.HTTPRequest())
+		return nil
+	}
 
 	e := time.Now().Add(24 * time.Hour).Unix()
 	u := fmt.Sprintf("%s/%s?e=%d", qiniuKodoBucketEndpoint, name, e)
