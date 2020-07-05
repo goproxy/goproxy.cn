@@ -55,7 +55,7 @@ func init() {
 	}
 
 	if _, err := base.Cron.AddFunc(
-		"0 */10 * * * *", // every 10 minutes
+		"0 */10 * * * *", // Every 10 minutes
 		updateModuleVersionsCount,
 	); err != nil {
 		base.Logger.Fatal().Err(err).

@@ -18,6 +18,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 
 	"github.com/aofei/air"
 	"github.com/goproxy/goproxy"
@@ -88,6 +89,10 @@ func hGoproxy(req *air.Request, res *air.Response) error {
 	if !goproxyAutoRedirect || !isAutoRedirectableGoproxyCache(name) {
 		hhGoproxy.ServeHTTP(res.HTTPResponseWriter(), req.HTTPRequest())
 		return nil
+	}
+
+	if !utf8.ValidString(name) {
+		return req.Air.NotFoundHandler(req, res)
 	}
 
 	cache, err := hhGoproxy.Cacher.Cache(req.Context, name)
