@@ -12,6 +12,7 @@ import (
 	"github.com/aofei/air"
 	"github.com/goproxy/goproxy.cn/base"
 	"github.com/goproxy/goproxy/cacher"
+	"github.com/robfig/cron/v3"
 	"github.com/tidwall/gjson"
 )
 
@@ -48,15 +49,24 @@ var (
 )
 
 func init() {
-	updateModuleVersionsCount()
-	if moduleVersionCount == 0 {
-		base.Logger.Fatal().
+	if err := updateModuleVersionsCount(); err != nil {
+		base.Logger.Fatal().Err(err).
 			Msg("failed to initialize module version count")
 	}
 
-	if _, err := base.Cron.AddFunc(
-		"0 */10 * * * *", // Every 10 minutes
-		updateModuleVersionsCount,
+	if _, err := base.Cron.AddJob(
+		"*/10 * * * *", // Every 10 minutes
+		cron.NewChain(
+			cron.SkipIfStillRunning(cron.DiscardLogger),
+		).Then(cron.FuncJob(func() {
+			err := updateModuleVersionsCount()
+			if err == nil {
+				return
+			}
+
+			base.Logger.Error().Err(err).
+				Msg("failed to update module version count")
+		})),
 	); err != nil {
 		base.Logger.Fatal().Err(err).
 			Msg("failed to add module version count update cron " +
@@ -112,27 +122,25 @@ func hIndexPage(req *air.Request, res *air.Response) error {
 }
 
 // updateModuleVersionsCount updates the `moduleVersionCount`.
-func updateModuleVersionsCount() {
+func updateModuleVersionsCount() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	defer base.Air.RemoveShutdownJob(base.Air.AddShutdownJob(cancel))
 
 	cache, err := qiniuKodoCacher.Cache(ctx, "stats/summary")
 	if err != nil {
-		base.Logger.Error().Err(err).
-			Msg("failed to update module version count")
-		return
+		return err
 	}
 	defer cache.Close()
 
 	b, err := ioutil.ReadAll(cache)
 	if err != nil {
-		base.Logger.Error().Err(err).
-			Msg("failed to update module version count")
-		return
+		return err
 	}
 
 	moduleVersionCount = gjson.GetBytes(b, "module_version_count").Int()
+
+	return nil
 }
 
 // thousandsCommaSeperated returns a thousands comma seperated string for the n.

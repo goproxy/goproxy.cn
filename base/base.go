@@ -26,11 +26,7 @@ var (
 	Air = air.New()
 
 	// Cron is the global instance of the `cron.Cron`.
-	Cron = cron.New(
-		cron.WithLocation(time.UTC),
-		cron.WithSeconds(),
-		cron.WithLogger(cron.PrintfLogger(log.New(Logger, "", 0))),
-	)
+	Cron *cron.Cron
 )
 
 func init() {
@@ -63,6 +59,12 @@ func init() {
 			Msg("failed to unmarshal air configuration items")
 	}
 
+	Cron = cron.New(
+		cron.WithLocation(time.UTC),
+		cron.WithLogger(
+			cron.PrintfLogger(log.New(Logger, "cron: ", 0)),
+		),
+	)
 	Cron.Start()
 	Air.AddShutdownJob(func() {
 		<-Cron.Stop().Done()

@@ -167,7 +167,7 @@ func hStat(req *air.Request, res *air.Response) error {
 			}
 		}
 
-		statJSON, err := json.Marshal(&mvs)
+		statJSON, err := json.Marshal(mvs)
 		if err != nil {
 			return err
 		}
@@ -209,7 +209,7 @@ func hStat(req *air.Request, res *air.Response) error {
 		mvs.Top10ModuleVersions = make([]interface{}, 0)
 	}
 
-	statJSON, err := json.Marshal(&mvs)
+	statJSON, err := json.Marshal(mvs)
 	if err != nil {
 		return err
 	}
