@@ -86,14 +86,14 @@ func init() {
 	base.Air.BATCH(getHeadMethods, "/", hIndexPage)
 }
 
-// NotFoundHandler handles not found.
-func NotFoundHandler(req *air.Request, res *air.Response) error {
+// NotFound returns not found error.
+func NotFound(req *air.Request, res *air.Response) error {
 	res.Status = http.StatusNotFound
 	return errors.New(strings.ToLower(http.StatusText(res.Status)))
 }
 
-// MethodNotAllowedHandler handles method not allowed.
-func MethodNotAllowedHandler(req *air.Request, res *air.Response) error {
+// MethodNotAllowed returns method not allowed error.
+func MethodNotAllowed(req *air.Request, res *air.Response) error {
 	res.Status = http.StatusMethodNotAllowed
 	return errors.New(strings.ToLower(http.StatusText(res.Status)))
 }

@@ -26,8 +26,8 @@ func main() {
 		}
 	}
 
-	base.Air.NotFoundHandler = handler.NotFoundHandler
-	base.Air.MethodNotAllowedHandler = handler.MethodNotAllowedHandler
+	base.Air.NotFoundHandler = handler.NotFound
+	base.Air.MethodNotAllowedHandler = handler.MethodNotAllowed
 	base.Air.ErrorHandler = handler.Error
 	base.Air.ErrorLogger = log.New(base.Logger, "", 0)
 
