@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"unicode/utf8"
 
 	"github.com/air-gases/defibrillator"
 	"github.com/air-gases/limiter"
@@ -42,10 +43,16 @@ func main() {
 		limiter.BodySizeGas(limiter.BodySizeGasConfig{
 			MaxBytes: 1 << 20,
 		}),
-	}
+		func(next air.Handler) air.Handler {
+			return func(req *air.Request, res *air.Response) error {
+				if !utf8.ValidString(req.Path) {
+					return req.Air.NotFoundHandler(req, res)
+				}
 
-	shutdownChan := make(chan os.Signal, 1)
-	signal.Notify(shutdownChan, os.Interrupt, syscall.SIGTERM)
+				return next(req, res)
+			}
+		},
+	}
 
 	go func() {
 		if err := base.Air.Serve(); err != nil {
@@ -54,6 +61,8 @@ func main() {
 		}
 	}()
 
+	shutdownChan := make(chan os.Signal, 1)
+	signal.Notify(shutdownChan, os.Interrupt, syscall.SIGTERM)
 	<-shutdownChan
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
