@@ -49,9 +49,8 @@ func init() {
 	if Viper.GetBool("air.debug_mode") {
 		Logger = Logger.Level(zerolog.DebugLevel)
 	} else {
-		ll, _ := zerolog.
-			ParseLevel(Viper.GetString("zerolog.logger_level"))
-		Logger = Logger.Level(ll)
+		l, _ := zerolog.ParseLevel(Viper.GetString("zerolog.level"))
+		Logger = Logger.Level(l)
 	}
 
 	if err := Viper.UnmarshalKey("air", Air); err != nil {
