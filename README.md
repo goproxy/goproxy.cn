@@ -58,6 +58,15 @@ $ echo "export GOPROXY=https://goproxy.cn" >> ~/.profile
 $ source ~/.profile
 ```
 
+or macOS Catalina(10.15) above
+
+```zsh
+$ touch ~/.zshrc
+$ echo "export GO111MODULE=on" >> ~/.zshrc
+$ echo "export GOPROXY=https://goproxy.cn" >> ~/.zshrc
+$ source ~/.zshrc
+```
+
 done.
 
 ### Windows
