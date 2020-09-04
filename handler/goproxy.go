@@ -45,9 +45,6 @@ var (
 )
 
 func init() {
-	ctx, cancel := context.WithCancel(context.Background())
-	base.Air.AddShutdownJob(cancel)
-
 	if err := goproxyViper.Unmarshal(hhGoproxy); err != nil {
 		base.Logger.Fatal().Err(err).
 			Msg("failed to unmarshal goproxy configuration items")
@@ -74,7 +71,6 @@ func init() {
 	hhGoproxy.Cacher = &goproxyCacher{
 		Cacher:         qiniuKodoCacher,
 		localCacheRoot: goproxyLocalCacheRoot,
-		settingContext: ctx,
 	}
 
 	hhGoproxy.ErrorLogger = log.New(base.Logger, "", 0)
@@ -122,7 +118,6 @@ type goproxyCacher struct {
 	goproxy.Cacher
 
 	localCacheRoot    string
-	settingContext    context.Context
 	settingMutex      sync.Mutex
 	settingCaches     sync.Map
 	startSetCacheOnce sync.Once
@@ -133,12 +128,12 @@ func (gc *goproxyCacher) startSetCache() {
 	go func() {
 		for {
 			time.Sleep(time.Second)
-			if gc.settingContext.Err() != nil {
+			if base.Context.Err() != nil {
 				return
 			}
 
 			gc.settingCaches.Range(func(k, v interface{}) bool {
-				if gc.settingContext.Err() != nil {
+				if base.Context.Err() != nil {
 					return false
 				}
 
@@ -160,7 +155,7 @@ func (gc *goproxyCacher) startSetCache() {
 
 				cache := v.(goproxy.Cache)
 				gc.Cacher.SetCache(
-					gc.settingContext,
+					base.Context,
 					&goproxyCache{
 						File:     localCacheFile,
 						name:     cache.Name(),

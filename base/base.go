@@ -1,7 +1,7 @@
 package base
 
 import (
-	"flag"
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -12,6 +12,7 @@ import (
 	"github.com/aofei/air"
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
@@ -25,13 +26,16 @@ var (
 	// Air is the global instace of the `air.Air`.
 	Air = air.New()
 
+	// Context is the global instance of the `context.Context`.
+	Context context.Context
+
 	// Cron is the global instance of the `cron.Cron`.
 	Cron *cron.Cron
 )
 
 func init() {
-	cf := flag.String("config", "config.toml", "configuration file")
-	flag.Parse()
+	cf := pflag.StringP("config", "c", "config.toml", "configuration file")
+	pflag.Parse()
 
 	ext := filepath.Ext(*cf)
 	Viper.AddConfigPath(filepath.Dir(*cf))
@@ -57,6 +61,10 @@ func init() {
 		Logger.Fatal().Err(err).
 			Msg("failed to unmarshal air configuration items")
 	}
+
+	var cancel context.CancelFunc
+	Context, cancel = context.WithCancel(context.Background())
+	Air.AddShutdownJob(cancel)
 
 	Cron = cron.New(
 		cron.WithLocation(time.UTC),

@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -123,11 +122,7 @@ func hIndexPage(req *air.Request, res *air.Response) error {
 
 // updateModuleVersionsCount updates the `moduleVersionCount`.
 func updateModuleVersionsCount() error {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	defer base.Air.RemoveShutdownJob(base.Air.AddShutdownJob(cancel))
-
-	cache, err := qiniuKodoCacher.Cache(ctx, "stats/summary")
+	cache, err := qiniuKodoCacher.Cache(base.Context, "stats/summary")
 	if err != nil {
 		return err
 	}
