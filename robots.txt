@@ -5,3 +5,4 @@ Disallow: /*/@v/*.info
 Disallow: /*/@v/*.mod
 Disallow: /*/@v/*.zip
 Disallow: /sumdb/
+Disallow: /stats/
