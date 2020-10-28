@@ -84,7 +84,7 @@ C:\> $env:GOPROXY = "https://goproxy.cn"
 
 ### Goproxy 中国在中国是合法的吗？
 
-Goproxy 中国是一个由商业支持的项目而不是一个个人项目。并且它已经 ICP 备案在中华人民共和国工业和信息化部（ICP 备案号：[沪ICP备11037377号-56](http://beian.miit.gov.cn)），这也就意味着它在中国完全合法。
+Goproxy 中国是一个由商业支持的项目而不是一个个人项目。并且它已经 ICP 备案在中华人民共和国工业和信息化部（ICP 备案号：[沪ICP备11037377号-56](https://beian.miit.gov.cn)），这也就意味着它在中国完全合法。
 
 ### 为什么不使用 [proxy.golang.org](https://proxy.golang.org)？
 

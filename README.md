@@ -114,7 +114,7 @@ China already supports
 
 Goproxy China is a business-supported project rather than a personal project.
 And it has been ICP filed in the MIIT of China (ICP license:
-[沪ICP备11037377号-56](http://beian.miit.gov.cn)), which means it's **fully
+[沪ICP备11037377号-56](https://beian.miit.gov.cn)), which means it's **fully
 legal** in China.
 
 ### Why not use the [proxy.golang.org](https://proxy.golang.org)?
