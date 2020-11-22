@@ -51,7 +51,7 @@
 				<div class="card-body">
 					<p>获取服务中的模块趋势，如最近一段时间内最活跃的最多前 1000 个模块。</p>
 					<pre><code class="language-http">GET /stats/trends/&lt;trend&gt;</code></pre>
-					<p>路径参数 <code>&lt;trend&gt;</code> 是<span class="text-danger">必填的</span>，它拥有三个可选值：<code>latest</code>（最新趋势）、<code>last-7-days</code>（最近 7 天的趋势）和 <code>last-30-days</code>（最近 30 天的趋势）。</p>
+					<p>路径参数 <code>&lt;trend&gt;</code> 是<span class="text-danger">必填的</span>，它拥有三个选项：<code>latest</code>（最新趋势）、<code>last-7-days</code>（最近 7 天的趋势）和 <code>last-30-days</code>（最近 30 天的趋势）。</p>
 					<p>示例请求 URL：<a href="https://goproxy.cn/stats/trends/latest" target="_blank">goproxy.cn/stats/trends/latest</a></p>
 					<p>示例响应主体：</p>
 					<pre><code class="language-json">[
