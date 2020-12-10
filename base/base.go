@@ -45,9 +45,8 @@ func init() {
 		panic(fmt.Errorf("failed to read configuration file: %v", err))
 	}
 
-	zerolog.TimeFieldFormat = ""
-	Logger = Logger.
-		With().
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	Logger = Logger.With().
 		Str("app_name", Viper.GetString("air.app_name")).
 		Logger()
 	if Viper.GetBool("air.debug_mode") {

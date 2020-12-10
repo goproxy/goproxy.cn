@@ -60,7 +60,7 @@ func hStatSummary(req *air.Request, res *air.Response) error {
 
 // hStatTrend handles requests to query stat trend.
 func hStatTrend(req *air.Request, res *air.Response) error {
-	trend := req.Param("Trend").Value().String()
+	trend := req.ParamValue("Trend").String()
 	switch trend {
 	case "latest", "last-7-days", "last-30-days":
 	default:
@@ -93,7 +93,7 @@ func hStatTrend(req *air.Request, res *air.Response) error {
 func hStat(req *air.Request, res *air.Response) error {
 	const downloadCountBadgeSuffix = "/badges/download-count.svg"
 
-	name := path.Clean(req.Param("*").Value().String())
+	name := path.Clean(req.ParamValue("*").String())
 
 	date := time.Now().UTC()
 	date = time.Date(

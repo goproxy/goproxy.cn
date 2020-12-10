@@ -24,7 +24,7 @@ var (
 
 	// parseFAQsOnce is used to guarantee that the `parseFAQs` will only be
 	// called once.
-	parseFAQsOnce sync.Once
+	parseFAQsOnce = &sync.Once{}
 )
 
 func init() {
@@ -60,7 +60,7 @@ func init() {
 		for {
 			select {
 			case <-faqsWatcher.Events:
-				parseFAQsOnce = sync.Once{}
+				parseFAQsOnce = &sync.Once{}
 			case err := <-faqsWatcher.Errors:
 				base.Logger.Error().Err(err).
 					Msg("faq watcher error")
