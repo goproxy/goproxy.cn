@@ -2,7 +2,7 @@ package handler
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -128,7 +128,7 @@ func updateModuleVersionsCount() error {
 	}
 	defer cache.Close()
 
-	b, err := ioutil.ReadAll(cache)
+	b, err := io.ReadAll(cache)
 	if err != nil {
 		return err
 	}

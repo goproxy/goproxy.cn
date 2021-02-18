@@ -3,7 +3,7 @@ package handler
 import (
 	"bytes"
 	"html/template"
-	"io/ioutil"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"sort"
@@ -37,10 +37,10 @@ func init() {
 			Msg("failed to watch faq directory")
 	}
 
-	if err := filepath.Walk(
+	if err := filepath.WalkDir(
 		"faqs",
-		func(p string, fi os.FileInfo, err error) error {
-			if fi == nil || !fi.IsDir() {
+		func(p string, de fs.DirEntry, err error) error {
+			if de == nil || !de.IsDir() {
 				return err
 			}
 
@@ -93,10 +93,10 @@ func hFaqPage(req *air.Request, res *air.Response) error {
 // parseFAQs parses frequently asked questions.
 func parseFAQs() {
 	var dirs []string
-	if err := filepath.Walk(
+	if err := filepath.WalkDir(
 		"faqs",
-		func(p string, fi os.FileInfo, err error) error {
-			if fi == nil || !fi.IsDir() {
+		func(p string, de fs.DirEntry, err error) error {
+			if de == nil || !de.IsDir() {
 				return err
 			}
 
@@ -113,10 +113,10 @@ func parseFAQs() {
 	nfaqs := make(map[string][]model.QA, len(dirs))
 	for _, dir := range dirs {
 		var qas []model.QA
-		if err := filepath.Walk(
+		if err := filepath.WalkDir(
 			dir,
-			func(p string, fi os.FileInfo, err error) error {
-				if fi == nil || fi.IsDir() {
+			func(p string, de fs.DirEntry, err error) error {
+				if de == nil || de.IsDir() {
 					return err
 				}
 
@@ -125,7 +125,7 @@ func parseFAQs() {
 					return err
 				}
 
-				b, err := ioutil.ReadFile(p)
+				b, err := os.ReadFile(p)
 				if err != nil {
 					return err
 				}

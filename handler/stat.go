@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"path"
 	"strings"
@@ -129,7 +129,7 @@ func hStat(req *air.Request, res *air.Response) error {
 			return res.Write(cache)
 		}
 
-		b, err := ioutil.ReadAll(cache)
+		b, err := io.ReadAll(cache)
 		if err != nil {
 			return err
 		}

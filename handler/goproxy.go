@@ -10,7 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"io/fs"
 	"log"
 	"os"
 	"path"
@@ -50,7 +50,7 @@ func init() {
 			Msg("failed to unmarshal goproxy configuration items")
 	}
 
-	goproxyLocalCacheRoot, err := ioutil.TempDir(
+	goproxyLocalCacheRoot, err := os.MkdirTemp(
 		goproxyViper.GetString("local_cache_root"),
 		"goproxy-china-local-caches",
 	)
@@ -139,7 +139,7 @@ func (gc *goproxyCacher) startSetCache() {
 
 				localCacheFile, err := os.Open(k.(string))
 				if err != nil {
-					if os.IsNotExist(err) {
+					if errors.Is(err, fs.ErrNotExist) {
 						gc.settingCaches.Delete(k)
 					}
 
@@ -188,7 +188,7 @@ func (gc *goproxyCacher) SetCache(ctx context.Context, c goproxy.Cache) error {
 	if _, err := os.Stat(localCacheFileName); err == nil {
 		gc.settingMutex.Unlock()
 		return nil
-	} else if !os.IsNotExist(err) {
+	} else if !errors.Is(err, fs.ErrNotExist) {
 		gc.settingMutex.Unlock()
 		return err
 	}
