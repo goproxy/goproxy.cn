@@ -4,7 +4,7 @@
 "FAQ" = "常见问题"
 "Goproxy China is now trying to collect as many questions as possible about the problems Gophers have when working with Go moduels and try to give the best answers. By doing this, we believe we can better help everyone use Go moduels." = "Goproxy 中国现在正试图尽可能多地收集各种关于大家在使用 Go 模块时所遇见的问题并尽力给出最棒的解答。通过这样做，我们相信我们可以更好地帮助大家去使用 Go 模块。"
 "Goproxy China" = "Goproxy 中国"
-"If you can't find the answer to the question you want to ask below, you can always post your question by clicking the \"New Question\" button below. Please pay attention to follow the issue template we have prepared for you, that will help us better answer your question." = "如果你无法在下方找到你想要问的问题的解答，那么可以随时通过点击下方的“新建问题”按钮来发表你的问题。请注意遵循我们为你准备好的 Issue 模版，那样可以帮助我们更好地解答你的问题。"
+"If you can't find the answer to the question you want to ask below, you can always post your question by clicking the <code>New Question</code> button below. Please pay attention to follow the issue template we have prepared for you, that will help us better answer your question." = "如果你无法在下方找到你想要问的问题的解答，那么可以随时通过点击下方的<code>新建问题</code>按钮来发表你的问题。请注意遵循我们为你准备好的 Issue 模版，那样可以帮助我们更好地解答你的问题。"
 "Index" = "首页"
 "New Question" = "新建问题"
 "Qiniu Cloud, Inc." = "七牛云"

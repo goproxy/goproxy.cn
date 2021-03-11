@@ -31,8 +31,9 @@ github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRF
 github.com/allegro/bigcache v1.2.1-0.20190218064605-e24eb225f156/go.mod h1:Cb/ax3seSYIx7SuZdm2G2xzfwmv3TPSk2ucNfQESPXM=
 github.com/allegro/bigcache v1.2.1 h1:hg1sY1raCwic3Vnsvje6TT7/pnZba83LeFck5NrFKSc=
 github.com/allegro/bigcache v1.2.1/go.mod h1:Cb/ax3seSYIx7SuZdm2G2xzfwmv3TPSk2ucNfQESPXM=
-github.com/aofei/air v0.21.3 h1:bGdor6YuP6k51S7muw67l4RfZzucUKyKPXpaPuE2Wls=
 github.com/aofei/air v0.21.3/go.mod h1:gYmYFOAHsQvOcG35qFgJIUhTYl8Z9SzfxzIkeYUhGAQ=
+github.com/aofei/air v0.21.4-0.20210311192843-02db42959f21 h1:8a9xMXlNgwhYnP9FUo+laDkBdtEZp2QFAHLBwMgtiiw=
+github.com/aofei/air v0.21.4-0.20210311192843-02db42959f21/go.mod h1:gYmYFOAHsQvOcG35qFgJIUhTYl8Z9SzfxzIkeYUhGAQ=
 github.com/aofei/mimesniffer v1.1.6 h1:jueF5siJzI9sGanC9gjSKMCFKQvH93TNOHJ7XRwQmzw=
 github.com/aofei/mimesniffer v1.1.6/go.mod h1:jUnb40YhdVAhs+rZ5yyWJcBS1afj7F0RZudl98tOSHM=
 github.com/armon/circbuf v0.0.0-20150827004946-bbbad097214e/go.mod h1:3U/XgcO3hCbHZ8TKRvWD2dDTCfh9M9ya+I9JpbB7O8o=

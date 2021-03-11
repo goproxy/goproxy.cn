@@ -8,7 +8,7 @@ require (
 	github.com/air-gases/limiter v0.21.3
 	github.com/air-gases/logger v0.21.3
 	github.com/air-gases/redirector v0.21.3
-	github.com/aofei/air v0.21.3
+	github.com/aofei/air v0.21.4-0.20210311192843-02db42959f21
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/goproxy/goproxy v0.3.0
 	github.com/magiconair/properties v1.8.4 // indirect
