@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/air-gases/cacheman v0.16.3
 	github.com/air-gases/defibrillator v0.21.3
+	github.com/air-gases/langman v0.8.3
 	github.com/air-gases/limiter v0.21.3
 	github.com/air-gases/logger v0.21.3
 	github.com/air-gases/redirector v0.21.3

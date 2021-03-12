@@ -36,3 +36,9 @@ pre code {
 		font-size: 2.5rem;
 	}
 }
+
+.language-item-selected,
+.language-item-selected:hover {
+	color: #5a5a5a;
+	font-weight: bold;
+}

@@ -10,6 +10,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/air-gases/defibrillator"
+	"github.com/air-gases/langman"
 	"github.com/air-gases/limiter"
 	"github.com/air-gases/logger"
 	"github.com/air-gases/redirector"
@@ -45,6 +46,12 @@ func main() {
 				return next(req, res)
 			}
 		},
+	}
+
+	base.Air.Gases = []air.Gas{
+		langman.Gas(langman.GasConfig{
+			CookieMaxAge: 31536000,
+		}),
 	}
 
 	go func() {

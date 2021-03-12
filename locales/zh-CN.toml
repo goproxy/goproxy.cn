@@ -1,5 +1,4 @@
 "Aofei Sheng" = "盛傲飞"
-"Back to top" = "返回顶部"
 "Contact" = "联系我们"
 "FAQ" = "常见问题"
 "Goproxy China is now trying to collect as many questions as possible about the problems Gophers have when working with Go moduels and try to give the best answers. By doing this, we believe we can better help everyone use Go moduels." = "Goproxy 中国现在正试图尽可能多地收集各种关于大家在使用 Go 模块时所遇见的问题并尽力给出最棒的解答。通过这样做，我们相信我们可以更好地帮助大家去使用 Go 模块。"
@@ -13,5 +12,6 @@
 "Table of Contents" = "目录"
 "The most trusted Go module proxy in China." = "中国最可靠的 Go 模块代理。"
 "https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=new-question.md&title=Question%3A+" = "https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=new-question.zh-CN.md&title=问题："
+"i18n.locale" = "简体中文"
 "index.html" = "index.zh-CN.html"
 "stats.html" = "stats.zh-CN.html"

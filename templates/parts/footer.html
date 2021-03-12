@@ -1,4 +1,11 @@
 <footer class="container">
-	<p class="float-right"><a href="#">{{locstr "Back to top"}}</a></p>
-	<p>&copy; {{locstr "Qiniu Cloud, Inc."}} &middot; <a href="https://beian.miit.gov.cn" target="_blank">沪ICP备11037377号-56</a></p>
+	<p>
+		&copy; {{locstr "Qiniu Cloud, Inc."}}
+		&middot;
+		<a href="https://beian.miit.gov.cn" target="_blank">沪ICP备11037377号-56</a>
+		&middot;
+		<a class="language-item {{if (eq (locstr "i18n.locale") "English")}}language-item-selected{{end}}" href="javascript:;" tag="en-US">English</a>
+		&middot;
+		<a class="language-item {{if (eq (locstr "i18n.locale") "简体中文")}}language-item-selected{{end}}" href="javascript:;" tag="zh-CN">简体中文</a>
+	</p>
 </footer>

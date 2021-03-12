@@ -20,6 +20,8 @@ github.com/air-gases/cacheman v0.16.3 h1:5q0WgSvggYKWbN4L1X46UoBTPJNp4BJR1BDyDLE
 github.com/air-gases/cacheman v0.16.3/go.mod h1:Q4zS72POJkbO/GJOnFbYmCupwJmzhgZ2zWJoLMP9xXE=
 github.com/air-gases/defibrillator v0.21.3 h1:Ps6bdk/RXvELNXbhD9b6kqhpj5qOeQWbtkroaRSMj9U=
 github.com/air-gases/defibrillator v0.21.3/go.mod h1:UkdsD4kYW2+JmI67FI4y5o+n9l+PR2i7gJpx3qAMgzw=
+github.com/air-gases/langman v0.8.3 h1:FUTjFLtouEuXddd1UvhkOyBrmIXBg3SjWj2AK+9g/dI=
+github.com/air-gases/langman v0.8.3/go.mod h1:R4X4R5dbfYy/f2U+KeFaBV4T8zBBIEvZmm4sMrLErbA=
 github.com/air-gases/limiter v0.21.3 h1:zJwU73BZz4i5o3q54Vj9hSquPnfSsgrB14GgIyCrSmw=
 github.com/air-gases/limiter v0.21.3/go.mod h1:ZvYtOaecgX0pHjf3ZOueoEuokH2VWy7G+WXEEUqGReM=
 github.com/air-gases/logger v0.21.3 h1:ID7V/eO1KoM4vz7UnoKOwEFXp7z/jjCPD4qm+nUxDL8=
