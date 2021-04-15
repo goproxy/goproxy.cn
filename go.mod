@@ -12,7 +12,7 @@ require (
 	github.com/air-gases/redirector v0.21.3
 	github.com/aofei/air v0.21.4-0.20210311192843-02db42959f21
 	github.com/fsnotify/fsnotify v1.4.9
-	github.com/goproxy/goproxy v0.3.1
+	github.com/goproxy/goproxy v0.3.2
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/pelletier/go-toml v1.9.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1
