@@ -153,26 +153,40 @@ func (gc *goproxyCacher) startSetCache() {
 
 					return true
 				}
-				defer func() {
+				defer localCacheFile.Close()
+
+				cache := v.(goproxy.Cache)
+				if _, err := qiniuKodoClient.StatObject(
+					base.Context,
+					qiniuKodoBucketName,
+					cache.Name(),
+					minio.StatObjectOptions{},
+				); err == nil {
+					gc.settingCaches.Delete(k)
 					gc.settingMutex.Lock()
 					os.Remove(localCacheFile.Name())
 					gc.settingMutex.Unlock()
-				}()
+					return true
+				} else if !isMinIOObjectNotExist(err) {
+					return true
+				}
 
-				gc.settingCaches.Delete(k)
-
-				cache := v.(goproxy.Cache)
-
-				qiniuKodoClient.PutObject(
+				if _, err := qiniuKodoClient.PutObject(
 					base.Context,
 					qiniuKodoBucketName,
 					cache.Name(),
 					localCacheFile,
 					cache.Size(),
 					minio.PutObjectOptions{
-						ContentType: cache.MIMEType(),
+						ContentType:      cache.MIMEType(),
+						DisableMultipart: cache.Size() > 256<<20,
 					},
-				)
+				); err == nil {
+					gc.settingCaches.Delete(k)
+					gc.settingMutex.Lock()
+					os.Remove(localCacheFile.Name())
+					gc.settingMutex.Unlock()
+				}
 
 				return true
 			})
