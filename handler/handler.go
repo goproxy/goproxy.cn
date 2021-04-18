@@ -4,13 +4,15 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/air-gases/cacheman"
 	"github.com/aofei/air"
 	"github.com/goproxy/goproxy.cn/base"
-	"github.com/goproxy/goproxy/cacher"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/robfig/cron/v3"
 	"github.com/tidwall/gjson"
 )
@@ -19,19 +21,11 @@ var (
 	// qiniuViper is used to get the configuration items of the Qiniu Cloud.
 	qiniuViper = base.Viper.Sub("qiniu")
 
-	// qiniuAccessKey is the access key for the Qiniu Cloud.
-	qiniuAccessKey = qiniuViper.GetString("access_key")
+	// qiniuKodoBucketName is the bucket name for the Qiniu Cloud Kodo.
+	qiniuKodoBucketName = qiniuViper.GetString("kodo_bucket_name")
 
-	// qiniuSecretKey is the secret key for the Qiniu Cloud.
-	qiniuSecretKey = qiniuViper.GetString("secret_key")
-
-	// qiniuKodoCacher is the kodo cacher for the Qiniu Cloud.
-	qiniuKodoCacher = &cacher.Kodo{
-		Endpoint:   qiniuViper.GetString("kodo_endpoint"),
-		AccessKey:  qiniuAccessKey,
-		SecretKey:  qiniuSecretKey,
-		BucketName: qiniuViper.GetString("kodo_bucket_name"),
-	}
+	// qiniuKodoClient is the client for the Qiniu Cloud Kodo.
+	qiniuKodoClient *minio.Client
 
 	// getHeadMethods is an array contains the GET and HEAD methods.
 	getHeadMethods = []string{http.MethodGet, http.MethodHead}
@@ -48,6 +42,34 @@ var (
 )
 
 func init() {
+	qiniuKodoEndpoint, err := url.Parse(
+		qiniuViper.GetString("kodo_endpoint"),
+	)
+	if err != nil {
+		base.Logger.Fatal().Err(err).
+			Msg("failed to parse qiniu kodo endpoint")
+	}
+
+	qiniuKodoClientOptions := &minio.Options{
+		Creds: credentials.NewStaticV4(
+			qiniuViper.GetString("access_key"),
+			qiniuViper.GetString("secret_key"),
+			"",
+		),
+		Secure:       qiniuKodoEndpoint.Scheme == "https",
+		BucketLookup: minio.BucketLookupPath,
+	}
+
+	qiniuKodoEndpoint.Scheme = ""
+	qiniuKodoClient, err = minio.New(
+		strings.TrimPrefix(qiniuKodoEndpoint.String(), "//"),
+		qiniuKodoClientOptions,
+	)
+	if err != nil {
+		base.Logger.Fatal().Err(err).
+			Msg("failed to create qiniu kodo client")
+	}
+
 	if err := updateModuleVersionsCount(); err != nil {
 		base.Logger.Fatal().Err(err).
 			Msg("failed to initialize module version count")
@@ -122,13 +144,18 @@ func hIndexPage(req *air.Request, res *air.Response) error {
 
 // updateModuleVersionsCount updates the `moduleVersionCount`.
 func updateModuleVersionsCount() error {
-	cache, err := qiniuKodoCacher.Cache(base.Context, "stats/summary")
+	object, err := qiniuKodoClient.GetObject(
+		base.Context,
+		qiniuKodoBucketName,
+		"stats/summary",
+		minio.GetObjectOptions{},
+	)
 	if err != nil {
 		return err
 	}
-	defer cache.Close()
+	defer object.Close()
 
-	b, err := io.ReadAll(cache)
+	b, err := io.ReadAll(object)
 	if err != nil {
 		return err
 	}
@@ -136,6 +163,12 @@ func updateModuleVersionsCount() error {
 	moduleVersionCount = gjson.GetBytes(b, "module_version_count").Int()
 
 	return nil
+}
+
+// isMinIOObjectNotExist reports whether the err means a MinIO object is not
+// exist.
+func isMinIOObjectNotExist(err error) bool {
+	return minio.ToErrorResponse(err).StatusCode == http.StatusNotFound
 }
 
 // thousandsCommaSeperated returns a thousands comma seperated string for the n.

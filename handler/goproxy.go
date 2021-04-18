@@ -2,16 +2,15 @@ package handler
 
 import (
 	"context"
-	"crypto/hmac"
-	"crypto/sha1"
+	"crypto/md5"
 	"crypto/sha256"
-	"encoding/base64"
 	"encoding/hex"
 	"errors"
-	"fmt"
+	"hash"
 	"io"
 	"io/fs"
 	"log"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -22,6 +21,7 @@ import (
 	"github.com/aofei/air"
 	"github.com/goproxy/goproxy"
 	"github.com/goproxy/goproxy.cn/base"
+	"github.com/minio/minio-go/v7"
 )
 
 var (
@@ -38,10 +38,6 @@ var (
 	// goproxyAutoRedirectMinSize is the minimum size of the Goproxy used to
 	// limit at least how big Goproxy cache can be automatically redirected.
 	goproxyAutoRedirectMinSize = goproxyViper.GetInt64("auto_redirect_min_size")
-
-	// qiniuKodoBucketEndpoint is the bucket endpoint for the Qiniu Cloud
-	// Kodo.
-	qiniuKodoBucketEndpoint = qiniuViper.GetString("kodo_bucket_endpoint")
 )
 
 func init() {
@@ -69,13 +65,12 @@ func init() {
 	})
 
 	hhGoproxy.Cacher = &goproxyCacher{
-		Cacher:         qiniuKodoCacher,
 		localCacheRoot: goproxyLocalCacheRoot,
 	}
 
 	hhGoproxy.ErrorLogger = log.New(base.Logger, "", 0)
 
-	base.Air.BATCH(nil, "/*", hGoproxy)
+	base.Air.BATCH(getHeadMethods, "/*", hGoproxy)
 }
 
 // hGoproxy handles requests to play with Go module proxy.
@@ -86,37 +81,50 @@ func hGoproxy(req *air.Request, res *air.Response) error {
 		return nil
 	}
 
-	cache, err := hhGoproxy.Cacher.Cache(req.Context, name)
+	objectInfo, err := qiniuKodoClient.StatObject(
+		req.Context,
+		qiniuKodoBucketName,
+		name,
+		minio.StatObjectOptions{},
+	)
 	if err != nil {
-		if !errors.Is(err, goproxy.ErrCacheNotFound) {
-			return err
+		if isMinIOObjectNotExist(err) {
+			hhGoproxy.ServeHTTP(
+				res.HTTPResponseWriter(),
+				req.HTTPRequest(),
+			)
+			return nil
 		}
 
-		hhGoproxy.ServeHTTP(res.HTTPResponseWriter(), req.HTTPRequest())
-
-		return nil
+		return err
 	}
-	defer cache.Close()
 
-	if cache.Size() < goproxyAutoRedirectMinSize {
+	if objectInfo.Size < goproxyAutoRedirectMinSize {
 		hhGoproxy.ServeHTTP(res.HTTPResponseWriter(), req.HTTPRequest())
 		return nil
 	}
 
-	e := time.Now().Add(24 * time.Hour).Unix()
-	u := fmt.Sprintf("%s/%s?e=%d", qiniuKodoBucketEndpoint, name, e)
-	h := hmac.New(sha1.New, []byte(qiniuSecretKey))
-	h.Write([]byte(u))
-	s := base64.URLEncoding.EncodeToString(h.Sum(nil))
-	u = fmt.Sprintf("%s&token=%s:%s", u, qiniuAccessKey, s)
+	u, err := qiniuKodoClient.Presign(
+		req.Context,
+		req.Method,
+		qiniuKodoBucketName,
+		objectInfo.Key,
+		7*24*time.Hour,
+		url.Values{
+			"response-cache-control": []string{
+				"public, max-age=604800",
+			},
+		},
+	)
+	if err != nil {
+		return err
+	}
 
-	return res.Redirect(u)
+	return res.Redirect(u.String())
 }
 
 // goproxyCacher implements the `goproxy.Cacher`.
 type goproxyCacher struct {
-	goproxy.Cacher
-
 	localCacheRoot    string
 	settingMutex      sync.Mutex
 	settingCaches     sync.Map
@@ -154,15 +162,15 @@ func (gc *goproxyCacher) startSetCache() {
 				gc.settingCaches.Delete(k)
 
 				cache := v.(goproxy.Cache)
-				gc.Cacher.SetCache(
+
+				qiniuKodoClient.PutObject(
 					base.Context,
-					&goproxyCache{
-						File:     localCacheFile,
-						name:     cache.Name(),
-						mimeType: cache.MIMEType(),
-						size:     cache.Size(),
-						modTime:  cache.ModTime(),
-						checksum: cache.Checksum(),
+					qiniuKodoBucketName,
+					cache.Name(),
+					localCacheFile,
+					cache.Size(),
+					minio.PutObjectOptions{
+						ContentType: cache.MIMEType(),
 					},
 				)
 
@@ -170,6 +178,56 @@ func (gc *goproxyCacher) startSetCache() {
 			})
 		}
 	}()
+}
+
+// NewHash implements the `goproxy.Cacher`.
+func (gc *goproxyCacher) NewHash() hash.Hash {
+	return md5.New()
+}
+
+// Cache implements the `goproxy.Cacher`.
+func (gc *goproxyCacher) Cache(
+	ctx context.Context,
+	name string,
+) (goproxy.Cache, error) {
+	objectInfo, err := qiniuKodoClient.StatObject(
+		ctx,
+		qiniuKodoBucketName,
+		name,
+		minio.StatObjectOptions{},
+	)
+	if err != nil {
+		if isMinIOObjectNotExist(err) {
+			return nil, goproxy.ErrCacheNotFound
+		}
+
+		return nil, err
+	}
+
+	checksum, _ := hex.DecodeString(objectInfo.ETag)
+	if len(checksum) != md5.Size {
+		eTagChecksum := md5.Sum([]byte(objectInfo.ETag))
+		checksum = eTagChecksum[:]
+	}
+
+	object, err := qiniuKodoClient.GetObject(
+		ctx,
+		qiniuKodoBucketName,
+		objectInfo.Key,
+		minio.GetObjectOptions{},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &goproxyCache{
+		ReadSeekCloser: object,
+		name:           name,
+		mimeType:       objectInfo.ContentType,
+		size:           objectInfo.Size,
+		modTime:        objectInfo.LastModified,
+		checksum:       checksum,
+	}, nil
 }
 
 // SetCache implements the `goproxy.Cacher`.
@@ -219,7 +277,7 @@ func (gc *goproxyCacher) SetCache(ctx context.Context, c goproxy.Cache) error {
 // goproxyCache implements the `goproxy.Cache`. It is the cache unit of the
 // `goproxyCacher`.
 type goproxyCache struct {
-	*os.File
+	io.ReadSeekCloser
 
 	name     string
 	mimeType string

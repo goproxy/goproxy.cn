@@ -2,7 +2,6 @@ package handler
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,8 +11,8 @@ import (
 	"time"
 
 	"github.com/aofei/air"
-	"github.com/goproxy/goproxy"
 	"github.com/goproxy/goproxy.cn/base"
+	"github.com/minio/minio-go/v7"
 	"github.com/tidwall/gjson"
 )
 
@@ -39,23 +38,39 @@ func init() {
 
 // hStatSummary handles requests to query stat summary.
 func hStatSummary(req *air.Request, res *air.Response) error {
-	cache, err := qiniuKodoCacher.Cache(req.Context, "stats/summary")
+	objectInfo, err := qiniuKodoClient.StatObject(
+		req.Context,
+		qiniuKodoBucketName,
+		"stats/summary",
+		minio.StatObjectOptions{},
+	)
+	if err != nil {
+		if isMinIOObjectNotExist(err) {
+			return req.Air.NotFoundHandler(req, res)
+		}
+
+		return err
+	}
+
+	object, err := qiniuKodoClient.GetObject(
+		req.Context,
+		qiniuKodoBucketName,
+		objectInfo.Key,
+		minio.GetObjectOptions{},
+	)
 	if err != nil {
 		return err
 	}
-	defer cache.Close()
+	defer object.Close()
 
-	res.Header.Set("Content-Type", cache.MIMEType())
-	res.Header.Set("ETag", fmt.Sprintf(
-		"%q",
-		base64.StdEncoding.EncodeToString(cache.Checksum()),
-	))
+	res.Header.Set("Content-Type", objectInfo.ContentType)
+	res.Header.Set("ETag", fmt.Sprintf("%q", objectInfo.ETag))
 	res.Header.Set(
 		"Last-Modified",
-		cache.ModTime().UTC().Format(http.TimeFormat),
+		objectInfo.LastModified.UTC().Format(http.TimeFormat),
 	)
 
-	return res.Write(cache)
+	return res.Write(object)
 }
 
 // hStatTrend handles requests to query stat trend.
@@ -67,26 +82,39 @@ func hStatTrend(req *air.Request, res *air.Response) error {
 		return req.Air.NotFoundHandler(req, res)
 	}
 
-	cache, err := qiniuKodoCacher.Cache(
+	objectInfo, err := qiniuKodoClient.StatObject(
 		req.Context,
+		qiniuKodoBucketName,
 		fmt.Sprint("stats/trends/", trend),
+		minio.StatObjectOptions{},
+	)
+	if err != nil {
+		if isMinIOObjectNotExist(err) {
+			return req.Air.NotFoundHandler(req, res)
+		}
+
+		return err
+	}
+
+	object, err := qiniuKodoClient.GetObject(
+		req.Context,
+		qiniuKodoBucketName,
+		objectInfo.Key,
+		minio.GetObjectOptions{},
 	)
 	if err != nil {
 		return err
 	}
-	defer cache.Close()
+	defer object.Close()
 
-	res.Header.Set("Content-Type", cache.MIMEType())
-	res.Header.Set("ETag", fmt.Sprintf(
-		"%q",
-		base64.StdEncoding.EncodeToString(cache.Checksum()),
-	))
+	res.Header.Set("Content-Type", objectInfo.ContentType)
+	res.Header.Set("ETag", fmt.Sprintf("%q", objectInfo.ETag))
 	res.Header.Set(
 		"Last-Modified",
-		cache.ModTime().UTC().Format(http.TimeFormat),
+		objectInfo.LastModified.UTC().Format(http.TimeFormat),
 	)
 
-	return res.Write(cache)
+	return res.Write(object)
 }
 
 // hStat handles requests to query stat.
@@ -107,29 +135,40 @@ func hStat(req *air.Request, res *air.Response) error {
 		time.UTC,
 	)
 
-	cache, err := qiniuKodoCacher.Cache(
+	objectInfo, err := qiniuKodoClient.StatObject(
 		req.Context,
+		qiniuKodoBucketName,
 		path.Join("stats", name),
+		minio.StatObjectOptions{},
 	)
 	if err == nil {
-		defer cache.Close()
+		object, err := qiniuKodoClient.GetObject(
+			req.Context,
+			qiniuKodoBucketName,
+			objectInfo.Key,
+			minio.GetObjectOptions{},
+		)
+		if err != nil {
+			return err
+		}
+		defer object.Close()
 
 		if strings.HasSuffix(name, downloadCountBadgeSuffix) {
-			res.Header.Set("Content-Type", cache.MIMEType())
-			res.Header.Set("ETag", fmt.Sprintf(
-				"%q",
-				base64.StdEncoding.
-					EncodeToString(cache.Checksum()),
-			))
+			res.Header.Set("Content-Type", objectInfo.ContentType)
+			res.Header.Set(
+				"ETag",
+				fmt.Sprintf("%q", objectInfo.ETag),
+			)
 			res.Header.Set(
 				"Last-Modified",
-				cache.ModTime().UTC().Format(http.TimeFormat),
+				objectInfo.LastModified.UTC().
+					Format(http.TimeFormat),
 			)
 
-			return res.Write(cache)
+			return res.Write(object)
 		}
 
-		b, err := io.ReadAll(cache)
+		b, err := io.ReadAll(object)
 		if err != nil {
 			return err
 		}
@@ -172,10 +211,10 @@ func hStat(req *air.Request, res *air.Response) error {
 			return err
 		}
 
-		res.Header.Set("Content-Type", cache.MIMEType())
+		res.Header.Set("Content-Type", objectInfo.ContentType)
 
 		return res.Write(bytes.NewReader(statJSON))
-	} else if err != goproxy.ErrCacheNotFound {
+	} else if !isMinIOObjectNotExist(err) {
 		return err
 	}
 

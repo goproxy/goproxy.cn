@@ -18,7 +18,6 @@ access_key = "<ACCESS_KEY>"
 secret_key = "<SECRET_KEY>"
 kodo_endpoint = "<KODO_ENDPOINT>"
 kodo_bucket_name = "<KODO_BUCKET_NAME>"
-kodo_bucket_endpoint = "<KODO_BUCKET_ENDPOINT>"
 
 # Goproxy
 [goproxy]
