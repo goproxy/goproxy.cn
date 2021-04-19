@@ -179,7 +179,7 @@ func (gc *goproxyCacher) startSetCache() {
 					cache.Size(),
 					minio.PutObjectOptions{
 						ContentType:      cache.MIMEType(),
-						DisableMultipart: cache.Size() > 256<<20,
+						DisableMultipart: cache.Size() < 256<<20,
 					},
 				); err == nil {
 					gc.settingCaches.Delete(k)
