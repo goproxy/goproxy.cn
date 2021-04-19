@@ -26,8 +26,6 @@ github.com/air-gases/limiter v0.22.0 h1:5A+OXenbik/tNF11juU5ZxY+BA/Y6ZP+R/WBu95U
 github.com/air-gases/limiter v0.22.0/go.mod h1:MV3UvwmXbSZ11DzuGZMrvohinvjtrR2ubtT7aJfZb74=
 github.com/air-gases/logger v0.22.0 h1:S3qWKrWq1sWnzvqGBnwrXsyI8rEXhefjPtH8WY7kqCs=
 github.com/air-gases/logger v0.22.0/go.mod h1:goKEv8ocGVc9+BMLM1tg1L1MmJXkXiRc65ImDHlcoio=
-github.com/air-gases/redirector v0.22.0 h1:02UkcO89BtUJoiHBvvj58bDdlFXNW8j33v51SaQCfQw=
-github.com/air-gases/redirector v0.22.0/go.mod h1:bdOrgDlS/BLbGxr7kagFibPgEe5COwoTRifgIK0gfW8=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
 github.com/allegro/bigcache v1.2.1-0.20190218064605-e24eb225f156/go.mod h1:Cb/ax3seSYIx7SuZdm2G2xzfwmv3TPSk2ucNfQESPXM=

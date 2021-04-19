@@ -13,7 +13,6 @@ import (
 	"github.com/air-gases/langman"
 	"github.com/air-gases/limiter"
 	"github.com/air-gases/logger"
-	"github.com/air-gases/redirector"
 	"github.com/aofei/air"
 	"github.com/goproxy/goproxy.cn/base"
 	"github.com/goproxy/goproxy.cn/handler"
@@ -31,9 +30,6 @@ func main() {
 			IncludeClientAddress: true,
 		}),
 		defibrillator.Gas(defibrillator.GasConfig{}),
-		redirector.WWW2NonWWWGas(redirector.WWW2NonWWWGasConfig{
-			HTTPSEnforced: true,
-		}),
 		limiter.BodySizeGas(limiter.BodySizeGasConfig{
 			MaxBytes: 1 << 20,
 		}),

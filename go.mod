@@ -8,7 +8,6 @@ require (
 	github.com/air-gases/langman v0.9.0
 	github.com/air-gases/limiter v0.22.0
 	github.com/air-gases/logger v0.22.0
-	github.com/air-gases/redirector v0.22.0
 	github.com/aofei/air v0.22.0
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/goproxy/goproxy v0.3.3
