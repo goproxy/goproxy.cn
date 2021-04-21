@@ -22,8 +22,8 @@ kodo_bucket_name = "<KODO_BUCKET_NAME>"
 # Goproxy
 [goproxy]
 go_bin_name = "go"
-go_bin_fetch_timeout = "60s"
 proxied_sumdbs = ["sum.golang.org"]
 local_cache_root = "/tmp"
+fetch_timeout = "60s"
 auto_redirect = false
 auto_redirect_min_size = 10485760

@@ -6,10 +6,11 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
-	"hash"
 	"io"
 	"io/fs"
 	"log"
+	"net"
+	"net/http"
 	"net/url"
 	"os"
 	"path"
@@ -29,7 +30,26 @@ var (
 	goproxyViper = base.Viper.Sub("goproxy")
 
 	// hhGoproxy is an instance of the `goproxy.Goproxy`.
-	hhGoproxy = goproxy.New()
+	hhGoproxy = &goproxy.Goproxy{
+		Transport: &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
+			DialContext: (&net.Dialer{
+				Timeout:   30 * time.Second,
+				KeepAlive: 30 * time.Second,
+				DualStack: true,
+			}).DialContext,
+			MaxIdleConnsPerHost:   200,
+			IdleConnTimeout:       90 * time.Second,
+			TLSHandshakeTimeout:   10 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
+			ForceAttemptHTTP2:     true,
+		},
+		ErrorLogger: log.New(base.Logger, "", 0),
+	}
+
+	// goproxyFetchTimeout is the maximum duration allowed for Goproxy to
+	// fetch a module.
+	goproxyFetchTimeout = goproxyViper.GetDuration("fetch_timeout")
 
 	// goproxyAutoRedirect indicates whether the automatic redirection
 	// feature is enabled for Goproxy.
@@ -68,13 +88,20 @@ func init() {
 		localCacheRoot: goproxyLocalCacheRoot,
 	}
 
-	hhGoproxy.ErrorLogger = log.New(base.Logger, "", 0)
-
 	base.Air.BATCH(getHeadMethods, "/*", hGoproxy)
 }
 
 // hGoproxy handles requests to play with Go module proxy.
 func hGoproxy(req *air.Request, res *air.Response) error {
+	if goproxyFetchTimeout != 0 {
+		var cancel context.CancelFunc
+		req.Context, cancel = context.WithTimeout(
+			req.Context,
+			goproxyFetchTimeout,
+		)
+		defer cancel()
+	}
+
 	name := strings.TrimPrefix(path.Clean(req.RawPath()), "/")
 	if !goproxyAutoRedirect || !isAutoRedirectableGoproxyCache(name) {
 		hhGoproxy.ServeHTTP(res.HTTPResponseWriter(), req.HTTPRequest())
@@ -145,7 +172,7 @@ func (gc *goproxyCacher) startSetCache() {
 					return false
 				}
 
-				localCacheFile, err := os.Open(k.(string))
+				localCacheFile, err := os.Open(v.(string))
 				if err != nil {
 					if errors.Is(err, fs.ErrNotExist) {
 						gc.settingCaches.Delete(k)
@@ -155,11 +182,16 @@ func (gc *goproxyCacher) startSetCache() {
 				}
 				defer localCacheFile.Close()
 
-				cache := v.(goproxy.Cache)
+				localCacheFileInfo, err := localCacheFile.Stat()
+				if err != nil {
+					return true
+				}
+
+				name := k.(string)
 				if _, err := qiniuKodoClient.StatObject(
 					base.Context,
 					qiniuKodoBucketName,
-					cache.Name(),
+					name,
 					minio.StatObjectOptions{},
 				); err == nil {
 					gc.settingCaches.Delete(k)
@@ -171,15 +203,25 @@ func (gc *goproxyCacher) startSetCache() {
 					return true
 				}
 
+				var contentType string
+				switch path.Ext(name) {
+				case ".info":
+					contentType = "application/json; charset=utf-8"
+				case ".mod":
+					contentType = "text/plain; charset=utf-8"
+				case ".zip":
+					contentType = "application/zip"
+				}
+
 				if _, err := qiniuKodoClient.PutObject(
 					base.Context,
 					qiniuKodoBucketName,
-					cache.Name(),
+					name,
 					localCacheFile,
-					cache.Size(),
+					localCacheFileInfo.Size(),
 					minio.PutObjectOptions{
-						ContentType:      cache.MIMEType(),
-						DisableMultipart: cache.Size() < 256<<20,
+						ContentType:      contentType,
+						DisableMultipart: localCacheFileInfo.Size() < 256<<20,
 					},
 				); err == nil {
 					gc.settingCaches.Delete(k)
@@ -194,16 +236,11 @@ func (gc *goproxyCacher) startSetCache() {
 	}()
 }
 
-// NewHash implements the `goproxy.Cacher`.
-func (gc *goproxyCacher) NewHash() hash.Hash {
-	return md5.New()
-}
-
 // Cache implements the `goproxy.Cacher`.
-func (gc *goproxyCacher) Cache(
+func (gc *goproxyCacher) Get(
 	ctx context.Context,
 	name string,
-) (goproxy.Cache, error) {
+) (io.ReadCloser, error) {
 	objectInfo, err := qiniuKodoClient.StatObject(
 		ctx,
 		qiniuKodoBucketName,
@@ -212,7 +249,7 @@ func (gc *goproxyCacher) Cache(
 	)
 	if err != nil {
 		if isMinIOObjectNotExist(err) {
-			return nil, goproxy.ErrCacheNotFound
+			return nil, fs.ErrNotExist
 		}
 
 		return nil, err
@@ -234,21 +271,22 @@ func (gc *goproxyCacher) Cache(
 		return nil, err
 	}
 
-	return &goproxyCache{
+	return &goproxyCacheReader{
 		ReadSeekCloser: object,
-		name:           name,
-		mimeType:       objectInfo.ContentType,
-		size:           objectInfo.Size,
 		modTime:        objectInfo.LastModified,
 		checksum:       checksum,
 	}, nil
 }
 
 // SetCache implements the `goproxy.Cacher`.
-func (gc *goproxyCacher) SetCache(ctx context.Context, c goproxy.Cache) error {
+func (gc *goproxyCacher) Set(
+	ctx context.Context,
+	name string,
+	content io.Reader,
+) error {
 	gc.startSetCacheOnce.Do(gc.startSetCache)
 
-	cacheNameChecksum := sha256.Sum256([]byte(c.Name()))
+	cacheNameChecksum := sha256.Sum256([]byte(name))
 
 	localCacheFileName := filepath.Join(
 		gc.localCacheRoot,
@@ -273,7 +311,7 @@ func (gc *goproxyCacher) SetCache(ctx context.Context, c goproxy.Cache) error {
 
 	gc.settingMutex.Unlock()
 
-	if _, err := io.Copy(localCacheFile, c); err != nil {
+	if _, err := io.Copy(localCacheFile, content); err != nil {
 		os.Remove(localCacheFile.Name())
 		return err
 	}
@@ -283,46 +321,27 @@ func (gc *goproxyCacher) SetCache(ctx context.Context, c goproxy.Cache) error {
 		return err
 	}
 
-	gc.settingCaches.Store(localCacheFile.Name(), c)
+	gc.settingCaches.Store(name, localCacheFile.Name())
 
 	return nil
 }
 
-// goproxyCache implements the `goproxy.Cache`. It is the cache unit of the
-// `goproxyCacher`.
-type goproxyCache struct {
+// goproxyCacheReader is the reader of the cache unit of the `goproxyCacher`.
+type goproxyCacheReader struct {
 	io.ReadSeekCloser
 
-	name     string
-	mimeType string
-	size     int64
 	modTime  time.Time
 	checksum []byte
 }
 
-// Name implements the `goproxy.Cache`.
-func (gc *goproxyCache) Name() string {
-	return gc.name
+// ModTime returns the modification time of the gcr.
+func (gcr *goproxyCacheReader) ModTime() time.Time {
+	return gcr.modTime
 }
 
-// MIMEType implements the `goproxy.Cache`.
-func (gc *goproxyCache) MIMEType() string {
-	return gc.mimeType
-}
-
-// Size implements the `goproxy.Cache`.
-func (gc *goproxyCache) Size() int64 {
-	return gc.size
-}
-
-// ModTime implements the `goproxy.Cache`.
-func (gc *goproxyCache) ModTime() time.Time {
-	return gc.modTime
-}
-
-// Checksum implements the `goproxy.Cache`.
-func (gc *goproxyCache) Checksum() []byte {
-	return gc.checksum
+// Checksum returns the checksum of the gcr.
+func (gcr *goproxyCacheReader) Checksum() []byte {
+	return gcr.checksum
 }
 
 // isAutoRedirectableGoproxyCache reports whether the name refers to an
