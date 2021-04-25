@@ -11,7 +11,7 @@ require (
 	github.com/aofei/air v0.22.0
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/google/uuid v1.2.0 // indirect
-	github.com/goproxy/goproxy v0.4.1
+	github.com/goproxy/goproxy v0.5.0
 	github.com/klauspost/cpuid/v2 v2.0.6 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
@@ -27,9 +27,7 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/tidwall/gjson v1.7.5
 	github.com/yuin/goldmark v1.3.5
-	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b // indirect
-	golang.org/x/net v0.0.0-20210421230115-4e50805a0758 // indirect
-	golang.org/x/sys v0.0.0-20210421221651-33663a62ff08 // indirect
+	golang.org/x/sys v0.0.0-20210423185535-09eb48e85fd7 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
