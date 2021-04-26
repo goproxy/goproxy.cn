@@ -1,5 +1,5 @@
 [Unit]
-Description=Goproxy China
+Description=Goproxy.cn
 After=network.target
 
 [Service]

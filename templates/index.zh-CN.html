@@ -1,7 +1,7 @@
 <div class="jumbotron">
 	<div class="container text-center">
 		<img class="logo" src="/assets/images/logo.svg">
-		<h1 class="brand display-3">Goproxy 中国</h1>
+		<h1 class="brand display-3">Goproxy.cn</h1>
 		<p>中国最可靠的 Go 模块代理。</p>
 		<p><span class="badge badge-success">已缓存 {{.ModuleVersionCount}} 个模块版本</span></p>
 		<a class="github-button" href="https://github.com/goproxy/goproxy.cn" data-size="large" data-show-count="true" aria-label="Star goproxy/goproxy.cn on GitHub">Star</a>
@@ -88,7 +88,7 @@ C:\> $env:GOPROXY = "https://goproxy.cn"</code></pre>
 
 	<div class="row">
 		<div class="col-md">
-			<p>你的代码永远只属于你自己，因此我们向你提供目前世界上最炫酷的自托管 Go 模块代理搭建方案。通过使用 <a href="https://github.com/goproxy/goproxy" target="_blank">Goproxy</a> 这个极简主义项目，你可以在现有的任意 Web 服务中轻松地引入 Go 模块代理支持，要知道 <a href="https://goproxy.cn" target="_blank">goproxy.cn</a> 就是基于它搭建的。</p>
+			<p>你的代码永远只属于你自己，因此我们向你提供目前世界上最炫酷的自托管 Go 模块代理搭建方案。通过使用 <a href="https://github.com/goproxy/goproxy" target="_blank">Goproxy</a> 这个极简主义项目，你可以在现有的任意 Web 服务中轻松地引入 Go 模块代理支持，要知道 Goproxy.cn 就是基于它搭建的。</p>
 			<p>创建一个名为 <code>goproxy.go</code> 的文件</p>
 			<pre><code class="language-go">package main
 
@@ -103,7 +103,7 @@ func main() {
 	http.ListenAndServe("localhost:8080", &goproxy.Goproxy{
 		GoBinEnv: append(
 			os.Environ(),
-			"GOPROXY=https://goproxy.cn,direct", // 使用 goproxy.cn 作为上游代理
+			"GOPROXY=https://goproxy.cn,direct", // 使用 Goproxy.cn 作为上游代理
 			"GOPRIVATE=git.example.com",         // 解决私有模块的拉取问题（比如可以配置成公司内部的代码源）
 		),
 		ProxiedSUMDBs: []string{
