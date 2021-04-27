@@ -1,6 +1,6 @@
 # Air
 [air]
-app_name = "goproxy-china"
+app_name = "goproxy.cn"
 debug_mode = true
 address = "localhost:8080"
 minifier_enabled = true
