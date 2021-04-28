@@ -21,7 +21,7 @@ func init() {
 		getHeadMethods,
 		"/stats/summary",
 		hStatSummary,
-		hourlyCachemanGas,
+		minutelyCachemanGas,
 	)
 
 	base.Air.BATCH(

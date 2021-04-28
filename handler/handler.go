@@ -30,6 +30,13 @@ var (
 	// getHeadMethods is an array contains the GET and HEAD methods.
 	getHeadMethods = []string{http.MethodGet, http.MethodHead}
 
+	// minutelyCachemanGas is used to manage the Cache-Control header.
+	minutelyCachemanGas = cacheman.Gas(cacheman.GasConfig{
+		Public:  true,
+		MaxAge:  60,
+		SMaxAge: -1,
+	})
+
 	// hourlyCachemanGas is used to manage the Cache-Control header.
 	hourlyCachemanGas = cacheman.Gas(cacheman.GasConfig{
 		Public:  true,
@@ -76,7 +83,7 @@ func init() {
 	}
 
 	if _, err := base.Cron.AddJob(
-		"*/10 * * * *", // Every 10 minutes
+		"* * * * *", // Every minute
 		cron.NewChain(
 			cron.SkipIfStillRunning(cron.DiscardLogger),
 		).Then(cron.FuncJob(func() {
