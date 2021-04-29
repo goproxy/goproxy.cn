@@ -130,17 +130,27 @@ func parseFAQs() {
 					return err
 				}
 
+				nameParts := strings.SplitN(
+					strings.TrimSuffix(
+						filepath.Base(p),
+						ext,
+					),
+					"-",
+					2,
+				)
+				if len(nameParts) != 2 {
+					return nil
+				}
+
 				var buf bytes.Buffer
 				if err := gm.Convert(b, &buf); err != nil {
 					return err
 				}
 
 				qas = append(qas, model.QA{
-					Question: strings.TrimSuffix(
-						filepath.Base(p),
-						ext,
-					),
-					Answer: template.HTML(buf.String()),
+					ID:       nameParts[0],
+					Question: nameParts[1],
+					Answer:   template.HTML(buf.String()),
 				})
 
 				return nil
@@ -150,14 +160,8 @@ func parseFAQs() {
 		}
 
 		sort.Slice(qas, func(i, j int) bool {
-			return qas[i].Question < qas[j].Question
+			return qas[i].ID < qas[j].ID
 		})
-
-		for i := range qas {
-			q := qas[i].Question
-			q = q[strings.Index(q, "-")+1:]
-			qas[i].Question = q
-		}
 
 		nfaqs[filepath.Base(dir)] = qas
 	}

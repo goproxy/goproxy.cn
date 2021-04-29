@@ -21,7 +21,7 @@
 
 	<div class="row">
 		<div class="col-md">
-			<h3 id="{{locstr "Table of Contents"}}"><a class="font-weight-bold text-info" href="#{{locstr "Table of Contents"}}">{{locstr "Table of Contents"}}</a></h3>
+			<h3 id="table-of-contents"><a class="font-weight-bold text-info" href="#table-of-contents">{{locstr "Table of Contents"}}</a></h3>
 		</div>
 	</div>
 
@@ -29,7 +29,7 @@
 		<div class="col-md">
 			<ul>
 				{{range .QAs}}
-				<li><a href="#{{.Question}}">{{.Question}}</a></li>
+				<li><a href="#{{.ID}}">{{.Question}}</a></li>
 				{{end}}
 			</ul>
 		</div>
@@ -41,7 +41,7 @@
 
 	<div class="row">
 		<div class="col-md">
-			<p id="{{.Question}}"><a class="font-weight-bold text-info" href="#{{.Question}}">{{.Question}}</a></p>
+			<p id="{{.ID}}"><a class="font-weight-bold text-info" href="#{{.ID}}">{{.Question}}</a></p>
 		</div>
 	</div>
 
