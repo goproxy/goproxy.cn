@@ -175,6 +175,8 @@ func (gc *goproxyCacher) Set(
 	name string,
 	content io.ReadSeeker,
 ) error {
+	const partSize = 256 << 20
+
 	if _, err := qiniuKodoClient.StatObject(
 		base.Context,
 		qiniuKodoBucketName,
@@ -211,7 +213,9 @@ func (gc *goproxyCacher) Set(
 		size,
 		minio.PutObjectOptions{
 			ContentType:      contentType,
-			DisableMultipart: size < 256<<20,
+			NumThreads:       1,
+			PartSize:         partSize,
+			DisableMultipart: size <= partSize,
 		},
 	)
 
