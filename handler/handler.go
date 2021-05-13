@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
@@ -14,7 +15,6 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/robfig/cron/v3"
-	"github.com/tidwall/gjson"
 )
 
 var (
@@ -45,7 +45,7 @@ var (
 	})
 
 	// moduleVersionCount is the module version count.
-	moduleVersionCount int64
+	moduleVersionCount int
 )
 
 func init() {
@@ -144,7 +144,7 @@ func hIndexPage(req *air.Request, res *air.Response) error {
 	return res.Render(map[string]interface{}{
 		"IsIndexPage": true,
 		"ModuleVersionCount": thousandsCommaSeperated(
-			moduleVersionCount,
+			int64(moduleVersionCount),
 		),
 	}, req.LocalizedString("index.html"), "layouts/default.html")
 }
@@ -167,7 +167,15 @@ func updateModuleVersionsCount() error {
 		return err
 	}
 
-	moduleVersionCount = gjson.GetBytes(b, "module_version_count").Int()
+	var statSummary struct {
+		ModuleVersionCount int `json:"module_version_count"`
+	}
+
+	if err := json.Unmarshal(b, &statSummary); err != nil {
+		return err
+	}
+
+	moduleVersionCount = statSummary.ModuleVersionCount
 
 	return nil
 }

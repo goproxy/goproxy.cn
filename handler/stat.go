@@ -13,8 +13,40 @@ import (
 	"github.com/aofei/air"
 	"github.com/goproxy/goproxy.cn/base"
 	"github.com/minio/minio-go/v7"
-	"github.com/tidwall/gjson"
 )
+
+// moduleVersionStat is the module version statastic.
+type moduleVersionStat struct {
+	DownloadCount int `json:"download_count"`
+	Last30Days    []struct {
+		Date          string `json:"date"`
+		DownloadCount int    `json:"download_count"`
+	} `json:"last_30_days"`
+	Top10ModuleVersions []struct {
+		ModuleVersion string `json:"module_version"`
+		DownloadCount int    `json:"download_count"`
+	} `json:"top_10_module_versions,omitempty"`
+}
+
+// updateLast30Days updates `mvs.Last30Days` to the date.
+func (mvs *moduleVersionStat) updateLast30Days(date time.Time) {
+	last30Days := make([]struct {
+		Date          string `json:"date"`
+		DownloadCount int    `json:"download_count"`
+	}, 30)
+
+	for i := 0; i < len(last30Days); i++ {
+		last30Days[i].Date = date.AddDate(0, 0, -i).Format(time.RFC3339)
+		for _, d := range mvs.Last30Days {
+			if d.Date == last30Days[i].Date {
+				last30Days[i].DownloadCount = d.DownloadCount
+				break
+			}
+		}
+	}
+
+	mvs.Last30Days = last30Days
+}
 
 func init() {
 	base.Air.BATCH(
@@ -173,40 +205,14 @@ func hStat(req *air.Request, res *air.Response) error {
 			return err
 		}
 
-		gjr := gjson.ParseBytes(b)
-
-		mvs := struct {
-			DownloadCount       int64         `json:"download_count"`
-			Last30Days          []interface{} `json:"last_30_days"`
-			Top10ModuleVersions interface{}   `json:"top_10_module_versions,omitempty"`
-		}{
-			gjr.Get("download_count").Int(),
-			make([]interface{}, 30),
-			gjr.Get("top_10_module_versions").Value(),
+		var stat moduleVersionStat
+		if err := json.Unmarshal(b, &stat); err != nil {
+			return err
 		}
 
-		gjrL30DsArray := gjr.Get("last_30_days").Array()
-		for i := 0; i < len(mvs.Last30Days); i++ {
-			date := date.AddDate(0, 0, -i).Format(time.RFC3339)
-			var downloadCount int64
-			for _, gjr := range gjrL30DsArray {
-				if gjr.Get("date").String() != date {
-					continue
-				}
+		stat.updateLast30Days(date)
 
-				downloadCount = gjr.Get("download_count").Int()
-			}
-
-			mvs.Last30Days[i] = struct {
-				Date          string `json:"date"`
-				DownloadCount int64  `json:"download_count"`
-			}{
-				date,
-				downloadCount,
-			}
-		}
-
-		statJSON, err := json.Marshal(mvs)
+		statJSON, err := json.Marshal(stat)
 		if err != nil {
 			return err
 		}
@@ -224,31 +230,10 @@ func hStat(req *air.Request, res *air.Response) error {
 		return res.WriteFile("unknown-badge.svg")
 	}
 
-	mvs := struct {
-		DownloadCount       int64         `json:"download_count"`
-		Last30Days          []interface{} `json:"last_30_days"`
-		Top10ModuleVersions interface{}   `json:"top_10_module_versions,omitempty"`
-	}{
-		0,
-		make([]interface{}, 30),
-		nil,
-	}
+	var stat moduleVersionStat
+	stat.updateLast30Days(date)
 
-	for i := 0; i < len(mvs.Last30Days); i++ {
-		mvs.Last30Days[i] = struct {
-			Date          string `json:"date"`
-			DownloadCount int64  `json:"download_count"`
-		}{
-			date.AddDate(0, 0, -i).Format(time.RFC3339),
-			0,
-		}
-	}
-
-	if !strings.Contains(name, "@") {
-		mvs.Top10ModuleVersions = make([]interface{}, 0)
-	}
-
-	statJSON, err := json.Marshal(mvs)
+	statJSON, err := json.Marshal(stat)
 	if err != nil {
 		return err
 	}

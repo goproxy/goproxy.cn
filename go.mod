@@ -28,7 +28,6 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.1
 	github.com/tdewolff/parse/v2 v2.5.16 // indirect
-	github.com/tidwall/gjson v1.7.5
 	github.com/vmihailenco/msgpack/v5 v5.3.2 // indirect
 	github.com/yuin/goldmark v1.3.5
 	golang.org/x/sys v0.0.0-20210511113859-b0526f3d8744 // indirect
