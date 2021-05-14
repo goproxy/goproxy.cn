@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
 	"strconv"
 	"strings"
@@ -198,7 +199,7 @@ func qiniuKodoUpload(
 	ctx context.Context,
 	name string,
 	content io.ReadSeeker,
-) error {
+) (err error) {
 	var contentType string
 	switch path.Ext(name) {
 	case ".info":
@@ -209,63 +210,49 @@ func qiniuKodoUpload(
 		contentType = "application/zip"
 	}
 
-	size, err := content.Seek(0, io.SeekEnd)
-	if err != nil {
-		return err
-	}
-
-	if size > qiniuKodoMultipartUploadPartSize {
-		if _, err := content.Seek(0, io.SeekStart); err != nil {
+	var size int64
+	if f, ok := content.(*os.File); ok {
+		fi, err := f.Stat()
+		if err != nil {
 			return err
 		}
 
-		return qiniuKodoMultipartUpload(
-			ctx,
-			name,
-			content,
-			contentType,
-			size,
-			qiniuKodoMultipartUploadPartSize,
-		)
-	}
-
-PutObject:
-	if _, err := content.Seek(0, io.SeekStart); err != nil {
+		size = fi.Size()
+	} else if size, err = content.Seek(0, io.SeekEnd); err != nil {
+		return err
+	} else if _, err := content.Seek(0, io.SeekStart); err != nil {
 		return err
 	}
 
-	if _, err := qiniuKodoCore.PutObject(
-		ctx,
-		qiniuKodoBucketName,
-		name,
-		content,
-		size,
-		"",
-		"",
-		minio.PutObjectOptions{
-			ContentType: contentType,
-		},
-	); err != nil {
-		if isRetryableMinIOError(err) {
-			goto PutObject
+	if size <= qiniuKodoMultipartUploadPartSize {
+	PutObject:
+		content := content
+		if ra, ok := content.(io.ReaderAt); ok {
+			content = io.NewSectionReader(ra, 0, size)
+		} else if _, err := content.Seek(0, io.SeekStart); err != nil {
+			return err
 		}
 
-		return err
+		if _, err := qiniuKodoCore.PutObject(
+			ctx,
+			qiniuKodoBucketName,
+			name,
+			content,
+			size,
+			"",
+			"",
+			minio.PutObjectOptions{
+				ContentType: contentType,
+			},
+		); err != nil {
+			if isRetryableMinIOError(err) {
+				goto PutObject
+			}
+
+			return err
+		}
 	}
 
-	return nil
-}
-
-// qiniuKodoMultipartUpload is similar to the `qiniuKodoUpload`, but uses
-// multiple uploads.
-func qiniuKodoMultipartUpload(
-	ctx context.Context,
-	name string,
-	content io.ReadSeeker,
-	contentType string,
-	size int64,
-	partSize int64,
-) (err error) {
 	var uploadID string
 	defer func() {
 		if err != nil && uploadID != "" {
@@ -295,14 +282,20 @@ NewMultipartUpload:
 	}
 
 	var completeParts []minio.CompletePart
-	for offset := int64(0); offset < size; offset += partSize {
-		partSize := partSize
+	for offset := int64(0); offset < size; {
+		partSize := qiniuKodoMultipartUploadPartSize
 		if r := size - offset; r < partSize {
 			partSize = r
 		}
 
 	PutObjectPart:
-		if _, err := content.Seek(offset, io.SeekStart); err != nil {
+		content := content
+		if ra, ok := content.(io.ReaderAt); ok {
+			content = io.NewSectionReader(ra, offset, partSize)
+		} else if _, err := content.Seek(
+			offset,
+			io.SeekStart,
+		); err != nil {
 			return err
 		}
 
@@ -330,6 +323,8 @@ NewMultipartUpload:
 			PartNumber: part.PartNumber,
 			ETag:       part.ETag,
 		})
+
+		offset += part.Size
 	}
 
 CompleteMultipartUpload:
