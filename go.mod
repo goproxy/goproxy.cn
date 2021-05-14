@@ -11,7 +11,7 @@ require (
 	github.com/aofei/air v0.22.0
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/google/uuid v1.2.0 // indirect
-	github.com/goproxy/goproxy v0.6.0
+	github.com/goproxy/goproxy v0.6.1
 	github.com/json-iterator/go v1.1.11 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.6 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
@@ -21,7 +21,7 @@ require (
 	github.com/pelletier/go-toml v1.9.1 // indirect
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/xid v1.3.0 // indirect
-	github.com/rs/zerolog v1.21.0
+	github.com/rs/zerolog v1.22.0
 	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect

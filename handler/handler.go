@@ -1,11 +1,13 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
 	"net/url"
+	"path"
 	"strconv"
 	"strings"
 
@@ -24,8 +26,15 @@ var (
 	// qiniuKodoBucketName is the bucket name for the Qiniu Cloud Kodo.
 	qiniuKodoBucketName = qiniuViper.GetString("kodo_bucket_name")
 
+	// qiniuKodoMultipartUploadPartSize is the multipart upload part size
+	// for the Qiniu Cloud Kodo.
+	qiniuKodoMultipartUploadPartSize = qiniuViper.GetInt64("kodo_multipart_upload_part_size")
+
 	// qiniuKodoClient is the client for the Qiniu Cloud Kodo.
 	qiniuKodoClient *minio.Client
+
+	// qiniuKodoCore is the core for the Qiniu Cloud Kodo.
+	qiniuKodoCore *minio.Core
 
 	// getHeadMethods is an array contains the GET and HEAD methods.
 	getHeadMethods = []string{http.MethodGet, http.MethodHead}
@@ -75,6 +84,10 @@ func init() {
 	if err != nil {
 		base.Logger.Fatal().Err(err).
 			Msg("failed to create qiniu kodo client")
+	}
+
+	qiniuKodoCore = &minio.Core{
+		Client: qiniuKodoClient,
 	}
 
 	if err := updateModuleVersionsCount(); err != nil {
@@ -180,9 +193,179 @@ func updateModuleVersionsCount() error {
 	return nil
 }
 
-// isMinIOObjectNotExist reports whether the err means a MinIO object is not
-// exist.
-func isMinIOObjectNotExist(err error) bool {
+// qiniuKodoUpload uploads the content with the name to the Qiniu Cloud Kodo.
+func qiniuKodoUpload(
+	ctx context.Context,
+	name string,
+	content io.ReadSeeker,
+) error {
+	var contentType string
+	switch path.Ext(name) {
+	case ".info":
+		contentType = "application/json; charset=utf-8"
+	case ".mod":
+		contentType = "text/plain; charset=utf-8"
+	case ".zip":
+		contentType = "application/zip"
+	}
+
+	size, err := content.Seek(0, io.SeekEnd)
+	if err != nil {
+		return err
+	}
+
+	if size > qiniuKodoMultipartUploadPartSize {
+		if _, err := content.Seek(0, io.SeekStart); err != nil {
+			return err
+		}
+
+		return qiniuKodoMultipartUpload(
+			ctx,
+			name,
+			content,
+			contentType,
+			size,
+			qiniuKodoMultipartUploadPartSize,
+		)
+	}
+
+PutObject:
+	if _, err := content.Seek(0, io.SeekStart); err != nil {
+		return err
+	}
+
+	if _, err := qiniuKodoCore.PutObject(
+		ctx,
+		qiniuKodoBucketName,
+		name,
+		content,
+		size,
+		"",
+		"",
+		minio.PutObjectOptions{
+			ContentType: contentType,
+		},
+	); err != nil {
+		if isRetryableMinIOError(err) {
+			goto PutObject
+		}
+
+		return err
+	}
+
+	return nil
+}
+
+// qiniuKodoMultipartUpload is similar to the `qiniuKodoUpload`, but uses
+// multiple uploads.
+func qiniuKodoMultipartUpload(
+	ctx context.Context,
+	name string,
+	content io.ReadSeeker,
+	contentType string,
+	size int64,
+	partSize int64,
+) (err error) {
+	var uploadID string
+	defer func() {
+		if err != nil && uploadID != "" {
+			qiniuKodoCore.AbortMultipartUpload(
+				ctx,
+				qiniuKodoBucketName,
+				name,
+				uploadID,
+			)
+		}
+	}()
+
+NewMultipartUpload:
+	if uploadID, err = qiniuKodoCore.NewMultipartUpload(
+		ctx,
+		qiniuKodoBucketName,
+		name,
+		minio.PutObjectOptions{
+			ContentType: contentType,
+		},
+	); err != nil {
+		if isRetryableMinIOError(err) {
+			goto NewMultipartUpload
+		}
+
+		return err
+	}
+
+	var completeParts []minio.CompletePart
+	for offset := int64(0); offset < size; offset += partSize {
+		partSize := partSize
+		if r := size - offset; r < partSize {
+			partSize = r
+		}
+
+	PutObjectPart:
+		if _, err := content.Seek(offset, io.SeekStart); err != nil {
+			return err
+		}
+
+		part, err := qiniuKodoCore.PutObjectPart(
+			ctx,
+			qiniuKodoBucketName,
+			name,
+			uploadID,
+			len(completeParts)+1,
+			io.LimitReader(content, partSize),
+			partSize,
+			"",
+			"",
+			nil,
+		)
+		if err != nil {
+			if isRetryableMinIOError(err) {
+				goto PutObjectPart
+			}
+
+			return err
+		}
+
+		completeParts = append(completeParts, minio.CompletePart{
+			PartNumber: part.PartNumber,
+			ETag:       part.ETag,
+		})
+	}
+
+CompleteMultipartUpload:
+	if _, err := qiniuKodoCore.CompleteMultipartUpload(
+		ctx,
+		qiniuKodoBucketName,
+		name,
+		uploadID,
+		completeParts,
+	); err != nil {
+		if isRetryableMinIOError(err) {
+			goto CompleteMultipartUpload
+		}
+
+		return err
+	}
+
+	return nil
+}
+
+// isRetryableMinIOError reports whether the err is a retryable MinIO error.
+func isRetryableMinIOError(err error) bool {
+	switch minio.ToErrorResponse(err).StatusCode {
+	case http.StatusTooManyRequests,
+		http.StatusInternalServerError,
+		http.StatusBadGateway,
+		http.StatusServiceUnavailable,
+		http.StatusGatewayTimeout:
+		return true
+	}
+
+	return false
+}
+
+// isNotFoundMinIOError reports whether the err is MinIO not found error.
+func isNotFoundMinIOError(err error) bool {
 	return minio.ToErrorResponse(err).StatusCode == http.StatusNotFound
 }
 

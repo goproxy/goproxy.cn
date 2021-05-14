@@ -18,6 +18,7 @@ access_key = "<ACCESS_KEY>"
 secret_key = "<SECRET_KEY>"
 kodo_endpoint = "<KODO_ENDPOINT>"
 kodo_bucket_name = "<KODO_BUCKET_NAME>"
+kodo_multipart_upload_part_size = 104857600
 
 # Goproxy
 [goproxy]

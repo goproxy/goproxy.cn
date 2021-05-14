@@ -77,7 +77,7 @@ func hStatSummary(req *air.Request, res *air.Response) error {
 		minio.StatObjectOptions{},
 	)
 	if err != nil {
-		if isMinIOObjectNotExist(err) {
+		if isNotFoundMinIOError(err) {
 			return req.Air.NotFoundHandler(req, res)
 		}
 
@@ -121,7 +121,7 @@ func hStatTrend(req *air.Request, res *air.Response) error {
 		minio.StatObjectOptions{},
 	)
 	if err != nil {
-		if isMinIOObjectNotExist(err) {
+		if isNotFoundMinIOError(err) {
 			return req.Air.NotFoundHandler(req, res)
 		}
 
@@ -220,7 +220,7 @@ func hStat(req *air.Request, res *air.Response) error {
 		res.Header.Set("Content-Type", objectInfo.ContentType)
 
 		return res.Write(bytes.NewReader(statJSON))
-	} else if !isMinIOObjectNotExist(err) {
+	} else if !isNotFoundMinIOError(err) {
 		return err
 	}
 

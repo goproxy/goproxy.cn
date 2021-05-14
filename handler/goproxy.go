@@ -89,7 +89,7 @@ func hGoproxy(req *air.Request, res *air.Response) error {
 		minio.StatObjectOptions{},
 	)
 	if err != nil {
-		if isMinIOObjectNotExist(err) {
+		if isNotFoundMinIOError(err) {
 			hhGoproxy.ServeHTTP(
 				res.HTTPResponseWriter(),
 				req.HTTPRequest(),
@@ -139,7 +139,7 @@ func (gc *goproxyCacher) Get(
 		minio.StatObjectOptions{},
 	)
 	if err != nil {
-		if isMinIOObjectNotExist(err) {
+		if isNotFoundMinIOError(err) {
 			return nil, fs.ErrNotExist
 		}
 
@@ -175,8 +175,6 @@ func (gc *goproxyCacher) Set(
 	name string,
 	content io.ReadSeeker,
 ) error {
-	const partSize = 256 << 20
-
 	if _, err := qiniuKodoClient.StatObject(
 		base.Context,
 		qiniuKodoBucketName,
@@ -184,42 +182,11 @@ func (gc *goproxyCacher) Set(
 		minio.StatObjectOptions{},
 	); err == nil {
 		return nil
-	} else if !isMinIOObjectNotExist(err) {
+	} else if !isNotFoundMinIOError(err) {
 		return err
 	}
 
-	size, err := content.Seek(0, io.SeekEnd)
-	if err != nil {
-		return err
-	} else if _, err := content.Seek(0, io.SeekStart); err != nil {
-		return err
-	}
-
-	var contentType string
-	switch path.Ext(name) {
-	case ".info":
-		contentType = "application/json; charset=utf-8"
-	case ".mod":
-		contentType = "text/plain; charset=utf-8"
-	case ".zip":
-		contentType = "application/zip"
-	}
-
-	_, err = qiniuKodoClient.PutObject(
-		base.Context,
-		qiniuKodoBucketName,
-		name,
-		content,
-		size,
-		minio.PutObjectOptions{
-			ContentType:      contentType,
-			NumThreads:       1,
-			PartSize:         partSize,
-			DisableMultipart: size <= partSize,
-		},
-	)
-
-	return err
+	return qiniuKodoUpload(ctx, name, content)
 }
 
 // goproxyCacheReader is the reader of the cache unit of the `goproxyCacher`.
