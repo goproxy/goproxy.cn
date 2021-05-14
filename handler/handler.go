@@ -361,7 +361,9 @@ func isRetryableMinIOError(err error) bool {
 		return true
 	}
 
-	return false
+	t, ok := err.(interface{ Timeout() bool })
+
+	return ok && t.Timeout()
 }
 
 // isNotFoundMinIOError reports whether the err is MinIO not found error.
