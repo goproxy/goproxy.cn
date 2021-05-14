@@ -19,8 +19,8 @@ import (
 type moduleVersionStat struct {
 	DownloadCount int `json:"download_count"`
 	Last30Days    []struct {
-		Date          string `json:"date"`
-		DownloadCount int    `json:"download_count"`
+		Date          time.Time `json:"date"`
+		DownloadCount int       `json:"download_count"`
 	} `json:"last_30_days"`
 	Top10ModuleVersions []struct {
 		ModuleVersion string `json:"module_version"`
@@ -31,12 +31,12 @@ type moduleVersionStat struct {
 // updateLast30Days updates `mvs.Last30Days` to the date.
 func (mvs *moduleVersionStat) updateLast30Days(date time.Time) {
 	last30Days := make([]struct {
-		Date          string `json:"date"`
-		DownloadCount int    `json:"download_count"`
+		Date          time.Time `json:"date"`
+		DownloadCount int       `json:"download_count"`
 	}, 30)
 
 	for i := 0; i < len(last30Days); i++ {
-		last30Days[i].Date = date.AddDate(0, 0, -i).Format(time.RFC3339)
+		last30Days[i].Date = date.AddDate(0, 0, -i)
 		for _, d := range mvs.Last30Days {
 			if d.Date == last30Days[i].Date {
 				last30Days[i].DownloadCount = d.DownloadCount
