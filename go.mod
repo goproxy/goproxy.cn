@@ -30,6 +30,7 @@ require (
 	github.com/tdewolff/parse/v2 v2.5.16 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.2 // indirect
 	github.com/yuin/goldmark v1.3.5
+	golang.org/x/mod v0.4.2
 	golang.org/x/sys v0.0.0-20210511113859-b0526f3d8744 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

@@ -36,6 +36,10 @@ func main() {
 		func(next air.Handler) air.Handler {
 			return func(req *air.Request, res *air.Response) error {
 				if !utf8.ValidString(req.Path) {
+					res.Header.Set(
+						"Cache-Control",
+						"public, max-age=86400",
+					)
 					return req.Air.NotFoundHandler(req, res)
 				}
 

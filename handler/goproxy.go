@@ -18,6 +18,8 @@ import (
 	"github.com/goproxy/goproxy"
 	"github.com/goproxy/goproxy.cn/base"
 	"github.com/minio/minio-go/v7"
+	"golang.org/x/mod/module"
+	"golang.org/x/mod/semver"
 )
 
 var (
@@ -76,10 +78,16 @@ func hGoproxy(req *air.Request, res *air.Response) error {
 		defer cancel()
 	}
 
-	name := strings.TrimPrefix(path.Clean(req.RawPath()), "/")
-	if !goproxyAutoRedirect || !isAutoRedirectableGoproxyCache(name) {
+	if !goproxyAutoRedirect || path.Ext(req.RawPath()) != ".zip" {
 		hhGoproxy.ServeHTTP(res.HTTPResponseWriter(), req.HTTPRequest())
 		return nil
+	}
+
+	trimmedPath := strings.TrimPrefix(path.Clean(req.RawPath()), "/")
+	name, err := url.PathUnescape(trimmedPath)
+	if err != nil || !validGoproxyCacheName(name) {
+		res.Header.Set("Cache-Control", "public, max-age=86400")
+		return req.Air.NotFoundHandler(req, res)
 	}
 
 	objectInfo, err := qiniuKodoClient.StatObject(
@@ -207,10 +215,30 @@ func (gcr *goproxyCacheReader) Checksum() []byte {
 	return gcr.checksum
 }
 
-// isAutoRedirectableGoproxyCache reports whether the name refers to an
-// auto-redirectable Goproxy cache.
-func isAutoRedirectableGoproxyCache(name string) bool {
-	return !strings.HasPrefix(name, "sumdb/") &&
-		strings.Contains(name, "/@v/") &&
-		path.Ext(name) == ".zip"
+// validGoproxyCacheName reports whether the name is a valid Goproxy cache name.
+func validGoproxyCacheName(name string) bool {
+	nameParts := strings.Split(name, "/@v/")
+	if len(nameParts) != 2 {
+		return false
+	}
+
+	if _, err := module.UnescapePath(nameParts[0]); err != nil {
+		return false
+	}
+
+	nameBase := path.Base(name)
+	nameExt := path.Ext(nameBase)
+	switch nameExt {
+	case ".info", ".mod", ".zip":
+	default:
+		return false
+	}
+
+	escapedModuleVersion := strings.TrimSuffix(nameBase, nameExt)
+	moduleVersion, err := module.UnescapeVersion(escapedModuleVersion)
+	if err != nil {
+		return false
+	}
+
+	return semver.IsValid(moduleVersion)
 }
