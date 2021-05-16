@@ -11,6 +11,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/air-gases/cacheman"
 	"github.com/aofei/air"
@@ -246,6 +247,7 @@ func qiniuKodoUpload(
 			},
 		); err != nil {
 			if isRetryableMinIOError(err) {
+				time.Sleep(time.Second)
 				goto PutObject
 			}
 
@@ -275,6 +277,7 @@ NewMultipartUpload:
 		},
 	); err != nil {
 		if isRetryableMinIOError(err) {
+			time.Sleep(time.Second)
 			goto NewMultipartUpload
 		}
 
@@ -313,6 +316,7 @@ NewMultipartUpload:
 		)
 		if err != nil {
 			if isRetryableMinIOError(err) {
+				time.Sleep(time.Second)
 				goto PutObjectPart
 			}
 
@@ -336,6 +340,7 @@ CompleteMultipartUpload:
 		completeParts,
 	); err != nil {
 		if isRetryableMinIOError(err) {
+			time.Sleep(time.Second)
 			goto CompleteMultipartUpload
 		}
 
