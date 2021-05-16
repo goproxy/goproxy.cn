@@ -11,7 +11,6 @@ import (
 	"path"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/air-gases/cacheman"
 	"github.com/aofei/air"
@@ -226,7 +225,6 @@ func qiniuKodoUpload(
 	}
 
 	if size <= qiniuKodoMultipartUploadPartSize {
-	PutObject:
 		content := content
 		if ra, ok := content.(io.ReaderAt); ok {
 			content = io.NewSectionReader(ra, 0, size)
@@ -234,7 +232,7 @@ func qiniuKodoUpload(
 			return err
 		}
 
-		if _, err := qiniuKodoCore.PutObject(
+		_, err := qiniuKodoCore.PutObject(
 			ctx,
 			qiniuKodoBucketName,
 			name,
@@ -245,19 +243,24 @@ func qiniuKodoUpload(
 			minio.PutObjectOptions{
 				ContentType: contentType,
 			},
-		); err != nil {
-			if isRetryableMinIOError(err) {
-				time.Sleep(time.Second)
-				goto PutObject
-			}
+		)
 
-			return err
-		}
+		return err
 	}
 
-	var uploadID string
+	uploadID, err := qiniuKodoCore.NewMultipartUpload(
+		ctx,
+		qiniuKodoBucketName,
+		name,
+		minio.PutObjectOptions{
+			ContentType: contentType,
+		},
+	)
+	if err != nil {
+		return err
+	}
 	defer func() {
-		if err != nil && uploadID != "" {
+		if err != nil {
 			qiniuKodoCore.AbortMultipartUpload(
 				ctx,
 				qiniuKodoBucketName,
@@ -267,23 +270,6 @@ func qiniuKodoUpload(
 		}
 	}()
 
-NewMultipartUpload:
-	if uploadID, err = qiniuKodoCore.NewMultipartUpload(
-		ctx,
-		qiniuKodoBucketName,
-		name,
-		minio.PutObjectOptions{
-			ContentType: contentType,
-		},
-	); err != nil {
-		if isRetryableMinIOError(err) {
-			time.Sleep(time.Second)
-			goto NewMultipartUpload
-		}
-
-		return err
-	}
-
 	var completeParts []minio.CompletePart
 	for offset := int64(0); offset < size; {
 		partSize := qiniuKodoMultipartUploadPartSize
@@ -291,7 +277,6 @@ NewMultipartUpload:
 			partSize = r
 		}
 
-	PutObjectPart:
 		content := content
 		if ra, ok := content.(io.ReaderAt); ok {
 			content = io.NewSectionReader(ra, offset, partSize)
@@ -315,11 +300,6 @@ NewMultipartUpload:
 			nil,
 		)
 		if err != nil {
-			if isRetryableMinIOError(err) {
-				time.Sleep(time.Second)
-				goto PutObjectPart
-			}
-
 			return err
 		}
 
@@ -331,39 +311,15 @@ NewMultipartUpload:
 		offset += part.Size
 	}
 
-CompleteMultipartUpload:
-	if _, err := qiniuKodoCore.CompleteMultipartUpload(
+	_, err = qiniuKodoCore.CompleteMultipartUpload(
 		ctx,
 		qiniuKodoBucketName,
 		name,
 		uploadID,
 		completeParts,
-	); err != nil {
-		if isRetryableMinIOError(err) {
-			time.Sleep(time.Second)
-			goto CompleteMultipartUpload
-		}
+	)
 
-		return err
-	}
-
-	return nil
-}
-
-// isRetryableMinIOError reports whether the err is a retryable MinIO error.
-func isRetryableMinIOError(err error) bool {
-	switch minio.ToErrorResponse(err).StatusCode {
-	case http.StatusTooManyRequests,
-		http.StatusInternalServerError,
-		http.StatusBadGateway,
-		http.StatusServiceUnavailable,
-		http.StatusGatewayTimeout:
-		return true
-	}
-
-	t, ok := err.(interface{ Timeout() bool })
-
-	return ok && t.Timeout()
+	return err
 }
 
 // isNotFoundMinIOError reports whether the err is MinIO not found error.
