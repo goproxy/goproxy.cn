@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
@@ -35,7 +36,8 @@ func main() {
 		}),
 		func(next air.Handler) air.Handler {
 			return func(req *air.Request, res *air.Response) error {
-				if !utf8.ValidString(req.Path) {
+				path, err := url.PathUnescape(req.Path)
+				if err != nil || !utf8.ValidString(path) {
 					res.Header.Set(
 						"Cache-Control",
 						"public, max-age=86400",
