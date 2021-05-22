@@ -29,7 +29,7 @@
 		<div class="col-md">
 			<ul>
 				{{range .QAs}}
-				<li><a href="#{{.ID}}">{{.Question}}</a></li>
+				<li><a href="#{{.ID}}">{{.Question $.Locale}}</a></li>
 				{{end}}
 			</ul>
 		</div>
@@ -41,13 +41,13 @@
 
 	<div class="row">
 		<div class="col-md">
-			<p id="{{.ID}}"><a class="font-weight-bold text-info" href="#{{.ID}}">{{.Question}}</a></p>
+			<p id="{{.ID}}"><a class="font-weight-bold text-info" href="#{{.ID}}">{{.Question $.Locale}}</a></p>
 		</div>
 	</div>
 
 	<div class="row">
 		<div class="col-md">
-			<p>{{.Answer}}</p>
+			<p>{{.Answer $.Locale}}</p>
 		</div>
 	</div>
 

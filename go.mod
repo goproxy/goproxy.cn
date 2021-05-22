@@ -3,6 +3,7 @@ module github.com/goproxy/goproxy.cn
 go 1.16
 
 require (
+	github.com/BurntSushi/toml v0.3.1
 	github.com/air-gases/cacheman v0.17.0
 	github.com/air-gases/defibrillator v0.22.0
 	github.com/air-gases/langman v0.9.0
@@ -32,6 +33,7 @@ require (
 	github.com/yuin/goldmark v1.3.6
 	golang.org/x/mod v0.4.2
 	golang.org/x/sys v0.0.0-20210514084401-e8d321eab015 // indirect
+	golang.org/x/text v0.3.6
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
