@@ -7,7 +7,7 @@ The most trusted Go module proxy in China.
 Goproxy.cn has fully implemented the
 [GOPROXY protocol](https://golang.org/ref/mod#goproxy-protocol). And it's a
 non-profit project supported by China's well-trusted cloud service provider
-[Qiniu Cloud](https://www.qiniu.com). Our goal is to provide a free, trusted,
+[Qiniu Cloud](https://www.qiniu.com/en). Our goal is to provide a free, trusted,
 always on, and globally CDNed Go module proxy for Gophers in China. Please
 subscribe to our real-time and historical data on system performance at
 [status.goproxy.cn](https://status.goproxy.cn).
@@ -131,7 +131,7 @@ content.***
 
 * Author: [Aofei Sheng](https://aofeisheng.com)
 * Maintainer: [Aofei Sheng](https://aofeisheng.com)
-* Sponsor: [Qiniu Cloud](https://www.qiniu.com)
+* Sponsor: [Qiniu Cloud](https://www.qiniu.com/en)
 * Promoters: [Shiwei Xu (Qiniu Cloud's founder-CEO)](https://baike.baidu.com/item/许式伟), Chuntang Tao, [Lifu Mao](https://github.com/forrest-mao) and [Jianyu Chen](https://github.com/eddycjy)
 
 ## Community
