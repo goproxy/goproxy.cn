@@ -78,16 +78,27 @@ func hGoproxy(req *air.Request, res *air.Response) error {
 		defer cancel()
 	}
 
-	if !goproxyAutoRedirect || path.Ext(req.RawPath()) != ".zip" {
+	name, err := url.PathUnescape(req.ParamValue("*").String())
+	if err != nil || strings.HasSuffix(name, "/") {
+		return CacheableNotFound(req, res, 86400)
+	}
+
+	if !goproxyAutoRedirect || path.Ext(name) != ".zip" {
 		hhGoproxy.ServeHTTP(res.HTTPResponseWriter(), req.HTTPRequest())
 		return nil
 	}
 
-	trimmedPath := strings.TrimPrefix(path.Clean(req.RawPath()), "/")
-	name, err := url.PathUnescape(trimmedPath)
-	if err != nil || !validGoproxyCacheName(name) {
-		res.Header.Set("Cache-Control", "public, max-age=86400")
-		return req.Air.NotFoundHandler(req, res)
+	if strings.Contains(name, "..") {
+		for _, part := range strings.Split(name, "/") {
+			if part == ".." {
+				return CacheableNotFound(req, res, 86400)
+			}
+		}
+	}
+
+	name = strings.TrimPrefix(path.Clean(name), "/")
+	if !validGoproxyCacheName(name) {
+		return CacheableNotFound(req, res, 86400)
 	}
 
 	objectInfo, err := qiniuKodoClient.StatObject(

@@ -38,11 +38,11 @@ func main() {
 			return func(req *air.Request, res *air.Response) error {
 				path, err := url.PathUnescape(req.Path)
 				if err != nil || !utf8.ValidString(path) {
-					res.Header.Set(
-						"Cache-Control",
-						"public, max-age=86400",
+					return handler.CacheableNotFound(
+						req,
+						res,
+						86400,
 					)
-					return req.Air.NotFoundHandler(req, res)
 				}
 
 				return next(req, res)

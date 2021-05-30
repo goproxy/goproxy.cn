@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -132,6 +133,15 @@ func init() {
 func NotFound(req *air.Request, res *air.Response) error {
 	res.Status = http.StatusNotFound
 	return errors.New(strings.ToLower(http.StatusText(res.Status)))
+}
+
+// CacheableNotFound returns cacheable not found error.
+func CacheableNotFound(req *air.Request, res *air.Response, maxAge int) error {
+	res.Header.Set(
+		"Cache-Control",
+		fmt.Sprintf("public, max-age=%d", maxAge),
+	)
+	return NotFound(req, res)
 }
 
 // MethodNotAllowed returns method not allowed error.

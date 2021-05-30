@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"path"
 	"strings"
 	"time"
@@ -78,7 +79,7 @@ func hStatSummary(req *air.Request, res *air.Response) error {
 	)
 	if err != nil {
 		if isNotFoundMinIOError(err) {
-			return req.Air.NotFoundHandler(req, res)
+			return NotFound(req, res)
 		}
 
 		return err
@@ -111,7 +112,7 @@ func hStatTrend(req *air.Request, res *air.Response) error {
 	switch trend {
 	case "latest", "last-7-days", "last-30-days":
 	default:
-		return req.Air.NotFoundHandler(req, res)
+		return NotFound(req, res)
 	}
 
 	objectInfo, err := qiniuKodoClient.StatObject(
@@ -122,7 +123,7 @@ func hStatTrend(req *air.Request, res *air.Response) error {
 	)
 	if err != nil {
 		if isNotFoundMinIOError(err) {
-			return req.Air.NotFoundHandler(req, res)
+			return NotFound(req, res)
 		}
 
 		return err
@@ -153,7 +154,20 @@ func hStatTrend(req *air.Request, res *air.Response) error {
 func hStat(req *air.Request, res *air.Response) error {
 	const downloadCountBadgeSuffix = "/badges/download-count.svg"
 
-	name := path.Clean(req.ParamValue("*").String())
+	name, err := url.PathUnescape(req.ParamValue("*").String())
+	if err != nil || strings.HasSuffix(name, "/") {
+		return CacheableNotFound(req, res, 86400)
+	}
+
+	if strings.Contains(name, "..") {
+		for _, part := range strings.Split(name, "/") {
+			if part == ".." {
+				return CacheableNotFound(req, res, 86400)
+			}
+		}
+	}
+
+	name = strings.TrimPrefix(path.Clean(name), "/")
 
 	date := time.Now().UTC()
 	date = time.Date(
