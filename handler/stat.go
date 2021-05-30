@@ -14,6 +14,7 @@ import (
 	"github.com/aofei/air"
 	"github.com/goproxy/goproxy.cn/base"
 	"github.com/minio/minio-go/v7"
+	"golang.org/x/mod/module"
 )
 
 // moduleVersionStat is the module version statastic.
@@ -169,6 +170,25 @@ func hStat(req *air.Request, res *air.Response) error {
 
 	name = strings.TrimPrefix(path.Clean(name), "/")
 
+	hasDownloadCountBadgeSuffix := strings.HasSuffix(
+		name,
+		downloadCountBadgeSuffix,
+	)
+	if hasDownloadCountBadgeSuffix {
+		if module.CheckPath(strings.TrimSuffix(
+			name,
+			downloadCountBadgeSuffix,
+		)) != nil {
+			return CacheableNotFound(req, res, 86400)
+		}
+	} else if nameParts := strings.Split(name, "@"); len(nameParts) == 2 {
+		if module.Check(nameParts[0], nameParts[1]) != nil {
+			return CacheableNotFound(req, res, 86400)
+		}
+	} else if module.CheckPath(name) != nil {
+		return CacheableNotFound(req, res, 86400)
+	}
+
 	date := time.Now().UTC()
 	date = time.Date(
 		date.Year(),
@@ -199,7 +219,7 @@ func hStat(req *air.Request, res *air.Response) error {
 		}
 		defer object.Close()
 
-		if strings.HasSuffix(name, downloadCountBadgeSuffix) {
+		if hasDownloadCountBadgeSuffix {
 			res.Header.Set("Content-Type", objectInfo.ContentType)
 			res.Header.Set(
 				"ETag",
@@ -238,8 +258,7 @@ func hStat(req *air.Request, res *air.Response) error {
 		return err
 	}
 
-	switch {
-	case strings.HasSuffix(name, downloadCountBadgeSuffix):
+	if hasDownloadCountBadgeSuffix {
 		res.Header.Set("Content-Type", "image/svg+xml")
 		return res.WriteFile("unknown-badge.svg")
 	}
