@@ -233,7 +233,7 @@ func validGoproxyCacheName(name string) bool {
 		return false
 	}
 
-	if module.CheckPath(nameParts[0]) != nil {
+	if _, err := module.UnescapePath(nameParts[0]); err != nil {
 		return false
 	}
 
