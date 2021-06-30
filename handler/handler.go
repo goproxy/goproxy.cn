@@ -12,6 +12,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/air-gases/cacheman"
 	"github.com/aofei/air"
@@ -175,27 +176,26 @@ func hIndexPage(req *air.Request, res *air.Response) error {
 
 // updateModuleVersionsCount updates the `moduleVersionCount`.
 func updateModuleVersionsCount() error {
-	object, err := qiniuKodoClient.GetObject(
-		base.Context,
-		qiniuKodoBucketName,
-		"stats/summary",
-		minio.GetObjectOptions{},
-	)
-	if err != nil {
-		return err
-	}
-	defer object.Close()
-
-	b, err := io.ReadAll(object)
-	if err != nil {
-		return err
-	}
-
 	var statSummary struct {
 		ModuleVersionCount int `json:"module_version_count"`
 	}
 
-	if err := json.Unmarshal(b, &statSummary); err != nil {
+	if err := retryQiniuKodoDo(base.Context, func(
+		ctx context.Context,
+	) error {
+		object, err := qiniuKodoClient.GetObject(
+			ctx,
+			qiniuKodoBucketName,
+			"stats/summary",
+			minio.GetObjectOptions{},
+		)
+		if err != nil {
+			return err
+		}
+		defer object.Close()
+
+		return json.NewDecoder(object).Decode(&statSummary)
+	}); err != nil {
 		return err
 	}
 
@@ -242,41 +242,47 @@ func qiniuKodoUpload(
 			return err
 		}
 
-		_, err := qiniuKodoCore.PutObject(
+		return retryQiniuKodoDo(ctx, func(ctx context.Context) error {
+			_, err := qiniuKodoCore.PutObject(
+				ctx,
+				qiniuKodoBucketName,
+				name,
+				content,
+				size,
+				"",
+				"",
+				minio.PutObjectOptions{
+					ContentType: contentType,
+				},
+			)
+			return err
+		})
+	}
+
+	var uploadID string
+	if err := retryQiniuKodoDo(ctx, func(ctx context.Context) (err error) {
+		uploadID, err = qiniuKodoCore.NewMultipartUpload(
 			ctx,
 			qiniuKodoBucketName,
 			name,
-			content,
-			size,
-			"",
-			"",
 			minio.PutObjectOptions{
 				ContentType: contentType,
 			},
 		)
-
 		return err
-	}
-
-	uploadID, err := qiniuKodoCore.NewMultipartUpload(
-		ctx,
-		qiniuKodoBucketName,
-		name,
-		minio.PutObjectOptions{
-			ContentType: contentType,
-		},
-	)
-	if err != nil {
+	}); err != nil {
 		return err
 	}
 	defer func() {
 		if err != nil {
-			qiniuKodoCore.AbortMultipartUpload(
-				ctx,
-				qiniuKodoBucketName,
-				name,
-				uploadID,
-			)
+			retryQiniuKodoDo(ctx, func(ctx context.Context) error {
+				return qiniuKodoCore.AbortMultipartUpload(
+					ctx,
+					qiniuKodoBucketName,
+					name,
+					uploadID,
+				)
+			})
 		}
 	}()
 
@@ -287,29 +293,39 @@ func qiniuKodoUpload(
 			partSize = r
 		}
 
-		content := content
-		if ra, ok := content.(io.ReaderAt); ok {
-			content = io.NewSectionReader(ra, offset, partSize)
-		} else if _, err := content.Seek(
-			offset,
-			io.SeekStart,
-		); err != nil {
-			return err
-		}
+		var part minio.ObjectPart
+		if err := retryQiniuKodoDo(ctx, func(
+			ctx context.Context,
+		) (err error) {
+			content := content
+			if ra, ok := content.(io.ReaderAt); ok {
+				content = io.NewSectionReader(
+					ra,
+					offset,
+					partSize,
+				)
+			} else if _, err := content.Seek(
+				offset,
+				io.SeekStart,
+			); err != nil {
+				return err
+			}
 
-		part, err := qiniuKodoCore.PutObjectPart(
-			ctx,
-			qiniuKodoBucketName,
-			name,
-			uploadID,
-			len(completeParts)+1,
-			io.LimitReader(content, partSize),
-			partSize,
-			"",
-			"",
-			nil,
-		)
-		if err != nil {
+			part, err = qiniuKodoCore.PutObjectPart(
+				ctx,
+				qiniuKodoBucketName,
+				name,
+				uploadID,
+				len(completeParts)+1,
+				io.LimitReader(content, partSize),
+				partSize,
+				"",
+				"",
+				nil,
+			)
+
+			return err
+		}); err != nil {
 			return err
 		}
 
@@ -321,15 +337,32 @@ func qiniuKodoUpload(
 		offset += part.Size
 	}
 
-	_, err = qiniuKodoCore.CompleteMultipartUpload(
-		ctx,
-		qiniuKodoBucketName,
-		name,
-		uploadID,
-		completeParts,
-	)
+	return retryQiniuKodoDo(ctx, func(ctx context.Context) error {
+		_, err := qiniuKodoCore.CompleteMultipartUpload(
+			ctx,
+			qiniuKodoBucketName,
+			name,
+			uploadID,
+			completeParts,
+		)
+		return err
+	})
+}
 
-	return err
+// retryQiniuKodoDo retries a Qiniu Cloud Kodo operation in case of some special
+// errors.
+func retryQiniuKodoDo(
+	ctx context.Context,
+	f func(ctx context.Context) error,
+) error {
+	return base.RetryN(ctx, f, func(err error) bool {
+		switch minio.ToErrorResponse(err).StatusCode {
+		case 573, 579, 599:
+			return true
+		}
+
+		return false
+	}, 100*time.Millisecond, 10)
 }
 
 // isNotFoundMinIOError reports whether the err is MinIO not found error.

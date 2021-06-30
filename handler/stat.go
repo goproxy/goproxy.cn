@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -72,25 +73,38 @@ func init() {
 
 // hStatSummary handles requests to query stat summary.
 func hStatSummary(req *air.Request, res *air.Response) error {
-	object, err := qiniuKodoClient.GetObject(
-		req.Context,
-		qiniuKodoBucketName,
-		"stats/summary",
-		minio.GetObjectOptions{},
+	var (
+		object     *minio.Object
+		objectInfo minio.ObjectInfo
 	)
-	if err != nil {
-		return err
-	}
-	defer object.Close()
 
-	objectInfo, err := object.Stat()
-	if err != nil {
+	if err := retryQiniuKodoDo(req.Context, func(
+		ctx context.Context,
+	) (err error) {
+		object, err = qiniuKodoClient.GetObject(
+			ctx,
+			qiniuKodoBucketName,
+			"stats/summary",
+			minio.GetObjectOptions{},
+		)
+		if err != nil {
+			return err
+		}
+
+		objectInfo, err = object.Stat()
+		if err != nil {
+			object.Close()
+		}
+
+		return err
+	}); err != nil {
 		if isNotFoundMinIOError(err) {
 			return NotFound(req, res)
 		}
 
 		return err
 	}
+	defer object.Close()
 
 	res.Header.Set("Content-Type", objectInfo.ContentType)
 	res.Header.Set("ETag", fmt.Sprintf("%q", objectInfo.ETag))
@@ -111,25 +125,38 @@ func hStatTrend(req *air.Request, res *air.Response) error {
 		return NotFound(req, res)
 	}
 
-	object, err := qiniuKodoClient.GetObject(
-		req.Context,
-		qiniuKodoBucketName,
-		fmt.Sprint("stats/trends/", trend),
-		minio.GetObjectOptions{},
+	var (
+		object     *minio.Object
+		objectInfo minio.ObjectInfo
 	)
-	if err != nil {
-		return err
-	}
-	defer object.Close()
 
-	objectInfo, err := object.Stat()
-	if err != nil {
+	if err := retryQiniuKodoDo(req.Context, func(
+		ctx context.Context,
+	) (err error) {
+		object, err = qiniuKodoClient.GetObject(
+			ctx,
+			qiniuKodoBucketName,
+			fmt.Sprint("stats/trends/", trend),
+			minio.GetObjectOptions{},
+		)
+		if err != nil {
+			return err
+		}
+
+		objectInfo, err = object.Stat()
+		if err != nil {
+			object.Close()
+		}
+
+		return err
+	}); err != nil {
 		if isNotFoundMinIOError(err) {
 			return NotFound(req, res)
 		}
 
 		return err
 	}
+	defer object.Close()
 
 	res.Header.Set("Content-Type", objectInfo.ContentType)
 	res.Header.Set("ETag", fmt.Sprintf("%q", objectInfo.ETag))
@@ -191,19 +218,31 @@ func hStat(req *air.Request, res *air.Response) error {
 		time.UTC,
 	)
 
-	object, err := qiniuKodoClient.GetObject(
-		req.Context,
-		qiniuKodoBucketName,
-		path.Join("stats", name),
-		minio.GetObjectOptions{},
+	var (
+		object     *minio.Object
+		objectInfo minio.ObjectInfo
 	)
-	if err != nil {
-		return err
-	}
-	defer object.Close()
 
-	objectInfo, err := object.Stat()
-	if err != nil {
+	if err := retryQiniuKodoDo(req.Context, func(
+		ctx context.Context,
+	) (err error) {
+		object, err = qiniuKodoClient.GetObject(
+			ctx,
+			qiniuKodoBucketName,
+			path.Join("stats", name),
+			minio.GetObjectOptions{},
+		)
+		if err != nil {
+			return err
+		}
+
+		objectInfo, err = object.Stat()
+		if err != nil {
+			object.Close()
+		}
+
+		return err
+	}); err != nil {
 		if isNotFoundMinIOError(err) {
 			if hasDownloadCountBadgeSuffix {
 				res.Header.Set("Content-Type", "image/svg+xml")
@@ -228,6 +267,7 @@ func hStat(req *air.Request, res *air.Response) error {
 
 		return err
 	}
+	defer object.Close()
 
 	if hasDownloadCountBadgeSuffix {
 		res.Header.Set("Content-Type", objectInfo.ContentType)

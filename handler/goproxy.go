@@ -101,13 +101,18 @@ func hGoproxy(req *air.Request, res *air.Response) error {
 		return CacheableNotFound(req, res, 86400)
 	}
 
-	objectInfo, err := qiniuKodoClient.StatObject(
-		req.Context,
-		qiniuKodoBucketName,
-		name,
-		minio.StatObjectOptions{},
-	)
-	if err != nil {
+	var objectInfo minio.ObjectInfo
+	if err := retryQiniuKodoDo(req.Context, func(
+		ctx context.Context,
+	) (err error) {
+		objectInfo, err = qiniuKodoClient.StatObject(
+			ctx,
+			qiniuKodoBucketName,
+			name,
+			minio.StatObjectOptions{},
+		)
+		return err
+	}); err != nil {
 		if isNotFoundMinIOError(err) {
 			hhGoproxy.ServeHTTP(
 				res.HTTPResponseWriter(),
@@ -151,19 +156,29 @@ func (gc *goproxyCacher) Get(
 	ctx context.Context,
 	name string,
 ) (io.ReadCloser, error) {
-	object, err := qiniuKodoClient.GetObject(
-		ctx,
-		qiniuKodoBucketName,
-		name,
-		minio.GetObjectOptions{},
+	var (
+		object     *minio.Object
+		objectInfo minio.ObjectInfo
 	)
-	if err != nil {
-		return nil, err
-	}
 
-	objectInfo, err := object.Stat()
-	if err != nil {
-		object.Close()
+	if err := retryQiniuKodoDo(ctx, func(ctx context.Context) (err error) {
+		object, err = qiniuKodoClient.GetObject(
+			ctx,
+			qiniuKodoBucketName,
+			name,
+			minio.GetObjectOptions{},
+		)
+		if err != nil {
+			return err
+		}
+
+		objectInfo, err = object.Stat()
+		if err != nil {
+			object.Close()
+		}
+
+		return err
+	}); err != nil {
 		if isNotFoundMinIOError(err) {
 			return nil, fs.ErrNotExist
 		}
@@ -190,12 +205,15 @@ func (gc *goproxyCacher) Set(
 	name string,
 	content io.ReadSeeker,
 ) error {
-	if _, err := qiniuKodoClient.StatObject(
-		base.Context,
-		qiniuKodoBucketName,
-		name,
-		minio.StatObjectOptions{},
-	); err == nil {
+	if err := retryQiniuKodoDo(ctx, func(ctx context.Context) error {
+		_, err := qiniuKodoClient.StatObject(
+			ctx,
+			qiniuKodoBucketName,
+			name,
+			minio.StatObjectOptions{},
+		)
+		return err
+	}); err == nil {
 		return nil
 	} else if !isNotFoundMinIOError(err) {
 		return err
