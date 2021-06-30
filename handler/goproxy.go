@@ -151,13 +151,19 @@ func (gc *goproxyCacher) Get(
 	ctx context.Context,
 	name string,
 ) (io.ReadCloser, error) {
-	objectInfo, err := qiniuKodoClient.StatObject(
+	object, err := qiniuKodoClient.GetObject(
 		ctx,
 		qiniuKodoBucketName,
 		name,
-		minio.StatObjectOptions{},
+		minio.GetObjectOptions{},
 	)
 	if err != nil {
+		return nil, err
+	}
+
+	objectInfo, err := object.Stat()
+	if err != nil {
+		object.Close()
 		if isNotFoundMinIOError(err) {
 			return nil, fs.ErrNotExist
 		}
@@ -169,16 +175,6 @@ func (gc *goproxyCacher) Get(
 	if len(checksum) != md5.Size {
 		eTagChecksum := md5.Sum([]byte(objectInfo.ETag))
 		checksum = eTagChecksum[:]
-	}
-
-	object, err := qiniuKodoClient.GetObject(
-		ctx,
-		qiniuKodoBucketName,
-		objectInfo.Key,
-		minio.GetObjectOptions{},
-	)
-	if err != nil {
-		return nil, err
 	}
 
 	return &goproxyCacheReader{

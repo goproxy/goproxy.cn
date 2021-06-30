@@ -72,12 +72,18 @@ func init() {
 
 // hStatSummary handles requests to query stat summary.
 func hStatSummary(req *air.Request, res *air.Response) error {
-	objectInfo, err := qiniuKodoClient.StatObject(
+	object, err := qiniuKodoClient.GetObject(
 		req.Context,
 		qiniuKodoBucketName,
 		"stats/summary",
-		minio.StatObjectOptions{},
+		minio.GetObjectOptions{},
 	)
+	if err != nil {
+		return err
+	}
+	defer object.Close()
+
+	objectInfo, err := object.Stat()
 	if err != nil {
 		if isNotFoundMinIOError(err) {
 			return NotFound(req, res)
@@ -85,17 +91,6 @@ func hStatSummary(req *air.Request, res *air.Response) error {
 
 		return err
 	}
-
-	object, err := qiniuKodoClient.GetObject(
-		req.Context,
-		qiniuKodoBucketName,
-		objectInfo.Key,
-		minio.GetObjectOptions{},
-	)
-	if err != nil {
-		return err
-	}
-	defer object.Close()
 
 	res.Header.Set("Content-Type", objectInfo.ContentType)
 	res.Header.Set("ETag", fmt.Sprintf("%q", objectInfo.ETag))
@@ -116,12 +111,18 @@ func hStatTrend(req *air.Request, res *air.Response) error {
 		return NotFound(req, res)
 	}
 
-	objectInfo, err := qiniuKodoClient.StatObject(
+	object, err := qiniuKodoClient.GetObject(
 		req.Context,
 		qiniuKodoBucketName,
 		fmt.Sprint("stats/trends/", trend),
-		minio.StatObjectOptions{},
+		minio.GetObjectOptions{},
 	)
+	if err != nil {
+		return err
+	}
+	defer object.Close()
+
+	objectInfo, err := object.Stat()
 	if err != nil {
 		if isNotFoundMinIOError(err) {
 			return NotFound(req, res)
@@ -129,17 +130,6 @@ func hStatTrend(req *air.Request, res *air.Response) error {
 
 		return err
 	}
-
-	object, err := qiniuKodoClient.GetObject(
-		req.Context,
-		qiniuKodoBucketName,
-		objectInfo.Key,
-		minio.GetObjectOptions{},
-	)
-	if err != nil {
-		return err
-	}
-	defer object.Close()
 
 	res.Header.Set("Content-Type", objectInfo.ContentType)
 	res.Header.Set("ETag", fmt.Sprintf("%q", objectInfo.ETag))
@@ -201,69 +191,64 @@ func hStat(req *air.Request, res *air.Response) error {
 		time.UTC,
 	)
 
-	objectInfo, err := qiniuKodoClient.StatObject(
+	object, err := qiniuKodoClient.GetObject(
 		req.Context,
 		qiniuKodoBucketName,
 		path.Join("stats", name),
-		minio.StatObjectOptions{},
+		minio.GetObjectOptions{},
 	)
-	if err == nil {
-		object, err := qiniuKodoClient.GetObject(
-			req.Context,
-			qiniuKodoBucketName,
-			objectInfo.Key,
-			minio.GetObjectOptions{},
-		)
-		if err != nil {
-			return err
-		}
-		defer object.Close()
+	if err != nil {
+		return err
+	}
+	defer object.Close()
 
-		if hasDownloadCountBadgeSuffix {
-			res.Header.Set("Content-Type", objectInfo.ContentType)
+	objectInfo, err := object.Stat()
+	if err != nil {
+		if isNotFoundMinIOError(err) {
+			if hasDownloadCountBadgeSuffix {
+				res.Header.Set("Content-Type", "image/svg+xml")
+				return res.WriteFile("unknown-badge.svg")
+			}
+
+			var stat moduleVersionStat
+			stat.updateLast30Days(date)
+
+			statJSON, err := json.Marshal(stat)
+			if err != nil {
+				return err
+			}
+
 			res.Header.Set(
-				"ETag",
-				fmt.Sprintf("%q", objectInfo.ETag),
-			)
-			res.Header.Set(
-				"Last-Modified",
-				objectInfo.LastModified.UTC().
-					Format(http.TimeFormat),
+				"Content-Type",
+				"application/json; charset=utf-8",
 			)
 
-			return res.Write(object)
+			return res.Write(bytes.NewReader(statJSON))
 		}
 
-		b, err := io.ReadAll(object)
-		if err != nil {
-			return err
-		}
-
-		var stat moduleVersionStat
-		if err := json.Unmarshal(b, &stat); err != nil {
-			return err
-		}
-
-		stat.updateLast30Days(date)
-
-		statJSON, err := json.Marshal(stat)
-		if err != nil {
-			return err
-		}
-
-		res.Header.Set("Content-Type", objectInfo.ContentType)
-
-		return res.Write(bytes.NewReader(statJSON))
-	} else if !isNotFoundMinIOError(err) {
 		return err
 	}
 
 	if hasDownloadCountBadgeSuffix {
-		res.Header.Set("Content-Type", "image/svg+xml")
-		return res.WriteFile("unknown-badge.svg")
+		res.Header.Set("Content-Type", objectInfo.ContentType)
+		res.Header.Set("ETag", fmt.Sprintf("%q", objectInfo.ETag))
+		res.Header.Set(
+			"Last-Modified",
+			objectInfo.LastModified.UTC().Format(http.TimeFormat),
+		)
+		return res.Write(object)
+	}
+
+	b, err := io.ReadAll(object)
+	if err != nil {
+		return err
 	}
 
 	var stat moduleVersionStat
+	if err := json.Unmarshal(b, &stat); err != nil {
+		return err
+	}
+
 	stat.updateLast30Days(date)
 
 	statJSON, err := json.Marshal(stat)
@@ -271,7 +256,7 @@ func hStat(req *air.Request, res *air.Response) error {
 		return err
 	}
 
-	res.Header.Set("Content-Type", "application/json; charset=utf-8")
+	res.Header.Set("Content-Type", objectInfo.ContentType)
 
 	return res.Write(bytes.NewReader(statJSON))
 }
