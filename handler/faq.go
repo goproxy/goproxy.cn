@@ -9,10 +9,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/BurntSushi/toml"
 	"github.com/aofei/air"
 	"github.com/fsnotify/fsnotify"
 	"github.com/goproxy/goproxy.cn/base"
+	"github.com/pelletier/go-toml/v2"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"golang.org/x/text/language"
