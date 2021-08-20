@@ -344,6 +344,9 @@ func qiniuKodoUpload(
 			name,
 			uploadID,
 			completeParts,
+			minio.PutObjectOptions{
+				ContentType: contentType,
+			},
 		)
 		return err
 	})
