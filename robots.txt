@@ -1,4 +1,4 @@
-User-Agent: *
+User-agent: *
 Disallow: /*/@latest
 Disallow: /*/@v/list
 Disallow: /*/@v/*.info
