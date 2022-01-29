@@ -28,7 +28,10 @@ var (
 
 	// hhGoproxy is an instance of the `goproxy.Goproxy`.
 	hhGoproxy = &goproxy.Goproxy{
-		Cacher: &goproxyCacher{},
+		GoBinName:           goproxyViper.GetString("go_bin_name"),
+		Cacher:              &goproxyCacher{},
+		CacherMaxCacheBytes: goproxyViper.GetInt("cacher_max_cache_bytes"),
+		ProxiedSUMDBs:       goproxyViper.GetStringSlice("proxied_sumdbs"),
 		Transport: &http.Transport{
 			Proxy: http.ProxyFromEnvironment,
 			DialContext: (&net.Dialer{
@@ -59,11 +62,6 @@ var (
 )
 
 func init() {
-	if err := goproxyViper.Unmarshal(hhGoproxy); err != nil {
-		base.Logger.Fatal().Err(err).
-			Msg("failed to unmarshal goproxy configuration items")
-	}
-
 	base.Air.BATCH(getHeadMethods, "/*", hGoproxy)
 }
 

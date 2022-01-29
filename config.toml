@@ -23,6 +23,7 @@ kodo_multipart_upload_part_size = 104857600
 # Goproxy
 [goproxy]
 go_bin_name = "go"
+cacher_max_cache_bytes = 52428800
 proxied_sumdbs = ["sum.golang.org"]
 fetch_timeout = "60s"
 auto_redirect = false
