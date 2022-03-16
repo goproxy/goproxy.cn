@@ -83,7 +83,7 @@ func init() {
 // hFAQPage handles requests to get FAQ page.
 func hFAQPage(req *air.Request, res *air.Response) error {
 	parseQAsOnce.Do(parseQAs)
-	return res.Render(map[string]interface{}{
+	return res.Render(map[string]any{
 		"PageTitle":     req.LocalizedString("FAQ"),
 		"CanonicalPath": "/faq",
 		"IsFAQPage":     true,

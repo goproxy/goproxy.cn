@@ -166,7 +166,7 @@ func Error(err error, req *air.Request, res *air.Response) {
 
 // hIndexPage handles requests to get index page.
 func hIndexPage(req *air.Request, res *air.Response) error {
-	return res.Render(map[string]interface{}{
+	return res.Render(map[string]any{
 		"IsIndexPage": true,
 		"ModuleVersionCount": thousandsCommaSeperated(
 			int64(moduleVersionCount),

@@ -303,7 +303,7 @@ func hStat(req *air.Request, res *air.Response) error {
 
 // hStatsPage handles requests to get statistics page.
 func hStatsPage(req *air.Request, res *air.Response) error {
-	return res.Render(map[string]interface{}{
+	return res.Render(map[string]any{
 		"PageTitle":     req.LocalizedString("Statistics"),
 		"CanonicalPath": "/stats",
 		"IsStatsPage":   true,
