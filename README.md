@@ -5,7 +5,7 @@
 The most trusted Go module proxy in China.
 
 Goproxy.cn has fully implemented the
-[GOPROXY protocol](https://golang.org/ref/mod#goproxy-protocol). And it's a
+[GOPROXY protocol](https://go.dev/ref/mod#goproxy-protocol). And it's a
 non-profit project supported by China's well-trusted cloud service provider
 [Qiniu Cloud](https://www.qiniu.com/en). Our goal is to provide a free, trusted,
 always on, and globally CDNed Go module proxy for Gophers in China. Please
@@ -98,7 +98,7 @@ side. However, if you still can't fully trust us, then you can use the most
 trusted checksum database [sum.golang.org](https://sum.golang.org) to ensure
 that the modules you get from us have not been tampered with, since Goproxy.cn
 already supports
-[proxying checksum databases](https://golang.org/design/25530-sumdb#proxying-a-checksum-database).
+[proxying checksum databases](https://go.dev/design/25530-sumdb#proxying-a-checksum-database).
 
 ### Is Goproxy.cn legal in China?
 

@@ -4,7 +4,7 @@
 
 中国最可靠的 Go 模块代理。
 
-Goproxy.cn 完全实现了 [GOPROXY 协议](https://golang.org/ref/mod#goproxy-protocol)。并且它是一个由中国备受信赖的云服务提供商[七牛云](https://www.qiniu.com)支持的非营利性项目。我们的目标是为中国的 Gopher 们提供一个免费的、可靠的、持续在线的且经过 CDN 在全球范围内加速的模块代理。请在 [status.goproxy.cn](https://status.goproxy.cn) 订阅我们的有关系统性能的实时和历史数据。
+Goproxy.cn 完全实现了 [GOPROXY 协议](https://go.dev/ref/mod#goproxy-protocol)。并且它是一个由中国备受信赖的云服务提供商[七牛云](https://www.qiniu.com)支持的非营利性项目。我们的目标是为中国的 Gopher 们提供一个免费的、可靠的、持续在线的且经过 CDN 在全球范围内加速的模块代理。请在 [status.goproxy.cn](https://status.goproxy.cn) 订阅我们的有关系统性能的实时和历史数据。
 
 请注意，Goproxy.cn 只专注于服务在 [https://goproxy.cn](https://goproxy.cn) 的 Web 应用本身的开发。如果你正在寻找一种极其简单的方法来搭建你自己的 Go 模块代理，那么你应该看一下 [Goproxy](https://github.com/goproxy/goproxy)，Goproxy.cn 就是基于它开发的。
 
@@ -78,7 +78,7 @@ C:\> $env:GOPROXY = "https://goproxy.cn"
 
 ### 使用 Goproxy.cn 是否安全？
 
-当然，和所有其他的 Go 模块代理一样，我们只是将模块原封不动地缓存起来，所以我们可以向你保证它们绝对不会在我们这边被篡改。不过，如果你还是不能够完全信任我们，那么你可以使用最值得信任的校验和数据库 [sum.golang.org](https://sum.golang.org) 来确保你从我们这里获取的模块没有被篡改过，因为 Goproxy.cn 已经支持了[代理校验和数据库](https://golang.org/design/25530-sumdb#proxying-a-checksum-database)。
+当然，和所有其他的 Go 模块代理一样，我们只是将模块原封不动地缓存起来，所以我们可以向你保证它们绝对不会在我们这边被篡改。不过，如果你还是不能够完全信任我们，那么你可以使用最值得信任的校验和数据库 [sum.golang.org](https://sum.golang.org) 来确保你从我们这里获取的模块没有被篡改过，因为 Goproxy.cn 已经支持了[代理校验和数据库](https://go.dev/design/25530-sumdb#proxying-a-checksum-database)。
 
 ### Goproxy.cn 在中国是合法的吗？
 
