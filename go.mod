@@ -53,7 +53,7 @@ require (
 	github.com/tdewolff/parse/v2 v2.5.15 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
-	golang.org/x/crypto v0.0.0-20211215165025-cf75a172585e // indirect
+	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
