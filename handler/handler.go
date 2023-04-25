@@ -211,13 +211,20 @@ func qiniuKodoUpload(
 	content io.ReadSeeker,
 ) (err error) {
 	var contentType string
-	switch path.Ext(name) {
-	case ".info":
+	switch path.Base(name) {
+	case "@latest":
 		contentType = "application/json; charset=utf-8"
-	case ".mod":
+	case "list":
 		contentType = "text/plain; charset=utf-8"
-	case ".zip":
-		contentType = "application/zip"
+	default:
+		switch path.Ext(name) {
+		case ".info":
+			contentType = "application/json; charset=utf-8"
+		case ".mod":
+			contentType = "text/plain; charset=utf-8"
+		case ".zip":
+			contentType = "application/zip"
+		}
 	}
 
 	var size int64
