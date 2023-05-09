@@ -75,8 +75,13 @@ func init() {
 			qiniuViper.GetString("secret_key"),
 			"",
 		),
-		Secure:       qiniuKodoEndpoint.Scheme == "https",
-		BucketLookup: minio.BucketLookupPath,
+		Secure: qiniuKodoEndpoint.Scheme == "https",
+	}
+
+	if qiniuViper.GetBool("kodo_force_path_style") {
+		qiniuKodoClientOptions.BucketLookup = minio.BucketLookupPath
+	} else {
+		qiniuKodoClientOptions.BucketLookup = minio.BucketLookupDNS
 	}
 
 	qiniuKodoEndpoint.Scheme = ""
