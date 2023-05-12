@@ -1,4 +1,4 @@
-FROM golang:1.20-alpine3.17 AS build
+FROM golang:1.20-alpine3.18 AS build
 
 WORKDIR /usr/local/src/goproxy.cn
 COPY . .
@@ -7,7 +7,7 @@ RUN apk add --no-cache git
 RUN go mod download
 RUN CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o bin/
 
-FROM alpine:3.17
+FROM alpine:3.18
 
 COPY --from=build /usr/local/src/goproxy.cn/bin/ /usr/local/bin/
 COPY templates/ /goproxy.cn/templates/
