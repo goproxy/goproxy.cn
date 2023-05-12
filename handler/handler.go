@@ -331,9 +331,7 @@ func qiniuKodoUpload(
 				len(completeParts)+1,
 				io.LimitReader(content, partSize),
 				partSize,
-				"",
-				"",
-				nil,
+				minio.PutObjectPartOptions{},
 			)
 
 			return err
