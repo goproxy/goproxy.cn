@@ -149,7 +149,7 @@ func hGoproxy(req *air.Request, res *air.Response) error {
 // goproxyCacher implements the `goproxy.Cacher`.
 type goproxyCacher struct{}
 
-// Cache implements the `goproxy.Cacher`.
+// Get implements the `goproxy.Cacher`.
 func (gc *goproxyCacher) Get(
 	ctx context.Context,
 	name string,
@@ -197,8 +197,8 @@ func (gc *goproxyCacher) Get(
 	}, nil
 }
 
-// SetCache implements the `goproxy.Cacher`.
-func (gc *goproxyCacher) Set(
+// Put implements the `goproxy.Cacher`.
+func (gc *goproxyCacher) Put(
 	ctx context.Context,
 	name string,
 	content io.ReadSeeker,
