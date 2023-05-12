@@ -240,12 +240,12 @@ func (gcr *goproxyCacheReader) Checksum() []byte {
 
 // validGoproxyCacheName reports whether the name is a valid Goproxy cache name.
 func validGoproxyCacheName(name string) bool {
-	nameParts := strings.Split(name, "/@v/")
-	if len(nameParts) != 2 {
+	escapedModulePath, _, found := strings.Cut(name, "/@v/")
+	if !found {
 		return false
 	}
 
-	if _, err := module.UnescapePath(nameParts[0]); err != nil {
+	if _, err := module.UnescapePath(escapedModulePath); err != nil {
 		return false
 	}
 

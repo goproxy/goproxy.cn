@@ -198,8 +198,8 @@ func hStat(req *air.Request, res *air.Response) error {
 		)) != nil {
 			return CacheableNotFound(req, res, 86400)
 		}
-	} else if nameParts := strings.Split(name, "@"); len(nameParts) == 2 {
-		if module.Check(nameParts[0], nameParts[1]) != nil {
+	} else if path, version, found := strings.Cut(name, "@"); found {
+		if module.Check(path, version) != nil {
 			return CacheableNotFound(req, res, 86400)
 		}
 	} else if module.CheckPath(name) != nil {

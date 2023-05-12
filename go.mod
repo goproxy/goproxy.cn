@@ -1,6 +1,6 @@
 module github.com/goproxy/goproxy.cn
 
-go 1.18
+go 1.20
 
 require (
 	github.com/air-gases/cacheman v0.17.0
