@@ -81,6 +81,8 @@ func hGoproxy(req *air.Request, res *air.Response) error {
 		return CacheableNotFound(req, res, 86400)
 	}
 
+	req.Header.Del("Disable-Module-Fetch")
+
 	if !goproxyAutoRedirect || path.Ext(name) != ".zip" {
 		hhGoproxy.ServeHTTP(res.HTTPResponseWriter(), req.HTTPRequest())
 		return nil
