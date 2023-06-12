@@ -42,3 +42,7 @@ pre code {
 	color: #5a5a5a;
 	font-weight: bold;
 }
+
+footer p {
+	text-align: center;
+}
