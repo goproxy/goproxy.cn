@@ -383,7 +383,7 @@ func isNotFoundMinIOError(err error) bool {
 	return minio.ToErrorResponse(err).StatusCode == http.StatusNotFound
 }
 
-// thousandsCommaSeperated returns a thousands comma seperated string for the n.
+// thousandsCommaSeperated returns a thousands comma separated string for the n.
 func thousandsCommaSeperated(n int64) string {
 	in := strconv.FormatInt(n, 10)
 	numOfDigits := len(in)
