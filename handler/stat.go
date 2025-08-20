@@ -38,10 +38,10 @@ func (mvs *moduleVersionStat) updateLast30Days(date time.Time) {
 		DownloadCount int       `json:"download_count"`
 	}, 30)
 
-	for i := 0; i < len(last30Days); i++ {
+	for i := range len(last30Days) {
 		last30Days[i].Date = date.AddDate(0, 0, -i)
 		for _, d := range mvs.Last30Days {
-			if d.Date == last30Days[i].Date {
+			if d.Date.Equal(last30Days[i].Date) {
 				last30Days[i].DownloadCount = d.DownloadCount
 				break
 			}

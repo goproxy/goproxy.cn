@@ -300,10 +300,7 @@ func qiniuKodoUpload(
 
 	var completeParts []minio.CompletePart
 	for offset := int64(0); offset < size; {
-		partSize := qiniuKodoMultipartUploadPartSize
-		if r := size - offset; r < partSize {
-			partSize = r
-		}
+		partSize := min(qiniuKodoMultipartUploadPartSize, size-offset)
 
 		var part minio.ObjectPart
 		if err := retryQiniuKodoDo(ctx, func(

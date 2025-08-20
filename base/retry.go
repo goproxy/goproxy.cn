@@ -32,7 +32,7 @@ func Retry(
 	return RetryN(ctx, f, retryable, nap, 100_000_000)
 }
 
-// Retry retries the f based on the retryable at most n times. And there is a
+// RetryN retries the f based on the retryable at most n times. And there is a
 // nap before each retry.
 func RetryN(
 	ctx context.Context,
@@ -44,13 +44,10 @@ func RetryN(
 	if retryable == nil {
 		retryable = func(_ error) bool { return false }
 	}
-
-	if n < 1 {
-		n = 1
-	}
+	n = max(n, 1)
 
 	var err error
-	for i := 0; i < n; i++ {
+	for range n {
 		if err = f(ctx); err == nil {
 			return nil
 		} else if !errors.Is(err, ErrRetryable) && !retryable(err) {
@@ -63,6 +60,5 @@ func RetryN(
 		case <-time.After(nap):
 		}
 	}
-
 	return err
 }
