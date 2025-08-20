@@ -120,12 +120,6 @@ name extension.
 ### Who will answer the questions that I have asked in [here](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=new-question.md&title=Question%3A+)?
 
 Members of Goproxy.cn and enthusiastic volunteers from our great Go community.
-Please keep in mind that in order to alleviate the workload of others, don't
-forget to check if our [FAQ](https://goproxy.cn/faq) page already has the
-question you want to ask.
-
-***Don't forget to check out our [FAQ](https://goproxy.cn/faq) page for more
-content.***
 
 ## Credits
 

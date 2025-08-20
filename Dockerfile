@@ -13,7 +13,6 @@ COPY --from=build /usr/local/src/goproxy.cn/bin/ /usr/local/bin/
 COPY templates/ /goproxy.cn/templates/
 COPY assets/ /goproxy.cn/assets/
 COPY locales/ /goproxy.cn/locales/
-COPY qas/ /goproxy.cn/qas/
 COPY robots.txt favicon.ico apple-touch-icon.png unknown-badge.svg /goproxy.cn/
 
 RUN apk add --no-cache go git git-lfs openssh gpg subversion fossil mercurial breezy

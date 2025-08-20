@@ -90,9 +90,7 @@ Goproxy.cn 是一个由商业支持的项目而不是一个个人项目。并且
 
 ### 谁将回答我在[这里](https://github.com/goproxy/goproxy.cn/issues/new?assignees=&labels=&template=questions-related-to-go-modules.zh-CN.md&title=Go+%E6%A8%A1%E5%9D%97%EF%BC%9A)询问的问题？
 
-Goproxy.cn 的成员以及我们伟大的 Go 社区中热心肠的志愿者们。请牢记，为了减轻他人的工作量，别忘了先去检查我们的[常见问题](https://goproxy.cn/faq)页面中是否已经有了你想要问的问题。
-
-***别忘了查看我们的[常见问题](https://goproxy.cn/faq)页面以获取更多的内容。***
+Goproxy.cn 的成员以及我们伟大的 Go 社区中热心肠的志愿者们。
 
 ## 功劳
 
