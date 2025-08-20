@@ -4,9 +4,9 @@
 
 中国最可靠的 Go 模块代理。
 
-Goproxy.cn 完全实现了 [GOPROXY 协议](https://go.dev/ref/mod#goproxy-protocol)。并且它是一个由中国备受信赖的云服务提供商[七牛云](https://www.qiniu.com)支持的非营利性项目。我们的目标是为中国的 Gopher 们提供一个免费的、可靠的、持续在线的且经过 CDN 在全球范围内加速的模块代理。请在 [status.goproxy.cn](https://status.goproxy.cn) 订阅我们的有关系统性能的实时和历史数据。
+Goproxy.cn 完全实现了 [GOPROXY 协议](https://go.dev/ref/mod#goproxy-protocol)。它是一个由中国备受信赖的云服务提供商[七牛云](https://www.qiniu.com)支持的非营利性项目。我们的目标是为中国的 Gopher 提供一个免费的、可靠的、持续在线且通过全球 CDN 加速的模块代理。请在 [status.goproxy.cn](https://status.goproxy.cn) 订阅我们的系统性能实时和历史数据。
 
-请注意，Goproxy.cn 只专注于服务在 [https://goproxy.cn](https://goproxy.cn) 的 Web 应用本身的开发。如果你正在寻找一种极其简单的方法来搭建你自己的 Go 模块代理，那么你应该看一下 [Goproxy](https://github.com/goproxy/goproxy)，Goproxy.cn 就是基于它开发的。
+Goproxy.cn 专注于服务在 [https://goproxy.cn](https://goproxy.cn) 的 Web 应用开发。如果你正在寻找一种简单的方法来搭建自己的 Go 模块代理，请查看 [Goproxy](https://github.com/goproxy/goproxy)，Goproxy.cn 就是基于它开发的。
 
 愉快地编码吧，Gopher 们！;-)
 
@@ -53,7 +53,6 @@ C:\> $env:GOPROXY = "https://goproxy.cn"
 
 或者
 
-```md
 1. 打开“开始”并搜索“env”
 2. 选择“编辑系统环境变量”
 3. 点击“环境变量…”按钮
@@ -66,7 +65,6 @@ C:\> $env:GOPROXY = "https://goproxy.cn"
 10. 选择“变量名”输入框并输入“GOPROXY”
 11. 选择“变量值”输入框并输入“https://goproxy.cn”
 12. 点击“确定”按钮
-```
 
 完成。
 
@@ -74,15 +72,15 @@ C:\> $env:GOPROXY = "https://goproxy.cn"
 
 ### 为什么创建 Goproxy.cn？
 
-由于中国政府的网络监管系统，Go 生态系统中有着许多中国 Gopher 们无法获取的模块，比如最著名的 `golang.org/x/...`。并且在中国大陆从 GitHub 获取模块的速度也有点慢。因此，我们创建了 Goproxy.cn，使在中国的 Gopher 们能更好地使用 Go 模块。事实上，由于 Goproxy.cn 已在全球范围内通过 CDN 加速，所以你可以在任何地方使用它。
+由于中国的网络限制，Go 生态系统中有许多中国 Gopher 无法获取的模块，比如最著名的 `golang.org/x/...`。同时，在中国大陆从 GitHub 获取模块的速度也比较慢。因此，我们创建了 Goproxy.cn，帮助中国的 Gopher 更好地使用 Go 模块。事实上，由于 Goproxy.cn 已在全球范围内通过 CDN 加速，你可以在任何地方使用它。
 
 ### 使用 Goproxy.cn 是否安全？
 
-当然，和所有其他的 Go 模块代理一样，我们只是将模块原封不动地缓存起来，所以我们可以向你保证它们绝对不会在我们这边被篡改。不过，如果你还是不能够完全信任我们，那么你可以使用最值得信任的校验和数据库 [sum.golang.org](https://sum.golang.org) 来确保你从我们这里获取的模块没有被篡改过，因为 Goproxy.cn 已经支持了[代理校验和数据库](https://go.dev/design/25530-sumdb#proxying-a-checksum-database)。
+当然安全。和所有其他的 Go 模块代理一样，我们以原始形式缓存模块，确保它们在我们这边不会被篡改。如果你需要额外的验证，可以使用最值得信任的校验和数据库 [sum.golang.org](https://sum.golang.org) 来确保从我们这里获取的模块没有被篡改，因为 Goproxy.cn 完全支持[代理校验和数据库](https://go.dev/design/25530-sumdb#proxying-a-checksum-database)。
 
 ### Goproxy.cn 在中国是合法的吗？
 
-Goproxy.cn 是一个由商业支持的项目而不是一个个人项目。并且它已经 ICP 备案在中华人民共和国工业和信息化部（ICP 备案号：[沪ICP备11037377号-56](https://beian.miit.gov.cn)），这也就意味着它在中国完全合法。
+Goproxy.cn 是一个商业支持的项目而不是个人项目。它已经在中华人民共和国工业和信息化部完成 ICP 备案（ICP 备案号：[沪ICP备11037377号-56](https://beian.miit.gov.cn)），这意味着它在中国完全合法。
 
 ### 为什么不使用 [proxy.golang.org](https://proxy.golang.org)？
 
@@ -94,14 +92,14 @@ Goproxy.cn 的成员以及我们伟大的 Go 社区中热心肠的志愿者们�
 
 ## 功劳
 
-* 作者：[盛傲飞](https://aofeisheng.com)
-* 维护者：[盛傲飞](https://aofeisheng.com)
-* 赞助商：[七牛云](https://www.qiniu.com)
-* 推动者：[许式伟（七牛云的创始人兼首席执行官）](https://baike.baidu.com/item/许式伟)、陶纯堂、[茅力夫](https://github.com/forrest-mao)和[陈剑煜](https://github.com/eddycjy)
+- 作者：[盛傲飞](https://aofeisheng.com)
+- 维护者：[盛傲飞](https://aofeisheng.com)
+- 赞助商：[七牛云](https://www.qiniu.com)
+- 推动者：[许式伟（七牛云的创始人兼首席执行官）](https://baike.baidu.com/item/许式伟)、陶纯堂、[茅力夫](https://github.com/forrest-mao)和[陈剑煜](https://github.com/eddycjy)
 
 ## 赞助商
 
-作为一个社区驱动的开源项目，[Goproxy.cn](https://goproxy.cn) 得以运行完全依靠赞助商的慷慨支持。
+作为一个社区驱动的开源项目，Goproxy.cn 的运行完全依赖于赞助商的慷慨支持。
 
 ### [![七牛云](https://github.com/user-attachments/assets/8eeedef5-8b59-4bd5-abc9-1231631ae580)](https://www.qiniu.com)
 
@@ -117,14 +115,14 @@ Goproxy.cn 的成员以及我们伟大的 Go 社区中热心肠的志愿者们�
 
 ## 社区
 
-如果你想要参与讨论 Goproxy.cn 或者询问和它相关的问题，只需要简单地在[这里](https://github.com/goproxy/goproxy.cn/issues)发表你的问题或看法即可。
+如果你对此项目有任何问题或想法，欢迎在[这里](https://github.com/goproxy/goproxy.cn/discussions)讨论。
 
 ## 贡献
 
-如果你想要帮助一起构建 Goproxy.cn，只需要简单地遵循[这个](https://github.com/goproxy/goproxy.cn/wiki/Contributing)在[这里](https://github.com/goproxy/goproxy.cn/pulls)提交你的 PR 即可。
+如果你想要对此项目做出贡献，请在[这里](https://github.com/goproxy/goproxy.cn/issues)提交问题或在[这里](https://github.com/goproxy/goproxy.cn/pulls)提交 PR。
+
+在提交 PR 时，请确保提交信息遵循 [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) 规范。
 
 ## 许可证
 
-该项目是基于 MIT 许可证发布的。
-
-许可证可以在[这里](LICENSE)找到。
+此项目基于 [MIT 许可证](LICENSE)发布。
