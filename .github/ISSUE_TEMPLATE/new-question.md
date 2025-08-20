@@ -9,13 +9,6 @@ assignees: ''
 
 <!-- Please answer the following questions before submitting your issue. Thanks! -->
 
-## Are you sure that our [FAQ](https://goproxy.cn/faq) page doesn't have the question you want to ask?
-
-<!-- To avoid abuse of this support, we will not repeat the answer and close --
-<!-- the issue directly. -->
-<!-- Please fill in your answer in the blank line below this line. -->
-
-
 ## What is the output when you execute the `go version` command?
 
 <pre>
