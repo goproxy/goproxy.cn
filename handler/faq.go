@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -96,7 +97,19 @@ func hFAQPage(req *air.Request, res *air.Response) error {
 func parseQAs() {
 	const qaRoot = "qas"
 
-	qades, err := os.ReadDir(qaRoot)
+	root, err := os.OpenRoot(qaRoot)
+	if err != nil {
+		return
+	}
+	defer root.Close()
+
+	dir, err := root.Open(".")
+	if err != nil {
+		return
+	}
+	defer dir.Close()
+
+	qades, err := dir.ReadDir(0)
 	if err != nil {
 		return
 	}
@@ -130,7 +143,7 @@ func parseQAs() {
 			continue
 		}
 
-		b, err := os.ReadFile(filepath.Join(qaRoot, qade.Name()))
+		b, err := root.ReadFile(qade.Name())
 		if err != nil {
 			continue
 		}
@@ -180,8 +193,8 @@ func parseQAs() {
 		noqas = append(noqas, nqa)
 	}
 
-	sort.Slice(noqas, func(i, j int) bool {
-		return noqas[i].ID < noqas[j].ID
+	slices.SortFunc(noqas, func(a, b *qa) int {
+		return strings.Compare(a.ID, b.ID)
 	})
 
 	qas = noqas
