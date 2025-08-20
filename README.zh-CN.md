@@ -99,6 +99,22 @@ Goproxy.cn 的成员以及我们伟大的 Go 社区中热心肠的志愿者们�
 * 赞助商：[七牛云](https://www.qiniu.com)
 * 推动者：[许式伟（七牛云的创始人兼首席执行官）](https://baike.baidu.com/item/许式伟)、陶纯堂、[茅力夫](https://github.com/forrest-mao)和[陈剑煜](https://github.com/eddycjy)
 
+## 赞助商
+
+作为一个社区驱动的开源项目，[Goproxy.cn](https://goproxy.cn) 得以运行完全依靠赞助商的慷慨支持。
+
+### [![七牛云](https://github.com/user-attachments/assets/8eeedef5-8b59-4bd5-abc9-1231631ae580)](https://www.qiniu.com)
+
+[七牛云](https://www.qiniu.com)是我们的主要赞助商，提供了至关重要的基础设施支持，包括服务器、对象存储和 CDN 服务。
+
+### [![DigitalOcean](https://github.com/user-attachments/assets/95bd1397-9415-4d46-a7e5-16a5fb825982)](https://www.digitalocean.com)
+
+[DigitalOcean](https://www.digitalocean.com) 提供的服务器用于运行我们的 [Stats API](https://goproxy.cn/stats) 服务、处理日志分析，并提供备用基础设施以提高系统可用性。
+
+### [![Atlassian](https://github.com/user-attachments/assets/5f12924b-17be-4f37-8a80-376cc556a873)](https://www.atlassian.com)
+
+[Atlassian](https://www.atlassian.com) 为我们提供了 [Statuspage](https://www.atlassian.com/software/statuspage) 订阅，使我们能够在 [status.goproxy.cn](https://status.goproxy.cn) 维护系统状态页面。
+
 ## 社区
 
 如果你想要参与讨论 Goproxy.cn 或者询问和它相关的问题，只需要简单地在[这里](https://github.com/goproxy/goproxy.cn/issues)发表你的问题或看法即可。

@@ -128,6 +128,22 @@ Members of Goproxy.cn and enthusiastic volunteers from our great Go community.
 * Sponsor: [Qiniu Cloud](https://www.qiniu.com/en)
 * Promoters: [Shiwei Xu (Qiniu Cloud's founder-CEO)](https://baike.baidu.com/item/许式伟), Chuntang Tao, [Lifu Mao](https://github.com/forrest-mao) and [Jianyu Chen](https://github.com/eddycjy)
 
+## Sponsors
+
+As a community-driven open source project, [Goproxy.cn](https://goproxy.cn) is made possible by the generous support of our sponsors.
+
+### [![Qiniu Cloud](https://github.com/user-attachments/assets/8eeedef5-8b59-4bd5-abc9-1231631ae580)](https://www.qiniu.com/en)
+
+[Qiniu Cloud](https://www.qiniu.com/en) is our primary sponsor, providing essential infrastructure including servers, object storage, and CDN services.
+
+### [![DigitalOcean](https://github.com/user-attachments/assets/95bd1397-9415-4d46-a7e5-16a5fb825982)](https://www.digitalocean.com)
+
+[DigitalOcean](https://www.digitalocean.com) provides servers for our [Stats API](https://goproxy.cn/stats), log analytics, and backup infrastructure to enhance availability.
+
+### [![Atlassian](https://github.com/user-attachments/assets/5f12924b-17be-4f37-8a80-376cc556a873)](https://www.atlassian.com)
+
+[Atlassian](https://www.atlassian.com) provides our [Statuspage](https://www.atlassian.com/software/statuspage) subscription, enabling us to maintain our system status page at [status.goproxy.cn](https://status.goproxy.cn).
+
 ## Community
 
 If you want to discuss Goproxy.cn, or ask questions about it, simply post
