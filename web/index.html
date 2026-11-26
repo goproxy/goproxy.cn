@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="A public Go module proxy for developers in China. Configure GOPROXY and diagnose download problems."
+      data-zh-content="面向中国开发者的公共 Go 模块代理。查看配置指南或排查下载问题。"
+    />
+    <title data-zh="七牛云 - Goproxy.cn" data-en="Goproxy.cn | Go modules within reach">
+      七牛云 - Goproxy.cn
+    </title>
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="/assets/site.css" />
+    <script defer src="/assets/site.js"></script>
+  </head>
+  <body data-page="home">
+    <a class="skip" href="#main" data-zh="跳到内容">Skip to content</a>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="/" aria-label="Goproxy.cn home" data-zh-label="Goproxy.cn 首页">
+          <img class="brand-avatar" src="/logo.svg" width="42" height="42" alt="" />
+          <span class="brand-name">Goproxy<span class="brand-dot">.cn</span></span>
+          <span class="brand-tagline" data-zh="中国最可靠的 Go 模块代理">The most trusted Go module proxy in China</span>
+        </a>
+        <nav aria-label="Main navigation" data-zh-label="主导航">
+          <a href="/setup/" data-nav="setup" data-zh="使用指南">Setup</a>
+          <a href="/status/" data-nav="status" data-zh="诊断">Diagnostics</a>
+        </nav>
+        <div class="header-actions">
+          <button class="language" type="button" id="language" aria-label="切换到简体中文">简体中文</button>
+          <a class="github" aria-label="GitHub" href="https://github.com/goproxy/goproxy.cn">
+            <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-github"></use></svg>
+            <span>GitHub</span>
+          </a>
+        </div>
+      </div>
+    </header>
+    <main id="main">
+      <section class="hero wrap">
+        <div class="hero-copy">
+          <p class="kicker"><span></span><span data-zh="公共 Go 模块代理">PUBLIC GO MODULE PROXY</span></p>
+          <h1>
+            <span data-zh="Go 模块，">Go modules.</span>
+            <br />
+            <em data-zh="随取随用。">Within reach.</em>
+          </h1>
+          <p class="lede" data-zh="面向中国开发者的公共 Go 模块代理，可用于本地开发和 CI。">
+            A public Go module proxy built for developers in China. Use it for local development and CI.
+          </p>
+          <div class="terminal hero-terminal">
+            <div class="terminal-command">
+              <span class="terminal-prompt" aria-hidden="true"></span>
+              <code id="hero-command">go env -w GOPROXY=https://goproxy.cn,direct</code>
+            </div>
+            <button
+              type="button"
+              data-copy="hero-command"
+              aria-label="Copy the GOPROXY command"
+              data-zh-label="复制 GOPROXY 命令"
+            >
+              <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-copy"></use></svg>
+              <span data-zh="复制">Copy</span>
+            </button>
+          </div>
+          <div class="hero-links">
+            <a class="text-link" href="/setup/">
+              <span data-zh="查看配置指南">Read the setup guide</span>
+              <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-right"></use></svg>
+            </a>
+            <a href="/status/" data-zh="下载遇到问题？">Downloads failing?</a>
+          </div>
+        </div>
+        <figure class="hero-art">
+          <img src="/assets/gopher-module.svg" width="1200" height="900" alt="" fetchpriority="high" />
+          <figcaption>
+            <span>GOPROXY</span>
+            <span data-zh="公共模块缓存">PUBLIC MODULE CACHE</span>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="wrap service-facts" aria-label="Service facts" data-zh-label="服务功能">
+        <div class="service-fact">
+          <span class="service-fact-icon">
+            <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-shield"></use></svg>
+          </span>
+          <div>
+            <strong data-zh="Go 校验和数据库代理">Checksum database proxy</strong>
+            <span><code>sum.golang.org</code></span>
+          </div>
+        </div>
+        <div class="service-fact">
+          <span class="service-fact-icon">
+            <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-activity"></use></svg>
+          </span>
+          <div>
+            <strong data-zh="连通性诊断">Connectivity checks</strong>
+            <a class="inline-link" href="/status/">
+              <span data-zh="测试当前连接">Test your connection</span>
+              <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-right"></use></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="wrap essentials" aria-label="Documentation" data-zh-label="使用文档">
+        <a href="/setup/#ci">
+          <span class="resource-icon">
+            <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-terminal"></use></svg>
+          </span>
+          <h2 data-zh="在 CI 中使用">Use it in CI</h2>
+          <p><span data-zh="为构建环境设置 ">Configure </span><code>GOPROXY</code><span data-zh="。"> for your builds.</span></p>
+          <span class="resource-arrow">
+            <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-right"></use></svg>
+          </span>
+        </a>
+        <a href="/setup/#private">
+          <span class="resource-icon">
+            <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-shield"></use></svg>
+          </span>
+          <h2 data-zh="配置私有模块">Configure private modules</h2>
+          <p><span data-zh="用 ">Set </span><code>GOPRIVATE</code><span data-zh=" 匹配私有模块的路径前缀。"> for private module paths.</span></p>
+          <span class="resource-arrow">
+            <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-right"></use></svg>
+          </span>
+        </a>
+        <a href="/setup/#self-host">
+          <span class="resource-icon">
+            <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-box"></use></svg>
+          </span>
+          <h2 data-zh="自建模块代理">Run your own proxy</h2>
+          <p data-zh="用开源的 Goproxy 搭建自己的模块代理。">
+            Use the open-source Goproxy to host your own module proxy.
+          </p>
+          <span class="resource-arrow">
+            <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-right"></use></svg>
+          </span>
+        </a>
+      </section>
+      <section class="wrap about" aria-labelledby="about-heading">
+        <h2 id="about-heading" data-zh="关于 Goproxy.cn">About Goproxy.cn</h2>
+        <p><span data-zh="Goproxy.cn 始于 2019 年，基于">Goproxy.cn started in 2019. It runs on the </span><a href="https://github.com/goproxy/goproxy" data-zh="开源的 Goproxy 项目">open-source Goproxy project</a><span data-zh="，使用七牛云 CDN 分发公共 Go 模块。"> and serves public Go modules through Qiniu Cloud's CDN.</span></p>
+      </section>
+    </main>
+    <footer class="site-footer" id="site-footer">
+      <div class="wrap footer-links">
+        <a href="https://www.qiniu.com/" data-zh="七牛云">Qiniu Cloud</a>
+        <span aria-hidden="true">&middot;</span>
+        <a class="footer-registration" href="https://beian.miit.gov.cn/">沪ICP备11037377号-56</a>
+        <span aria-hidden="true">&middot;</span>
+        <a href="https://github.com/goproxy/goproxy.cn/issues" data-zh="反馈问题">Report an issue</a>
+      </div>
+    </footer>
+    <div
+      id="announcement"
+      class="sr-only"
+      role="status"
+      data-zh-copied="已复制"
+      data-zh-copy-failed="复制失败"
+    ></div>
+  </body>
+</html>
