@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Check Goproxy.cn connectivity from your browser and verify Go module downloads from your terminal."
+      data-zh-content="在浏览器中检查 Goproxy.cn 的连通性，并在终端验证 Go 模块下载。"
+    />
+    <title data-zh="下载诊断 | Goproxy.cn">Download diagnostics | Goproxy.cn</title>
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="/assets/site.css" />
+    <script defer src="/assets/site.js"></script>
+  </head>
+  <body data-page="status">
+    <a class="skip" href="#main" data-zh="跳到内容">Skip to content</a>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="/" aria-label="Goproxy.cn home" data-zh-label="Goproxy.cn 首页">
+          <img class="brand-avatar" src="/logo.svg" width="42" height="42" alt="" />
+          <span class="brand-name">Goproxy<span class="brand-dot">.cn</span></span>
+          <span class="brand-tagline" data-zh="中国最可靠的 Go 模块代理">The most trusted Go module proxy in China</span>
+        </a>
+        <nav aria-label="Main navigation" data-zh-label="主导航">
+          <a href="/setup/" data-nav="setup" data-zh="使用指南">Setup</a>
+          <a href="/status/" data-nav="status" data-zh="诊断">Diagnostics</a>
+        </nav>
+        <div class="header-actions">
+          <button class="language" type="button" id="language" aria-label="切换到简体中文">简体中文</button>
+          <a class="github" aria-label="GitHub" href="https://github.com/goproxy/goproxy.cn">
+            <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-github"></use></svg>
+            <span>GitHub</span>
+          </a>
+        </div>
+      </div>
+    </header>
+    <main id="main" class="wrap inner-page">
+      <nav class="crumb" aria-label="Breadcrumb" data-zh-label="位置导航">
+        <a href="/">Goproxy.cn</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page" data-zh="诊断">Diagnostics</span>
+      </nav>
+      <h1 data-zh="下载诊断">Download diagnostics</h1>
+      <p class="lede" data-zh="检查当前网络能否访问 Goproxy.cn 并下载公共 Go 模块。">
+        Check whether your network can reach Goproxy.cn and download a public Go module.
+      </p>
+      <div
+        class="diagnostic-panel"
+        data-zh-idle="等待测试"
+        data-zh-running="正在测试……"
+        data-zh-invalid="版本元数据异常"
+        data-zh-timeout="请求超时"
+        data-zh-failed="无法读取响应"
+      >
+        <div class="diagnostic-head">
+          <div>
+            <span class="eyebrow" data-zh="浏览器测试">BROWSER CHECK</span>
+            <h2 data-zh="测试当前连接">Test your connection</h2>
+          </div>
+          <button type="button" id="run-probe" class="primary" aria-describedby="probe-note">
+            <span data-zh="运行测试">Run checks</span>
+            <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-right"></use></svg>
+          </button>
+        </div>
+        <div class="probe-row">
+          <span class="probe-dot" id="module-dot" aria-hidden="true"></span>
+          <div>
+            <strong id="module-label" data-zh="模块版本元数据">Module version metadata</strong>
+            <code>/golang.org/x/text/@v/v0.3.2.info</code>
+          </div>
+          <span
+            class="probe-result"
+            id="module-result"
+            role="status"
+            aria-labelledby="module-label"
+            data-zh="等待测试"
+          >
+            Not run
+          </span>
+        </div>
+        <div class="probe-row">
+          <span class="probe-dot" id="checksum-dot" aria-hidden="true"></span>
+          <div>
+            <strong id="checksum-label" data-zh="校验和数据库代理">Checksum database proxy</strong>
+            <code>/sumdb/sum.golang.org/supported</code>
+          </div>
+          <span
+            class="probe-result"
+            id="checksum-result"
+            role="status"
+            aria-labelledby="checksum-label"
+            data-zh="等待测试"
+          >
+            Not run
+          </span>
+        </div>
+        <p class="panel-note" id="probe-note">
+          <span data-zh="浏览器会检查两个代理端点。下方的终端命令还能验证完整的模块下载。">The browser checks two proxy endpoints. The terminal commands below can also verify a full module download.</span>
+          <span data-zh="服务故障和维护信息见">For service incidents and maintenance, see </span><a href="https://status.goproxy.cn" data-zh="服务状态页">the service status page</a><span data-zh="。">.</span>
+        </p>
+      </div>
+      <div class="status-guide">
+        <h2 id="terminal-checks" data-zh="在 Bash 或 Zsh 中验证">Verify in Bash or Zsh</h2>
+        <p data-zh="第一个请求获取模块版本元数据，第二个检查 Goproxy.cn 是否代理默认的校验和数据库。">
+          The first request fetches module version metadata. The second checks whether Goproxy.cn proxies the
+          default checksum database.
+        </p>
+        <div class="terminal">
+          <div class="terminal-command"><code id="terminal-probe">curl -fsS -w '\n' https://goproxy.cn/golang.org/x/text/@v/v0.3.2.info
+curl -fsS -o /dev/null -w '%{http_code}\n' https://goproxy.cn/sumdb/sum.golang.org/supported</code></div>
+          <button
+            type="button"
+            data-copy="terminal-probe"
+            aria-label="Copy the curl commands"
+            data-zh-label="复制 curl 命令"
+          >
+            <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-copy"></use></svg>
+            <span data-zh="复制">Copy</span>
+          </button>
+        </div>
+        <p
+          data-zh="这条命令通过 Goproxy.cn 下载公共模块，使用空的模块缓存并启用公共校验和数据库。命令退出时会清理临时缓存。"
+        >
+          This command downloads a public module through Goproxy.cn with an empty module cache and the public
+          checksum database enabled. It removes the temporary cache on exit.
+        </p>
+        <div class="terminal">
+          <div class="terminal-command"><code id="go-probe">(
+  probe_cache=$(mktemp -d) &amp;&amp;
+  trap 'GOMODCACHE="$probe_cache" go clean -modcache' EXIT &amp;&amp;
+  cd "$probe_cache" &amp;&amp;
+  GOMODCACHE="$probe_cache" GOWORK=off \
+    GOPROXY=https://goproxy.cn GONOPROXY=none \
+    GOSUMDB=sum.golang.org GONOSUMDB=none \
+    go mod download -json golang.org/x/text@v0.3.2
+)</code></div>
+          <button
+            type="button"
+            data-copy="go-probe"
+            aria-label="Copy the module download command"
+            data-zh-label="复制模块下载命令"
+          >
+            <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-copy"></use></svg>
+            <span data-zh="复制">Copy</span>
+          </button>
+        </div>
+        <h2 data-zh="常见问题">Common failure modes</h2>
+        <details>
+          <summary data-zh="出现超时或 TLS 错误">Timeout or TLS error</summary>
+          <p><span data-zh="先用 ">Try the same endpoint with </span><code>curl</code><span data-zh=" 测试相同地址，再检查 DNS、系统证书、">, then check DNS, system certificates, </span><code>HTTPS_PROXY</code><span data-zh=" 和 CI 出站规则。"> and CI egress rules.</span></p>
+        </details>
+        <details>
+          <summary data-zh="收到 HTTP 404 或 410">HTTP 404 or 410</summary>
+          <p><span data-zh="检查模块路径和版本是否正确。配置了 ">Check the module path and version. If you configured </span><code>,direct</code><span data-zh=" 时，Go 收到这两种响应之一后会尝试直接访问版本控制系统。">, Go will try version control directly after either response.</span></p>
+        </details>
+        <details>
+          <summary data-zh="私有模块请求发往了公共代理">
+            A private module path was sent to a public proxy
+          </summary>
+          <p><span data-zh="参照">Follow the </span><a href="/setup/#private" data-zh="私有模块配置指南">private module setup guide</a><span data-zh="，确认 "> to make sure </span><code>GOPRIVATE</code><span data-zh=" 匹配模块路径前缀。如果你单独设置了 "> matches the module path prefix. If you set </span><code>GONOPROXY</code><span data-zh=" 或 "> or </span><code>GONOSUMDB</code><span data-zh="，也检查一下它们的匹配规则。"> separately, check those patterns too.</span></p>
+        </details>
+      </div>
+    </main>
+    <footer class="site-footer">
+      <div class="wrap footer-links">
+        <a href="https://www.qiniu.com/" data-zh="七牛云">Qiniu Cloud</a>
+        <span aria-hidden="true">&middot;</span>
+        <a class="footer-registration" href="https://beian.miit.gov.cn/">沪ICP备11037377号-56</a>
+        <span aria-hidden="true">&middot;</span>
+        <a href="https://github.com/goproxy/goproxy.cn/issues" data-zh="反馈问题">Report an issue</a>
+      </div>
+    </footer>
+    <div
+      id="announcement"
+      class="sr-only"
+      role="status"
+      data-zh-copied="已复制"
+      data-zh-copy-failed="复制失败"
+    ></div>
+  </body>
+</html>

@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Configure Goproxy.cn for local development, CI, and private Go modules, or run your own module proxy."
+      data-zh-content="了解如何为本地开发、CI 和私有 Go 模块配置 Goproxy.cn，或搭建自己的模块代理。"
+    />
+    <title data-zh="使用指南 | Goproxy.cn">Setup | Goproxy.cn</title>
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="/assets/site.css" />
+    <script defer src="/assets/site.js"></script>
+  </head>
+  <body data-page="setup">
+    <a class="skip" href="#main" data-zh="跳到内容">Skip to content</a>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="/" aria-label="Goproxy.cn home" data-zh-label="Goproxy.cn 首页">
+          <img class="brand-avatar" src="/logo.svg" width="42" height="42" alt="" />
+          <span class="brand-name">Goproxy<span class="brand-dot">.cn</span></span>
+          <span class="brand-tagline" data-zh="中国最可靠的 Go 模块代理">The most trusted Go module proxy in China</span>
+        </a>
+        <nav aria-label="Main navigation" data-zh-label="主导航">
+          <a href="/setup/" data-nav="setup" data-zh="使用指南">Setup</a>
+          <a href="/status/" data-nav="status" data-zh="诊断">Diagnostics</a>
+        </nav>
+        <div class="header-actions">
+          <button class="language" type="button" id="language" aria-label="切换到简体中文">简体中文</button>
+          <a class="github" aria-label="GitHub" href="https://github.com/goproxy/goproxy.cn">
+            <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-github"></use></svg>
+            <span>GitHub</span>
+          </a>
+        </div>
+      </div>
+    </header>
+    <main id="main" class="wrap inner-page docs-page">
+      <nav class="crumb" aria-label="Breadcrumb" data-zh-label="位置导航">
+        <a href="/">Goproxy.cn</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page" data-zh="使用指南">Setup</span>
+      </nav>
+      <h1 data-zh="配置 Goproxy.cn">Set up Goproxy.cn</h1>
+      <p class="lede" data-zh="为本地开发和 CI 配置代理，并设置私有模块访问。">
+        Configure the proxy for local development and CI, and set up access to private modules.
+      </p>
+      <div class="docs-layout">
+        <aside class="sidebar">
+          <nav aria-label="On this page" data-zh-label="本页目录">
+            <a href="#quickstart" data-zh="快速开始">Quickstart</a>
+            <a href="#ci" data-zh="持续集成">CI</a>
+            <a href="#private" data-zh="私有模块">Private modules</a>
+            <a href="#fallback" data-zh="回退规则">Fallback behavior</a>
+            <a href="#self-host" data-zh="自建代理">Self-host</a>
+          </nav>
+        </aside>
+        <div class="doc-content">
+          <section id="quickstart">
+            <h2 data-zh="快速开始">Quickstart</h2>
+            <p data-zh="选择配置方式后，在对应的终端运行命令。">
+              Choose a configuration method and run its command in the corresponding shell.
+            </p>
+            <div class="tab-group" role="group" aria-label="Configuration type" data-zh-label="配置方式">
+              <button
+                class="selected"
+                type="button"
+                data-setup="persistent"
+                aria-pressed="true"
+                data-zh="持久配置"
+              >
+                Persistent
+              </button>
+              <button
+                type="button"
+                data-setup="shell"
+                aria-pressed="false"
+                data-command="export GOPROXY=https://goproxy.cn,direct"
+                data-note="This applies to the current shell and its child processes."
+                data-zh-note="此命令只影响当前 shell 及其子进程。"
+              >
+                Bash / Zsh
+              </button>
+              <button
+                type="button"
+                data-setup="powershell"
+                aria-pressed="false"
+                data-command='$env:GOPROXY = "https://goproxy.cn,direct"'
+                data-note="This applies to the current PowerShell session and its child processes."
+                data-zh-note="此命令只影响当前 PowerShell 会话及其子进程。"
+              >
+                PowerShell
+              </button>
+            </div>
+            <div class="terminal">
+              <div class="terminal-command"><code id="setup-command">go env -w GOPROXY=https://goproxy.cn,direct</code></div>
+              <button
+                type="button"
+                data-copy="setup-command"
+                aria-label="Copy the setup command"
+                data-zh-label="复制配置命令"
+              >
+                <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-copy"></use></svg>
+                <span data-zh="复制">Copy</span>
+              </button>
+            </div>
+            <p id="setup-note" data-zh-note="此命令将设置保存到 Go 的用户级配置中。">
+              This saves the setting in Go&#x27;s per-user configuration.
+            </p>
+            <p><span data-zh="用 ">Run </span><code>go env GOPROXY</code><span data-zh=" 查看当前值。"> to check the current value.</span></p>
+            <p><span data-zh="用 ">To remove the saved setting, run </span><code>go env -u GOPROXY</code><span data-zh=" 撤销已保存的设置。">.</span></p>
+            <p><span data-zh="如果已经导出了 ">An existing </span><code>GOPROXY</code><span data-zh=" 环境变量，它会优先于 "> environment variable takes precedence over the value written by </span><code>go env</code><span data-zh=" 写入的值。">.</span></p>
+          </section>
+          <section id="ci">
+            <h2 data-zh="持续集成">Continuous integration</h2>
+            <p><span data-zh="把 ">Set </span><code>GOPROXY</code><span data-zh=" 设置为构建任务的环境变量。下面是 GitHub Actions 的任务配置片段。"> in your build job's environment. This is a job-level GitHub Actions example.</span></p>
+            <div class="terminal">
+              <div class="terminal-command"><code id="ci-command">env:
+  GOPROXY: https://goproxy.cn,direct</code></div>
+              <button
+                type="button"
+                data-copy="ci-command"
+                aria-label="Copy the CI configuration"
+                data-zh-label="复制 CI 配置"
+              >
+                <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-copy"></use></svg>
+                <span data-zh="复制">Copy</span>
+              </button>
+            </div>
+          </section>
+          <section id="private">
+            <h2 data-zh="私有模块">Private modules</h2>
+            <p><span data-zh="在下载依赖前，将私有模块的路径前缀加入 ">Add the path prefixes of your private modules to </span><code>GOPRIVATE</code><span data-zh="。请将示例前缀换成你的前缀。这条命令会替换已保存的列表，请保留原有条目，并用逗号隔开。"> before downloading dependencies. Replace the example prefix with your own. This command replaces the saved list, so include any existing entries, separated by commas.</span></p>
+            <div class="terminal">
+              <div class="terminal-command"><code id="private-command">go env -w GOPRIVATE=git.example.com</code></div>
+              <button
+                type="button"
+                data-copy="private-command"
+                aria-label="Copy the GOPRIVATE command"
+                data-zh-label="复制 GOPRIVATE 命令"
+              >
+                <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-copy"></use></svg>
+                <span data-zh="复制">Copy</span>
+              </button>
+            </div>
+            <p><span data-zh="如果你单独设置了 ">If you set </span><code>GONOPROXY</code><span data-zh=" 或 "> or </span><code>GONOSUMDB</code><span data-zh="，可查阅 "> separately, see the </span><a href="https://go.dev/ref/mod#private-modules" data-zh="Go 官方私有模块文档">Go documentation on private modules</a><span data-zh="，了解如何覆盖默认设置，以及如何匹配模块路径。"> for how they override the defaults and match module paths.</span></p>
+          </section>
+          <section id="fallback">
+            <h2 data-zh="代理回退规则">Proxy fallback</h2>
+            <p><code>,direct</code> <span data-zh="表示代理返回 HTTP 404 或 410 时，Go 会尝试直接访问版本控制系统。超时或其他 HTTP 错误会终止下载。">tells Go to try version control directly if the proxy returns HTTP 404 or 410. A timeout or another HTTP error stops the download.</span></p>
+            <p><span data-zh="如果下载仍然失败，可以用">If the download still fails, use the </span><a href="/status/" data-zh="下载诊断">download diagnostics</a><span data-zh="检查当前网络连接。"> to check your connection.</span></p>
+          </section>
+          <section id="self-host">
+            <h2 data-zh="自建 Go 模块代理">Run your own Go module proxy</h2>
+            <p><span data-zh="Goproxy.cn 基于开源项目 Goproxy。">Goproxy.cn is built on the open-source Goproxy project. The </span><a href="https://pkg.go.dev/github.com/goproxy/goproxy#readme" data-zh="Goproxy 部署文档">Goproxy deployment guide</a><span data-zh="介绍如何从命令行启动服务，或将 Goproxy 作为 HTTP 处理器嵌入 Go 应用。"> explains how to run the server from the command line or use Goproxy as an HTTP handler in a Go application.</span></p>
+            <p><span data-zh="在 Bash 或 Zsh 中运行以下命令。启动服务前，请确认 Go 安装可执行文件的目录已加入 ">Run these commands in Bash or Zsh. Before starting the server, make sure the directory where Go installs binaries is on your </span><code>PATH</code><span data-zh="。服务端需要使用独立于客户端的模块缓存。">. The server needs a module cache separate from the client&#x27;s.</span></p>
+            <div class="terminal">
+              <div class="terminal-command"><code id="self-command">go install github.com/goproxy/goproxy/cmd/goproxy@latest &amp;&amp;
+GOMODCACHE=/tmp/goproxy-gomodcache goproxy server --address localhost:8080</code></div>
+              <button
+                type="button"
+                data-copy="self-command"
+                aria-label="Copy the self-hosting commands"
+                data-zh-label="复制自建代理命令"
+              >
+                <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-copy"></use></svg>
+                <span data-zh="复制">Copy</span>
+              </button>
+            </div>
+            <p><span data-zh="要测试本地服务，可将客户端的 ">To try the server, set the client&#x27;s </span><code>GOPROXY</code><span data-zh=" 设置为 "> to </span><code>http://localhost:8080</code><span data-zh="。">.</span></p>
+          </section>
+        </div>
+      </div>
+    </main>
+    <footer class="site-footer">
+      <div class="wrap footer-links">
+        <a href="https://www.qiniu.com/" data-zh="七牛云">Qiniu Cloud</a>
+        <span aria-hidden="true">&middot;</span>
+        <a class="footer-registration" href="https://beian.miit.gov.cn/">沪ICP备11037377号-56</a>
+        <span aria-hidden="true">&middot;</span>
+        <a href="https://github.com/goproxy/goproxy.cn/issues" data-zh="反馈问题">Report an issue</a>
+      </div>
+    </footer>
+    <div
+      id="announcement"
+      class="sr-only"
+      role="status"
+      data-zh-copied="已复制"
+      data-zh-copy-failed="复制失败"
+    ></div>
+  </body>
+</html>
