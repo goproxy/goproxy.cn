@@ -18,7 +18,6 @@ let language = readLanguage() || browserLanguage;
 
 const localeListeners = [];
 const text = (english, chinese) => language === "zh" ? chinese : english;
-const select = (query) => document.querySelector(query);
 
 function readLanguage() {
   try {
@@ -95,8 +94,8 @@ function setupGuide() {
   const buttons = [...document.querySelectorAll("[data-setup]")];
   if (!buttons.length) return;
 
-  const command = select("#setup-command");
-  const note = select("#setup-note");
+  const command = document.getElementById("setup-command");
+  const note = document.getElementById("setup-note");
   const defaults = { command: command.textContent, note: note.textContent, zhNote: note.dataset.zhNote };
   let active = buttons.find((button) => button.getAttribute("aria-pressed") === "true");
 
@@ -105,9 +104,7 @@ function setupGuide() {
     command.textContent = value ?? defaults.command;
     note.textContent = text(english ?? defaults.note, chinese ?? defaults.zhNote);
     for (const button of buttons) {
-      const selected = button === active;
-      button.classList.toggle("selected", selected);
-      button.setAttribute("aria-pressed", selected);
+      button.setAttribute("aria-pressed", button === active);
     }
   };
 
@@ -121,58 +118,62 @@ function setupGuide() {
 }
 
 function diagnostics() {
-  const button = select("#run-probe");
+  const button = document.getElementById("run-probe");
   if (!button) return;
-  const messages = select(".diagnostic-panel").dataset;
-  const moduleVersion = "v0.3.2";
-  const endpoints = {
+  const messages = button.closest(".diagnostic-panel").dataset;
+  const moduleVersion = "v0.3.0";
+  const checks = Object.entries({
     module: `/golang.org/x/text/@v/${moduleVersion}.info`,
     checksum: "/sumdb/sum.golang.org/supported",
-  };
-  const probeStates = new Map();
+  }).map(([name, path]) => ({
+    name,
+    path,
+    output: document.getElementById(`${name}-result`),
+    dot: document.getElementById(`${name}-dot`),
+    result: { state: "idle" },
+  }));
 
   function render() {
-    for (const key of Object.keys(endpoints)) {
-      const result = probeStates.get(key) || {};
-      const message = {
+    for (const check of checks) {
+      const { state, http, time } = check.result;
+      check.output.textContent = {
         idle: text("Not run", messages.zhIdle),
         running: text("Checking...", messages.zhRunning),
-        ok: "HTTP " + result.http + " / " + result.time + " ms",
-        http: "HTTP " + result.http,
-        invalid: "HTTP " + result.http + " / " + text("Unexpected metadata", messages.zhInvalid),
+        ok: "HTTP " + http + " / " + time + " ms",
+        http: "HTTP " + http,
+        invalid: "HTTP " + http + " / " + text("Unexpected metadata", messages.zhInvalid),
         timeout: text("Timed out", messages.zhTimeout),
         failed: text("Could not read the response", messages.zhFailed),
-      }[result.state || "idle"];
-      select("#" + key + "-result").textContent = message;
-      select("#" + key + "-dot").dataset.state = ["http", "invalid", "timeout"].includes(result.state)
+      }[state];
+      check.dot.dataset.state = ["http", "invalid", "timeout"].includes(state)
         ? "failed"
-        : result.state || "idle";
+        : state;
     }
   }
 
-  async function probe(key, path) {
+  async function probe(check) {
     const start = performance.now();
     try {
-      const response = await fetch(path, {
+      const response = await fetch(check.path, {
         cache: "no-store",
         credentials: "omit",
         signal: AbortSignal.timeout(6500),
       });
       let state = response.status === 200 ? "ok" : "http";
-      if (state === "ok" && key === "module") {
+      if (state === "ok" && check.name === "module") {
         const metadata = await response.json().catch((error) => {
           if (error.name === "SyntaxError") return null;
           throw error;
         });
         if (metadata?.Version !== moduleVersion) state = "invalid";
       }
-      probeStates.set(key, {
+      check.result = {
         state,
         http: response.status,
         time: Math.round(performance.now() - start),
-      });
+      };
     } catch (error) {
-      probeStates.set(key, { state: error.name === "TimeoutError" ? "timeout" : "failed" });
+      check.result = { state: error.name === "TimeoutError" ? "timeout" : "failed" };
     }
     render();
   }
@@ -181,10 +182,9 @@ function diagnostics() {
     if (button.getAttribute("aria-disabled") === "true") return;
     button.setAttribute("aria-disabled", "true");
     try {
-      const entries = Object.entries(endpoints);
-      for (const [key] of entries) probeStates.set(key, { state: "running" });
+      for (const check of checks) check.result = { state: "running" };
       render();
-      await Promise.all(entries.map(([key, path]) => probe(key, path)));
+      await Promise.all(checks.map(probe));
     } finally {
       button.removeAttribute("aria-disabled");
     }

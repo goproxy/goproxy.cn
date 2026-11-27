@@ -68,7 +68,7 @@
           <span class="probe-dot" id="module-dot" aria-hidden="true"></span>
           <div>
             <strong id="module-label" data-zh="模块版本元数据">Module version metadata</strong>
-            <code>/golang.org/x/text/@v/v0.3.2.info</code>
+            <code>/golang.org/x/text/@v/v0.3.0.info</code>
           </div>
           <span
             class="probe-result"
@@ -108,12 +108,13 @@
           default checksum database.
         </p>
         <div class="terminal">
-          <div class="terminal-command"><code id="terminal-probe">curl -fsS -w '\n' https://goproxy.cn/golang.org/x/text/@v/v0.3.2.info
-curl -fsS -o /dev/null -w '%{http_code}\n' https://goproxy.cn/sumdb/sum.golang.org/supported</code></div>
+          <div class="terminal-command"><code id="terminal-probe">curl --fail-early -fsS -w '\nHTTP %{http_code}\n' \
+  https://goproxy.cn/golang.org/x/text/@v/v0.3.0.info \
+  https://goproxy.cn/sumdb/sum.golang.org/supported</code></div>
           <button
             type="button"
             data-copy="terminal-probe"
-            aria-label="Copy the curl commands"
+            aria-label="Copy the curl command"
             data-zh-label="复制 curl 命令"
           >
             <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-copy"></use></svg>
@@ -134,7 +135,7 @@ curl -fsS -o /dev/null -w '%{http_code}\n' https://goproxy.cn/sumdb/sum.golang.o
   GOMODCACHE="$probe_cache" GOWORK=off \
     GOPROXY=https://goproxy.cn GONOPROXY=none \
     GOSUMDB=sum.golang.org GONOSUMDB=none \
-    go mod download -json golang.org/x/text@v0.3.2
+    go mod download -json golang.org/x/text@v0.3.0
 )</code></div>
           <button
             type="button"
@@ -167,7 +168,7 @@ curl -fsS -o /dev/null -w '%{http_code}\n' https://goproxy.cn/sumdb/sum.golang.o
       <div class="wrap footer-links">
         <a href="https://www.qiniu.com/" data-zh="七牛云">Qiniu Cloud</a>
         <span aria-hidden="true">&middot;</span>
-        <a class="footer-registration" href="https://beian.miit.gov.cn/">沪ICP备11037377号-56</a>
+        <a href="https://beian.miit.gov.cn/">沪ICP备11037377号-56</a>
         <span aria-hidden="true">&middot;</span>
         <a href="https://github.com/goproxy/goproxy.cn/issues" data-zh="反馈问题">Report an issue</a>
       </div>
